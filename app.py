@@ -5,7 +5,15 @@ import hashlib
 
 # --- CONFIG ---
 genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
-model = genai.GenerativeModel("gemini-1.5-flash")
+
+# Preferred models in order
+PREFERRED_MODELS = [
+    "gemini-2.0-flash",
+    "gemini-2.0-flash-lite",
+    "gemini-1.5-flash",
+    "gemini-1.5-pro",
+    "gemini-pro"
+]
 
 # --- DATABASE SETUP ---
 def init_db():
@@ -42,31 +50,100 @@ def login_user(username, password):
     conn.close()
     return result is not None
 
+# --- AI MODEL HELPERS ---
+@st.cache_data(ttl=3600)
+def get_available_models():
+    available = []
+    try:
+        for m in genai.list_models():
+            methods = getattr(m, "supported_generation_methods", [])
+            if "generateContent" in methods:
+                name = getattr(m, "name", "")
+                if name.startswith("models/"):
+                    name = name.replace("models/", "", 1)
+                if name:
+                    available.append(name)
+    except Exception:
+        # If listing models fails, we will still try preferred models directly
+        pass
+    return available
+
+def extract_response_text(response):
+    try:
+        if hasattr(response, "text") and response.text:
+            return response.text
+    except Exception:
+        pass
+
+    try:
+        parts = []
+        if hasattr(response, "candidates"):
+            for candidate in response.candidates:
+                content = getattr(candidate, "content", None)
+                if content and hasattr(content, "parts"):
+                    for part in content.parts:
+                        text = getattr(part, "text", None)
+                        if text:
+                            parts.append(text)
+        if parts:
+            return "\n".join(parts)
+    except Exception:
+        pass
+
+    return None
+
+def generate_with_fallback(prompt):
+    available_models = get_available_models()
+
+    if available_models:
+        models_to_try = [m for m in PREFERRED_MODELS if m in available_models]
+        extra_models = [m for m in available_models if m not in models_to_try and "gemini" in m.lower()]
+        models_to_try.extend(extra_models)
+    else:
+        models_to_try = PREFERRED_MODELS[:]
+
+    errors = []
+
+    for model_name in models_to_try:
+        try:
+            model = genai.GenerativeModel(model_name)
+            response = model.generate_content(prompt)
+            text = extract_response_text(response)
+
+            if text and text.strip():
+                return text, model_name
+
+            errors.append(f"{model_name}: Empty response received")
+        except Exception as e:
+            errors.append(f"{model_name}: {str(e)}")
+
+    error_message = "\n".join(errors) if errors else "No model could be used."
+    raise RuntimeError(f"All Gemini models failed.\n\nDetails:\n{error_message}")
+
 # --- AI FUNCTIONS ---
 def generate_summary(standard, subject, topic):
     prompt = f"""
     You are an expert teacher for Class {standard} students.
     Generate a clear, simple, and well-structured summary for the following:
-    - Subject: {subject}
-    - Topic: {topic}
-    - Standard: Class {standard}
+    Subject: {subject}
+    Topic: {topic}
+    Standard: Class {standard}
 
     Include:
     1. Brief Introduction
-    2. Key Concepts (bullet points)
+    2. Key Concepts in bullet points
     3. Important Points to Remember
-    4. One simple real-life example (if applicable)
+    4. One simple real-life example if applicable
 
     Keep the language simple and easy to understand for a Class {standard} student.
     """
-    response = model.generate_content(prompt)
-    return response.text
+    return generate_with_fallback(prompt)
 
 def generate_quiz(standard, subject, topic):
     prompt = f"""
-    Create 5 multiple choice questions (MCQ) for Class {standard} students on:
-    - Subject: {subject}
-    - Topic: {topic}
+    Create 5 multiple choice questions for Class {standard} students on:
+    Subject: {subject}
+    Topic: {topic}
 
     Format each question as:
     Q1. Question here?
@@ -78,14 +155,13 @@ def generate_quiz(standard, subject, topic):
 
     Make questions clear and appropriate for Class {standard} level.
     """
-    response = model.generate_content(prompt)
-    return response.text
+    return generate_with_fallback(prompt)
 
 def generate_notes(standard, subject, topic):
     prompt = f"""
     Create short revision notes for Class {standard} students on:
-    - Subject: {subject}
-    - Topic: {topic}
+    Subject: {subject}
+    Topic: {topic}
 
     Format:
     - Use bullet points
@@ -96,23 +172,21 @@ def generate_notes(standard, subject, topic):
 
     Keep language simple for Class {standard} students.
     """
-    response = model.generate_content(prompt)
-    return response.text
+    return generate_with_fallback(prompt)
 
 def generate_qa(standard, subject, topic):
     prompt = f"""
     Generate 5 important exam questions with answers for Class {standard} students on:
-    - Subject: {subject}
-    - Topic: {topic}
+    Subject: {subject}
+    Topic: {topic}
 
     Format:
     Q1. Question?
-    Ans: Answer here (2-3 lines, exam style)
+    Ans: Answer here in 2 to 3 lines, exam style
 
     Make answers crisp and exam-ready for Class {standard} board exams.
     """
-    response = model.generate_content(prompt)
-    return response.text
+    return generate_with_fallback(prompt)
 
 # --- PAGE FUNCTIONS ---
 def login_page():
@@ -209,16 +283,20 @@ def main_app():
         st.markdown("---")
         col1, col2 = st.columns(2)
         with col1:
-            standard = st.selectbox("Select Your Class", STANDARDS)
+            standard = st.selectbox("Select Your Class", STANDARDS, key="summary_standard")
         with col2:
-            subject = st.selectbox("Select Subject", SUBJECTS[standard])
-        topic = st.text_input("Enter Topic Name", placeholder="e.g. Photosynthesis, Quadratic Equations...")
+            subject = st.selectbox("Select Subject", SUBJECTS[standard], key="summary_subject")
+        topic = st.text_input("Enter Topic Name", placeholder="e.g. Photosynthesis, Quadratic Equations...", key="summary_topic")
         if st.button("Generate Summary ✨", use_container_width=True):
             if topic:
-                with st.spinner("Generating your summary..."):
-                    result = generate_summary(standard, subject, topic)
-                st.success("✅ Summary Ready!")
-                st.markdown(result)
+                try:
+                    with st.spinner("Generating your summary..."):
+                        result, used_model = generate_summary(standard, subject, topic)
+                    st.success("✅ Summary Ready!")
+                    st.caption(f"Model used: {used_model}")
+                    st.markdown(result)
+                except Exception as e:
+                    st.error(f"❌ Failed to generate summary.\n\n{str(e)}")
             else:
                 st.warning("⚠️ Please enter a topic name.")
 
@@ -229,16 +307,20 @@ def main_app():
         st.markdown("---")
         col1, col2 = st.columns(2)
         with col1:
-            standard = st.selectbox("Select Your Class", STANDARDS)
+            standard = st.selectbox("Select Your Class", STANDARDS, key="quiz_standard")
         with col2:
-            subject = st.selectbox("Select Subject", SUBJECTS[standard])
-        topic = st.text_input("Enter Topic Name", placeholder="e.g. Newton's Laws, Trigonometry...")
+            subject = st.selectbox("Select Subject", SUBJECTS[standard], key="quiz_subject")
+        topic = st.text_input("Enter Topic Name", placeholder="e.g. Newton's Laws, Trigonometry...", key="quiz_topic")
         if st.button("Generate Quiz 🧠", use_container_width=True):
             if topic:
-                with st.spinner("Generating your quiz..."):
-                    result = generate_quiz(standard, subject, topic)
-                st.success("✅ Quiz Ready!")
-                st.markdown(result)
+                try:
+                    with st.spinner("Generating your quiz..."):
+                        result, used_model = generate_quiz(standard, subject, topic)
+                    st.success("✅ Quiz Ready!")
+                    st.caption(f"Model used: {used_model}")
+                    st.markdown(result)
+                except Exception as e:
+                    st.error(f"❌ Failed to generate quiz.\n\n{str(e)}")
             else:
                 st.warning("⚠️ Please enter a topic name.")
 
@@ -249,16 +331,20 @@ def main_app():
         st.markdown("---")
         col1, col2 = st.columns(2)
         with col1:
-            standard = st.selectbox("Select Your Class", STANDARDS)
+            standard = st.selectbox("Select Your Class", STANDARDS, key="notes_standard")
         with col2:
-            subject = st.selectbox("Select Subject", SUBJECTS[standard])
-        topic = st.text_input("Enter Topic Name", placeholder="e.g. French Revolution, Organic Chemistry...")
+            subject = st.selectbox("Select Subject", SUBJECTS[standard], key="notes_subject")
+        topic = st.text_input("Enter Topic Name", placeholder="e.g. French Revolution, Organic Chemistry...", key="notes_topic")
         if st.button("Generate Notes 📌", use_container_width=True):
             if topic:
-                with st.spinner("Generating revision notes..."):
-                    result = generate_notes(standard, subject, topic)
-                st.success("✅ Notes Ready!")
-                st.markdown(result)
+                try:
+                    with st.spinner("Generating revision notes..."):
+                        result, used_model = generate_notes(standard, subject, topic)
+                    st.success("✅ Notes Ready!")
+                    st.caption(f"Model used: {used_model}")
+                    st.markdown(result)
+                except Exception as e:
+                    st.error(f"❌ Failed to generate notes.\n\n{str(e)}")
             else:
                 st.warning("⚠️ Please enter a topic name.")
 
@@ -269,16 +355,20 @@ def main_app():
         st.markdown("---")
         col1, col2 = st.columns(2)
         with col1:
-            standard = st.selectbox("Select Your Class", STANDARDS)
+            standard = st.selectbox("Select Your Class", STANDARDS, key="qa_standard")
         with col2:
-            subject = st.selectbox("Select Subject", SUBJECTS[standard])
-        topic = st.text_input("Enter Topic Name", placeholder="e.g. Democracy, Thermodynamics...")
+            subject = st.selectbox("Select Subject", SUBJECTS[standard], key="qa_subject")
+        topic = st.text_input("Enter Topic Name", placeholder="e.g. Democracy, Thermodynamics...", key="qa_topic")
         if st.button("Generate Q&A ❓", use_container_width=True):
             if topic:
-                with st.spinner("Generating questions and answers..."):
-                    result = generate_qa(standard, subject, topic)
-                st.success("✅ Q&A Ready!")
-                st.markdown(result)
+                try:
+                    with st.spinner("Generating questions and answers..."):
+                        result, used_model = generate_qa(standard, subject, topic)
+                    st.success("✅ Q&A Ready!")
+                    st.caption(f"Model used: {used_model}")
+                    st.markdown(result)
+                except Exception as e:
+                    st.error(f"❌ Failed to generate Q&A.\n\n{str(e)}")
             else:
                 st.warning("⚠️ Please enter a topic name.")
 
