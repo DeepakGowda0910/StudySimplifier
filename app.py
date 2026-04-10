@@ -3,384 +3,184 @@ import google.generativeai as genai
 import sqlite3
 import hashlib
 
-# --- CONFIG ---
+# --- PAGE CONFIG ---
+st.set_page_config(page_title="StudyFiesta AI", page_icon="🎓", layout="wide")
+
+# --- CUSTOM CSS FOR PROFESSIONAL LOOK ---
+st.markdown("""
+    <style>
+    .main { background-color: #f8f9fa; }
+    .stButton>button {
+        width: 100%; border-radius: 8px; height: 3em;
+        background-color: #007bff; color: white; border: none; font-weight: bold;
+    }
+    .stButton>button:hover { background-color: #0056b3; color: white; }
+    .reportview-container .main .block-container { padding-top: 2rem; }
+    .sidebar .sidebar-content { background-image: linear-gradient(#2e3b4e,#2e3b4e); color: white; }
+    div.stSelectbox label, div.stTextInput label { font-weight: bold; color: #1f1f1f; }
+    .card {
+        background-color: white; padding: 20px; border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 20px;
+    }
+    h1, h2, h3 { color: #0e1117; }
+    </style>
+    """, unsafe_allow_html=True)
+
+# --- CONFIG & AI ---
 genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
+MODELS = ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-pro"]
 
-# Preferred models in order
-PREFERRED_MODELS = [
-    "gemini-2.0-flash",
-    "gemini-2.0-flash-lite",
-    "gemini-1.5-flash",
-    "gemini-1.5-pro",
-    "gemini-pro"
-]
+def generate_with_fallback(prompt):
+    for m in MODELS:
+        try:
+            model = genai.GenerativeModel(m)
+            response = model.generate_content(prompt)
+            return response.text, m
+        except: continue
+    return "Service temporarily unavailable.", "None"
 
-# --- DATABASE SETUP ---
+# --- DATABASE ---
 def init_db():
     conn = sqlite3.connect("users.db")
     c = conn.cursor()
-    c.execute('''CREATE TABLE IF NOT EXISTS users (
-        username TEXT PRIMARY KEY,
-        password TEXT NOT NULL
-    )''')
+    c.execute('CREATE TABLE IF NOT EXISTS users (username TEXT PRIMARY KEY, password TEXT)')
     conn.commit()
     conn.close()
 
-def hash_password(password):
-    return hashlib.sha256(password.encode()).hexdigest()
+def hash_p(p): return hashlib.sha256(p.encode()).hexdigest()
 
-def register_user(username, password):
-    conn = sqlite3.connect("users.db")
-    c = conn.cursor()
-    try:
-        c.execute("INSERT INTO users VALUES (?, ?)", (username, hash_password(password)))
-        conn.commit()
-        return True
-    except sqlite3.IntegrityError:
-        return False
-    finally:
-        conn.close()
+# --- COURSE ARCHITECTURE ---
+DATA_MAP = {
+    "Competitive Exams 🏆": {
+        "UPSC (Civil Services)": ["General Studies 1", "General Studies 2 (CSAT)", "History Optional", "Geography Optional", "Public Admin", "Ethics"],
+        "JEE (Mains/Adv)": ["Physics", "Chemistry", "Mathematics"],
+        "NEET": ["Biology", "Physics", "Chemistry"],
+        "GATE": ["Computer Science", "Mechanical", "Electrical", "Civil", "Electronics"],
+        "Banking/SSC": ["Quantitative Aptitude", "Reasoning", "English", "General Awareness"]
+    },
+    "Engineering & Tech 💻": {
+        "B.Tech / M.Tech": ["Computer Science (CSE)", "Information Technology (IT)", "Electronics (ECE)", "Mechanical (ME)", "Civil (CE)", "AI & Data Science"],
+        "Polytechnic Diploma": ["Mechanical", "Electrical", "Civil", "Computer"],
+        "BCA / MCA": ["Programming in C/C++", "Java & Python", "Database Management", "Software Engineering", "Web Development"]
+    },
+    "School (K-12) 🏫": {
+        "Class 10": ["Mathematics", "Science", "Social Science", "English", "Hindi"],
+        "Class 11 & 12": ["Physics", "Chemistry", "Mathematics", "Biology", "Accountancy", "Business Studies", "Economics", "History", "Psychology"]
+    },
+    "Degree & Masters 🎓": {
+        "Commerce (B.Com/M.Com)": ["Financial Accounting", "Corporate Tax", "Auditing", "Costing", "Management Accounting"],
+        "Science (B.Sc/M.Sc)": ["Physics", "Chemistry", "Maths", "Zoology", "Botany", "Biotechnology"],
+        "Management (BBA/MBA)": ["Marketing", "Finance", "HR", "Operations", "Strategy"],
+        "Arts (B.A/M.A)": ["English Literature", "Political Science", "Economics", "History", "Psychology"]
+    }
+}
 
-def login_user(username, password):
-    conn = sqlite3.connect("users.db")
-    c = conn.cursor()
-    c.execute("SELECT * FROM users WHERE username=? AND password=?",
-              (username, hash_password(password)))
-    result = c.fetchone()
-    conn.close()
-    return result is not None
+BOARDS = ["CBSE", "ICSE", "IGCSE", "State Board (Maharashtra)", "State Board (Karnataka)", "State Board (UP)", "State Board (Others)"]
 
-# --- AI MODEL HELPERS ---
-@st.cache_data(ttl=3600)
-def get_available_models():
-    available = []
-    try:
-        for m in genai.list_models():
-            methods = getattr(m, "supported_generation_methods", [])
-            if "generateContent" in methods:
-                name = getattr(m, "name", "")
-                if name.startswith("models/"):
-                    name = name.replace("models/", "", 1)
-                if name:
-                    available.append(name)
-    except Exception:
-        # If listing models fails, we will still try preferred models directly
-        pass
-    return available
-
-def extract_response_text(response):
-    try:
-        if hasattr(response, "text") and response.text:
-            return response.text
-    except Exception:
-        pass
-
-    try:
-        parts = []
-        if hasattr(response, "candidates"):
-            for candidate in response.candidates:
-                content = getattr(candidate, "content", None)
-                if content and hasattr(content, "parts"):
-                    for part in content.parts:
-                        text = getattr(part, "text", None)
-                        if text:
-                            parts.append(text)
-        if parts:
-            return "\n".join(parts)
-    except Exception:
-        pass
-
-    return None
-
-def generate_with_fallback(prompt):
-    available_models = get_available_models()
-
-    if available_models:
-        models_to_try = [m for m in PREFERRED_MODELS if m in available_models]
-        extra_models = [m for m in available_models if m not in models_to_try and "gemini" in m.lower()]
-        models_to_try.extend(extra_models)
-    else:
-        models_to_try = PREFERRED_MODELS[:]
-
-    errors = []
-
-    for model_name in models_to_try:
-        try:
-            model = genai.GenerativeModel(model_name)
-            response = model.generate_content(prompt)
-            text = extract_response_text(response)
-
-            if text and text.strip():
-                return text, model_name
-
-            errors.append(f"{model_name}: Empty response received")
-        except Exception as e:
-            errors.append(f"{model_name}: {str(e)}")
-
-    error_message = "\n".join(errors) if errors else "No model could be used."
-    raise RuntimeError(f"All Gemini models failed.\n\nDetails:\n{error_message}")
-
-# --- AI FUNCTIONS ---
-def generate_summary(standard, subject, topic):
-    prompt = f"""
-    You are an expert teacher for Class {standard} students.
-    Generate a clear, simple, and well-structured summary for the following:
-    Subject: {subject}
-    Topic: {topic}
-    Standard: Class {standard}
-
-    Include:
-    1. Brief Introduction
-    2. Key Concepts in bullet points
-    3. Important Points to Remember
-    4. One simple real-life example if applicable
-
-    Keep the language simple and easy to understand for a Class {standard} student.
-    """
-    return generate_with_fallback(prompt)
-
-def generate_quiz(standard, subject, topic):
-    prompt = f"""
-    Create 5 multiple choice questions for Class {standard} students on:
-    Subject: {subject}
-    Topic: {topic}
-
-    Format each question as:
-    Q1. Question here?
-    A) Option 1
-    B) Option 2
-    C) Option 3
-    D) Option 4
-    Answer: A
-
-    Make questions clear and appropriate for Class {standard} level.
-    """
-    return generate_with_fallback(prompt)
-
-def generate_notes(standard, subject, topic):
-    prompt = f"""
-    Create short revision notes for Class {standard} students on:
-    Subject: {subject}
-    Topic: {topic}
-
-    Format:
-    - Use bullet points
-    - Keep it concise
-    - Highlight key terms in CAPS
-    - Add important formulas if applicable
-    - Make it exam-ready
-
-    Keep language simple for Class {standard} students.
-    """
-    return generate_with_fallback(prompt)
-
-def generate_qa(standard, subject, topic):
-    prompt = f"""
-    Generate 5 important exam questions with answers for Class {standard} students on:
-    Subject: {subject}
-    Topic: {topic}
-
-    Format:
-    Q1. Question?
-    Ans: Answer here in 2 to 3 lines, exam style
-
-    Make answers crisp and exam-ready for Class {standard} board exams.
-    """
-    return generate_with_fallback(prompt)
-
-# --- PAGE FUNCTIONS ---
-def login_page():
-    st.title("📚 StudySimplifier")
-    st.subheader("Your AI-Powered Exam Preparation Assistant")
-    st.markdown("---")
-
-    tab1, tab2 = st.tabs(["🔐 Login", "📝 Register"])
-
-    with tab1:
-        st.subheader("Login to your account")
-        username = st.text_input("Username", key="login_user")
-        password = st.text_input("Password", type="password", key="login_pass")
-        if st.button("Login", use_container_width=True):
-            if login_user(username, password):
-                st.session_state.logged_in = True
-                st.session_state.username = username
-                st.success(f"Welcome back, {username}! 🎉")
-                st.rerun()
-            else:
-                st.error("❌ Invalid username or password.")
-
-    with tab2:
-        st.subheader("Create a new account")
-        new_username = st.text_input("Choose a Username", key="reg_user")
-        new_password = st.text_input("Choose a Password", type="password", key="reg_pass")
-        confirm_password = st.text_input("Confirm Password", type="password", key="reg_confirm")
-        if st.button("Register", use_container_width=True):
-            if new_password != confirm_password:
-                st.error("❌ Passwords do not match.")
-            elif len(new_username) < 3:
-                st.error("❌ Username must be at least 3 characters.")
-            elif len(new_password) < 6:
-                st.error("❌ Password must be at least 6 characters.")
-            elif register_user(new_username, new_password):
-                st.success("✅ Account created! Please login.")
-            else:
-                st.error("❌ Username already exists. Try another.")
+# --- APP LOGIC ---
+def get_chapters(category, course, subject):
+    prompt = f"Act as a top professor for {course}. List only the official chapter names for {subject}. Format: Comma-separated list only. No numbers, no intro."
+    res, _ = generate_with_fallback(prompt)
+    return [c.strip() for c in res.split(",") if len(c.strip()) > 2]
 
 def main_app():
-    # --- SIDEBAR ---
+    # Sidebar
     with st.sidebar:
-        st.title("📚 StudySimplifier")
-        st.markdown(f"👋 Hello, **{st.session_state.username}**!")
-        st.markdown("---")
-        st.markdown("### 🎯 Navigation")
-        page = st.radio("Go to:", [
-            "🏠 Home",
-            "📝 Summary Generator",
-            "🧠 Quiz Generator",
-            "📌 Revision Notes",
-            "❓ Q&A Generator"
-        ])
-        st.markdown("---")
-        if st.button("🚪 Logout", use_container_width=True):
+        st.title("🎓 StudyFiesta")
+        st.markdown(f"**Welcome, {st.session_state.username}**")
+        st.divider()
+        tool = st.radio("SELECT TOOL", ["📝 Summary", "🧠 Quiz", "📌 Revision Notes", "❓ Exam Q&A"])
+        st.divider()
+        if st.button("Logout"):
             st.session_state.logged_in = False
-            st.session_state.username = ""
             st.rerun()
 
-    # --- STANDARD & SUBJECT SELECTION ---
-    STANDARDS = [str(i) for i in range(10, 13)]  # Class 10, 11, 12
-    SUBJECTS = {
-        "10": ["Mathematics", "Science", "Social Science", "English", "Hindi"],
-        "11": ["Physics", "Chemistry", "Mathematics", "Biology", "Economics",
-               "Accountancy", "Business Studies", "English"],
-        "12": ["Physics", "Chemistry", "Mathematics", "Biology", "Economics",
-               "Accountancy", "Business Studies", "English"]
-    }
-
-    # --- HOME PAGE ---
-    if page == "🏠 Home":
-        st.title("🏠 Welcome to StudySimplifier!")
-        st.markdown(f"### Hello **{st.session_state.username}**! Ready to study smarter? 🚀")
-        st.markdown("---")
-        col1, col2, col3, col4 = st.columns(4)
-        col1.metric("📝 Summaries", "Instant")
-        col2.metric("🧠 Quizzes", "Auto-generated")
-        col3.metric("📌 Notes", "Exam-ready")
-        col4.metric("❓ Q&A", "Board-style")
-        st.markdown("---")
-        st.info("👈 Use the sidebar to navigate to any feature!")
-        st.markdown("""
-        ### What can I do for you?
-        - 📝 **Summary Generator** — Get instant topic summaries
-        - 🧠 **Quiz Generator** — Test your knowledge with MCQs
-        - 📌 **Revision Notes** — Quick bullet-point notes
-        - ❓ **Q&A Generator** — Board exam style questions & answers
-        """)
-
-    # --- SUMMARY PAGE ---
-    elif page == "📝 Summary Generator":
-        st.title("📝 Summary Generator")
-        st.markdown("Get instant AI-generated summaries for any topic!")
-        st.markdown("---")
-        col1, col2 = st.columns(2)
-        with col1:
-            standard = st.selectbox("Select Your Class", STANDARDS, key="summary_standard")
-        with col2:
-            subject = st.selectbox("Select Subject", SUBJECTS[standard], key="summary_subject")
-        topic = st.text_input("Enter Topic Name", placeholder="e.g. Photosynthesis, Quadratic Equations...", key="summary_topic")
-        if st.button("Generate Summary ✨", use_container_width=True):
-            if topic:
-                try:
-                    with st.spinner("Generating your summary..."):
-                        result, used_model = generate_summary(standard, subject, topic)
-                    st.success("✅ Summary Ready!")
-                    st.caption(f"Model used: {used_model}")
-                    st.markdown(result)
-                except Exception as e:
-                    st.error(f"❌ Failed to generate summary.\n\n{str(e)}")
+    # Header
+    st.markdown(f"# {tool}")
+    st.write("Streamlining your preparation with AI precision.")
+    
+    # Selectors
+    with st.container():
+        st.markdown('<div class="card">', unsafe_allow_html=True)
+        c1, c2, c3 = st.columns(3)
+        
+        with c1:
+            cat = st.selectbox("Category", list(DATA_MAP.keys()))
+        with c2:
+            course = st.selectbox("Exam / Course", list(DATA_MAP[cat].keys()))
+        with c3:
+            # Add Board selection for School category
+            if "School" in cat:
+                board = st.selectbox("Education Board", BOARDS)
             else:
-                st.warning("⚠️ Please enter a topic name.")
+                board = "University/National Syllabus"
 
-    # --- QUIZ PAGE ---
-    elif page == "🧠 Quiz Generator":
-        st.title("🧠 Quiz Generator")
-        st.markdown("Test your knowledge with AI-generated MCQs!")
-        st.markdown("---")
-        col1, col2 = st.columns(2)
-        with col1:
-            standard = st.selectbox("Select Your Class", STANDARDS, key="quiz_standard")
-        with col2:
-            subject = st.selectbox("Select Subject", SUBJECTS[standard], key="quiz_subject")
-        topic = st.text_input("Enter Topic Name", placeholder="e.g. Newton's Laws, Trigonometry...", key="quiz_topic")
-        if st.button("Generate Quiz 🧠", use_container_width=True):
-            if topic:
-                try:
-                    with st.spinner("Generating your quiz..."):
-                        result, used_model = generate_quiz(standard, subject, topic)
-                    st.success("✅ Quiz Ready!")
-                    st.caption(f"Model used: {used_model}")
-                    st.markdown(result)
-                except Exception as e:
-                    st.error(f"❌ Failed to generate quiz.\n\n{str(e)}")
-            else:
-                st.warning("⚠️ Please enter a topic name.")
+        c4, c5 = st.columns(2)
+        with c4:
+            sub = st.selectbox("Subject", DATA_MAP[cat][course])
+        
+        # Chapter Fetching
+        if "last_sub_key" not in st.session_state or st.session_state.last_sub_key != f"{course}_{sub}":
+            with st.spinner("AI Fetching Syllabus..."):
+                st.session_state.current_chapters = get_chapters(cat, course, sub)
+                st.session_state.last_sub_key = f"{course}_{sub}"
+        
+        with c5:
+            chap = st.selectbox("Chapter / Topic", st.session_state.current_chapters)
+        
+        st.markdown('</div>', unsafe_allow_html=True)
 
-    # --- NOTES PAGE ---
-    elif page == "📌 Revision Notes":
-        st.title("📌 Revision Notes")
-        st.markdown("Get quick, exam-ready revision notes!")
-        st.markdown("---")
-        col1, col2 = st.columns(2)
-        with col1:
-            standard = st.selectbox("Select Your Class", STANDARDS, key="notes_standard")
-        with col2:
-            subject = st.selectbox("Select Subject", SUBJECTS[standard], key="notes_subject")
-        topic = st.text_input("Enter Topic Name", placeholder="e.g. French Revolution, Organic Chemistry...", key="notes_topic")
-        if st.button("Generate Notes 📌", use_container_width=True):
-            if topic:
-                try:
-                    with st.spinner("Generating revision notes..."):
-                        result, used_model = generate_notes(standard, subject, topic)
-                    st.success("✅ Notes Ready!")
-                    st.caption(f"Model used: {used_model}")
-                    st.markdown(result)
-                except Exception as e:
-                    st.error(f"❌ Failed to generate notes.\n\n{str(e)}")
-            else:
-                st.warning("⚠️ Please enter a topic name.")
+    # Execution
+    if st.button(f"Generate {tool} ✨"):
+        with st.spinner(f"Analyzing {chap} for {course}..."):
+            prompt_map = {
+                "📝 Summary": f"Generate a professional, structured academic summary for {chap} in {sub} for {course} students. Use headings and bullet points.",
+                "🧠 Quiz": f"Generate 5 high-quality MCQs for {chap} ({sub} - {course}). Include options A-D and the correct Answer with a brief explanation.",
+                "📌 Revision Notes": f"Create concise revision notes for {chap} ({sub} - {course}). Highlight key terms, formulas, and critical concepts in CAPS.",
+                "❓ Exam Q&A": f"List 5 highly probable exam questions and detailed professional answers for {chap} ({sub} - {course})."
+            }
+            
+            final_prompt = f"{prompt_map[tool]} Important: If there are mathematical formulas, use LaTeX format $$...$$. Use clear formatting."
+            result, model_name = generate_with_fallback(final_prompt)
+            
+            st.markdown("---")
+            st.success(f"Preparation Material Ready! (Powered by {model_name})")
+            
+            # Display result in a nice box
+            st.markdown(f'<div class="card">{result}</div>', unsafe_allow_html=True)
 
-    # --- Q&A PAGE ---
-    elif page == "❓ Q&A Generator":
-        st.title("❓ Q&A Generator")
-        st.markdown("Get board exam style questions and answers!")
-        st.markdown("---")
-        col1, col2 = st.columns(2)
-        with col1:
-            standard = st.selectbox("Select Your Class", STANDARDS, key="qa_standard")
-        with col2:
-            subject = st.selectbox("Select Subject", SUBJECTS[standard], key="qa_subject")
-        topic = st.text_input("Enter Topic Name", placeholder="e.g. Democracy, Thermodynamics...", key="qa_topic")
-        if st.button("Generate Q&A ❓", use_container_width=True):
-            if topic:
-                try:
-                    with st.spinner("Generating questions and answers..."):
-                        result, used_model = generate_qa(standard, subject, topic)
-                    st.success("✅ Q&A Ready!")
-                    st.caption(f"Model used: {used_model}")
-                    st.markdown(result)
-                except Exception as e:
-                    st.error(f"❌ Failed to generate Q&A.\n\n{str(e)}")
-            else:
-                st.warning("⚠️ Please enter a topic name.")
+# --- AUTH UI ---
+def auth_ui():
+    st.title("📚 AI StudyFiesta")
+    st.subheader("Professional Exam Preparation Platform")
+    
+    tab1, tab2 = st.tabs(["Login", "Register"])
+    with tab1:
+        u = st.text_input("Username", key="login_u")
+        p = st.text_input("Password", type="password", key="login_p")
+        if st.button("Login"):
+            conn = sqlite3.connect("users.db")
+            c = conn.cursor()
+            c.execute("SELECT * FROM users WHERE username=? AND password=?", (u, hash_p(p)))
+            if c.fetchone():
+                st.session_state.logged_in = True
+                st.session_state.username = u
+                st.rerun()
+            else: st.error("Invalid Credentials")
+    with tab2:
+        nu = st.text_input("New Username")
+        np = st.text_input("New Password", type="password")
+        if st.button("Sign Up"):
+            try:
+                conn = sqlite3.connect("users.db")
+                c = conn.cursor()
+                c.execute("INSERT INTO users VALUES (?, ?)", (nu, hash_p(np)))
+                conn.commit()
+                st.success("Account Created! Go to Login tab.")
+            except: st.error("Username already exists.")
 
-# --- MAIN ENTRY POINT ---
+# --- START ---
 init_db()
-
-if "logged_in" not in st.session_state:
-    st.session_state.logged_in = False
-if "username" not in st.session_state:
-    st.session_state.username = ""
-
-if st.session_state.logged_in:
-    main_app()
-else:
-    login_page()
+if "logged_in" not in st.session_state: st.session_state.logged_in = False
+if st.session_state.logged_in: main_app()
+else: auth_ui()
