@@ -2,50 +2,79 @@ import streamlit as st
 import google.generativeai as genai
 import sqlite3
 import hashlib
+import io
+import re
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.units import cm
+from reportlab.lib import colors
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, HRFlowable
+from reportlab.lib.enums import TA_LEFT, TA_CENTER
 
-# --- PAGE CONFIG ---
+# =========================================================
+# PAGE CONFIG
+# =========================================================
 st.set_page_config(page_title="StudyFiesta AI", page_icon="🎓", layout="wide")
 
-# --- CUSTOM CSS ---
+# =========================================================
+# CUSTOM CSS
+# =========================================================
 st.markdown("""
     <style>
     .main { background-color: #f8f9fa; }
     .stButton>button {
-        width: 100%; border-radius: 8px; height: 3em;
-        background-color: #007bff; color: white; border: none; font-weight: bold;
+        width: 100%;
+        border-radius: 8px;
+        height: 3em;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        font-weight: bold;
     }
-    .stButton>button:hover { background-color: #0056b3; color: white; }
-    .reportview-container .main .block-container { padding-top: 2rem; }
-    div.stSelectbox label, div.stTextInput label { font-weight: bold; color: #1f1f1f; }
+    .stButton>button:hover {
+        background-color: #0056b3;
+        color: white;
+    }
+    .reportview-container .main .block-container {
+        padding-top: 2rem;
+    }
+    div.stSelectbox label,
+    div.stTextInput label,
+    div.stRadio label {
+        font-weight: bold;
+        color: #1f1f1f;
+    }
     .card {
-        background-color: white; padding: 20px; border-radius: 10px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.08); margin-bottom: 20px;
+        background-color: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.08);
+        margin-bottom: 20px;
     }
     h1, h2, h3 { color: #0e1117; }
     </style>
 """, unsafe_allow_html=True)
 
-# =====================================================================
-# AI CONFIG  —  Step 3 improved: stable model order + generation config
-# =====================================================================
+# =========================================================
+# AI CONFIG
+# =========================================================
 genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
 
-PRIMARY_MODEL  = "gemini-2.0-flash"
-BACKUP_MODELS  = ["gemini-2.5-flash", "gemini-1.5-flash"]
+PRIMARY_MODEL = "gemini-2.0-flash"
+BACKUP_MODELS = ["gemini-2.5-flash", "gemini-1.5-flash"]
 
 def generate_with_fallback(prompt):
     model_list = [PRIMARY_MODEL] + BACKUP_MODELS
-    last_error  = None
-
+    last_error = None
     for model_name in model_list:
         try:
             model = genai.GenerativeModel(
                 model_name,
                 generation_config={
-                    "temperature":      0.4,
-                    "top_p":            0.9,
-                    "top_k":            40,
-                    "max_output_tokens": 2048,
+                    "temperature": 0.5,
+                    "top_p": 0.9,
+                    "top_k": 40,
+                    "max_output_tokens": 4096,
                 },
             )
             response = model.generate_content(prompt)
@@ -53,13 +82,147 @@ def generate_with_fallback(prompt):
                 return response.text.strip(), model_name
         except Exception as e:
             last_error = str(e)
-            continue
-
     return f"AI generation failed. Last error: {last_error}", "None"
 
-# =====================================================================
+# =========================================================
+# PDF GENERATOR
+# =========================================================
+def generate_pdf(title, subtitle, content_text):
+    """Convert plain markdown-like text into a clean downloadable PDF."""
+    buffer = io.BytesIO()
+    doc = SimpleDocTemplate(
+        buffer,
+        pagesize=A4,
+        rightMargin=2 * cm,
+        leftMargin=2 * cm,
+        topMargin=2 * cm,
+        bottomMargin=2 * cm,
+    )
+
+    styles = getSampleStyleSheet()
+
+    style_title = ParagraphStyle(
+        "CustomTitle",
+        parent=styles["Title"],
+        fontSize=20,
+        textColor=colors.HexColor("#007bff"),
+        spaceAfter=6,
+        alignment=TA_CENTER,
+        fontName="Helvetica-Bold",
+    )
+    style_subtitle = ParagraphStyle(
+        "CustomSubtitle",
+        parent=styles["Normal"],
+        fontSize=11,
+        textColor=colors.HexColor("#555555"),
+        spaceAfter=14,
+        alignment=TA_CENTER,
+        fontName="Helvetica",
+    )
+    style_heading = ParagraphStyle(
+        "CustomHeading",
+        parent=styles["Heading2"],
+        fontSize=13,
+        textColor=colors.HexColor("#0056b3"),
+        spaceBefore=14,
+        spaceAfter=4,
+        fontName="Helvetica-Bold",
+    )
+    style_body = ParagraphStyle(
+        "CustomBody",
+        parent=styles["Normal"],
+        fontSize=10,
+        leading=16,
+        textColor=colors.HexColor("#1a1a1a"),
+        spaceAfter=4,
+        fontName="Helvetica",
+        alignment=TA_LEFT,
+    )
+    style_bullet = ParagraphStyle(
+        "CustomBullet",
+        parent=styles["Normal"],
+        fontSize=10,
+        leading=16,
+        textColor=colors.HexColor("#1a1a1a"),
+        spaceAfter=3,
+        leftIndent=16,
+        fontName="Helvetica",
+        bulletIndent=6,
+    )
+    style_footer = ParagraphStyle(
+        "Footer",
+        parent=styles["Normal"],
+        fontSize=8,
+        textColor=colors.HexColor("#aaaaaa"),
+        alignment=TA_CENTER,
+    )
+
+    story = []
+
+    # Title block
+    story.append(Paragraph(title, style_title))
+    story.append(Paragraph(subtitle, style_subtitle))
+    story.append(HRFlowable(width="100%", thickness=1.2, color=colors.HexColor("#007bff")))
+    story.append(Spacer(1, 0.4 * cm))
+
+    # Parse content line by line
+    lines = content_text.split("\n")
+    for line in lines:
+        stripped = line.strip()
+        if not stripped:
+            story.append(Spacer(1, 0.2 * cm))
+            continue
+
+        # Remove markdown bold (**text**)
+        stripped = re.sub(r"\*\*(.+?)\*\*", r"\1", stripped)
+        # Remove markdown italic (*text*)
+        stripped = re.sub(r"\*(.+?)\*", r"\1", stripped)
+        # Remove LaTeX math markers for PDF
+        stripped = re.sub(r"\$$\$$(.+?)\$$\$$", r"[\1]", stripped)
+        stripped = re.sub(r"\\$$(.+?)\\$$", r"[\1]", stripped)
+        # Escape XML special characters for ReportLab
+        stripped = stripped.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+
+        # Heading detection (##, ###, or ALL CAPS short lines, or numbered like "1. OVERVIEW")
+        if stripped.startswith("## ") or stripped.startswith("### "):
+            text = stripped.lstrip("#").strip()
+            story.append(Spacer(1, 0.15 * cm))
+            story.append(Paragraph(text, style_heading))
+
+        elif re.match(r"^\d+\.\s+[A-Z ]{4,}$", stripped):
+            # e.g. "1. OVERVIEW" or "5. QUICK REVISION NOTES"
+            story.append(Spacer(1, 0.15 * cm))
+            story.append(Paragraph(stripped, style_heading))
+
+        elif stripped.startswith("- ") or stripped.startswith("• "):
+            # Bullet point
+            text = stripped[2:].strip()
+            story.append(Paragraph(f"• {text}", style_bullet))
+
+        elif stripped.startswith("* "):
+            text = stripped[2:].strip()
+            story.append(Paragraph(f"• {text}", style_bullet))
+
+        elif re.match(r"^\d+\.\s", stripped) and len(stripped) < 120:
+            # Numbered list item (short line = list item)
+            story.append(Paragraph(stripped, style_bullet))
+
+        else:
+            story.append(Paragraph(stripped, style_body))
+
+    # Footer
+    story.append(Spacer(1, 0.6 * cm))
+    story.append(HRFlowable(width="100%", thickness=0.5, color=colors.HexColor("#cccccc")))
+    story.append(Spacer(1, 0.2 * cm))
+    story.append(Paragraph("Generated by StudyFiesta AI 🎓 | Your Smart Exam Preparation Platform", style_footer))
+
+    doc.build(story)
+    buffer.seek(0)
+    return buffer
+
+# =========================================================
 # DATABASE
-# =====================================================================
+# =========================================================
 def init_db():
     conn = sqlite3.connect("users.db")
     c = conn.cursor()
@@ -75,9 +238,9 @@ def init_db():
 def hash_p(password):
     return hashlib.sha256(password.encode()).hexdigest()
 
-# =====================================================================
-# COURSE / SUBJECT MAP   Category → Course → [Subjects]
-# =====================================================================
+# =========================================================
+# COURSE / SUBJECT MAP
+# =========================================================
 DATA_MAP = {
     "Competitive Exams 🏆": {
         "UPSC (Civil Services)": [
@@ -88,66 +251,95 @@ DATA_MAP = {
             "Public Administration",
             "Ethics"
         ],
-        "JEE (Mains/Adv)":  ["Physics", "Chemistry", "Mathematics"],
-        "NEET":              ["Biology", "Physics", "Chemistry"],
-        "GATE":              ["Computer Science", "Mechanical", "Electrical", "Civil", "Electronics"],
-        "Banking/SSC":       ["Quantitative Aptitude", "Reasoning", "English", "General Awareness"]
+        "JEE (Mains/Adv)": ["Physics", "Chemistry", "Mathematics"],
+        "NEET": ["Biology", "Physics", "Chemistry"],
+        "GATE": ["Computer Science", "Mechanical", "Electrical", "Civil", "Electronics"],
+        "Banking/SSC": ["Quantitative Aptitude", "Reasoning", "English", "General Awareness"]
     },
     "Engineering & Tech 💻": {
         "B.Tech / M.Tech": [
-            "Computer Science (CSE)", "Information Technology (IT)",
-            "Electronics (ECE)", "Mechanical (ME)", "Civil (CE)", "AI & Data Science"
+            "Computer Science (CSE)",
+            "Information Technology (IT)",
+            "Electronics (ECE)",
+            "Mechanical (ME)",
+            "Civil (CE)",
+            "AI & Data Science"
         ],
         "Polytechnic Diploma": ["Mechanical", "Electrical", "Civil", "Computer"],
         "BCA / MCA": [
-            "Programming in C/C++", "Java & Python",
-            "Database Management", "Software Engineering", "Web Development"
+            "Programming in C/C++",
+            "Java & Python",
+            "Database Management",
+            "Software Engineering",
+            "Web Development"
         ]
     },
     "School (K-12) 🏫": {
         "Class 10": [
-            "Mathematics", "Science",
+            "Mathematics",
+            "Science",
             "Social Science — History",
             "Social Science — Geography",
             "Social Science — Civics (Political Science)",
             "Social Science — Economics",
-            "English", "Hindi"
+            "English",
+            "Hindi"
         ],
         "Class 11 & 12": [
-            "Physics", "Chemistry", "Mathematics", "Biology",
-            "Accountancy", "Business Studies", "Economics", "History", "Psychology"
+            "Physics",
+            "Chemistry",
+            "Mathematics",
+            "Biology",
+            "Accountancy",
+            "Business Studies",
+            "Economics",
+            "History",
+            "Psychology"
         ]
     },
     "Degree & Masters 🎓": {
         "Commerce (B.Com/M.Com)": [
-            "Financial Accounting", "Corporate Tax", "Auditing", "Costing", "Management Accounting"
+            "Financial Accounting",
+            "Corporate Tax",
+            "Auditing",
+            "Costing",
+            "Management Accounting"
         ],
         "Science (B.Sc/M.Sc)": [
-            "Physics", "Chemistry", "Maths", "Zoology", "Botany", "Biotechnology"
+            "Physics", "Chemistry", "Maths",
+            "Zoology", "Botany", "Biotechnology"
         ],
-        "Management (BBA/MBA)": ["Marketing", "Finance", "HR", "Operations", "Strategy"],
+        "Management (BBA/MBA)": [
+            "Marketing", "Finance", "HR", "Operations", "Strategy"
+        ],
         "Arts (B.A/M.A)": [
-            "English Literature", "Political Science", "Economics", "History", "Psychology"
+            "English Literature", "Political Science",
+            "Economics", "History", "Psychology"
         ]
     }
 }
 
 BOARDS = [
     "CBSE", "ICSE", "IGCSE",
-    "State Board (Maharashtra)", "State Board (Karnataka)",
-    "State Board (UP)", "State Board (Others)"
+    "State Board (Maharashtra)",
+    "State Board (Karnataka)",
+    "State Board (UP)",
+    "State Board (Others)"
 ]
 
-# =====================================================================
-# TOPIC MAP   Category → Course → Subject → [Topics / Units]
-# =====================================================================
+# =========================================================
+# TOPIC MAP
+# =========================================================
 TOPIC_MAP = {
     "School (K-12) 🏫": {
         "Class 10": {
             "Mathematics": [
-                "Number Systems & Algebra", "Geometry",
-                "Trigonometry", "Coordinate Geometry",
-                "Mensuration", "Statistics & Probability"
+                "Number Systems & Algebra",
+                "Geometry",
+                "Trigonometry",
+                "Coordinate Geometry",
+                "Mensuration",
+                "Statistics & Probability"
             ],
             "Science": ["Chemistry", "Biology", "Physics"],
             "Social Science — History": [
@@ -171,39 +363,64 @@ TOPIC_MAP = {
                 "Consumer Awareness"
             ],
             "English": [
-                "Literature — Prose", "Literature — Poetry",
-                "Grammar", "Writing Skills"
+                "Literature — Prose",
+                "Literature — Poetry",
+                "Grammar",
+                "Writing Skills"
             ],
             "Hindi": [
-                "गद्य (Prose)", "पद्य (Poetry)",
-                "व्याकरण (Grammar)", "लेखन (Writing)"
+                "गद्य (Prose)",
+                "पद्य (Poetry)",
+                "व्याकरण (Grammar)",
+                "लेखन (Writing)"
             ]
         },
         "Class 11 & 12": {
             "Physics": [
-                "Mechanics", "Thermodynamics & Waves",
-                "Electromagnetism", "Optics & Modern Physics"
+                "Mechanics",
+                "Thermodynamics & Waves",
+                "Electromagnetism",
+                "Optics & Modern Physics"
             ],
-            "Chemistry": ["Physical Chemistry", "Inorganic Chemistry", "Organic Chemistry"],
+            "Chemistry": [
+                "Physical Chemistry",
+                "Inorganic Chemistry",
+                "Organic Chemistry"
+            ],
             "Mathematics": [
-                "Algebra", "Calculus", "Coordinate Geometry",
-                "Vectors & 3D", "Statistics & Probability"
+                "Algebra",
+                "Calculus",
+                "Coordinate Geometry",
+                "Vectors & 3D",
+                "Statistics & Probability"
             ],
             "Biology": [
-                "Cell Biology & Diversity", "Plant Physiology",
-                "Human Physiology", "Genetics & Evolution", "Ecology & Environment"
+                "Cell Biology & Diversity",
+                "Plant Physiology",
+                "Human Physiology",
+                "Genetics & Evolution",
+                "Ecology & Environment"
             ],
             "Accountancy": [
-                "Basic Accounting", "Partnership Accounts",
-                "Company Accounts", "Analysis of Financial Statements"
+                "Basic Accounting",
+                "Partnership Accounts",
+                "Company Accounts",
+                "Analysis of Financial Statements"
             ],
             "Business Studies": [
                 "Nature and Forms of Business",
                 "Management Principles",
                 "Business Finance and Marketing"
             ],
-            "Economics": ["Microeconomics", "Macroeconomics", "Indian Economic Development"],
-            "History": ["Themes in Indian History", "World History"],
+            "Economics": [
+                "Microeconomics",
+                "Macroeconomics",
+                "Indian Economic Development"
+            ],
+            "History": [
+                "Themes in Indian History",
+                "World History"
+            ],
             "Psychology": [
                 "Foundations of Psychology",
                 "Human Behaviour and Processes",
@@ -213,103 +430,236 @@ TOPIC_MAP = {
     },
     "Competitive Exams 🏆": {
         "JEE (Mains/Adv)": {
-            "Physics":     ["Mechanics", "Thermodynamics", "Electrodynamics", "Optics & Modern Physics"],
-            "Chemistry":   ["Physical Chemistry", "Inorganic Chemistry", "Organic Chemistry"],
-            "Mathematics": ["Algebra", "Calculus", "Coordinate Geometry", "Trigonometry", "Probability"]
+            "Physics": [
+                "Mechanics",
+                "Thermodynamics",
+                "Electrodynamics",
+                "Optics & Modern Physics"
+            ],
+            "Chemistry": [
+                "Physical Chemistry",
+                "Inorganic Chemistry",
+                "Organic Chemistry"
+            ],
+            "Mathematics": [
+                "Algebra",
+                "Calculus",
+                "Coordinate Geometry",
+                "Trigonometry",
+                "Probability"
+            ]
         },
         "NEET": {
-            "Biology":   ["Cell Biology", "Plant Biology", "Human Physiology", "Genetics & Evolution", "Ecology"],
-            "Physics":   ["Mechanics", "Thermodynamics", "Electrodynamics", "Optics"],
-            "Chemistry": ["Physical Chemistry", "Inorganic Chemistry", "Organic Chemistry"]
+            "Biology": [
+                "Cell Biology",
+                "Plant Biology",
+                "Human Physiology",
+                "Genetics & Evolution",
+                "Ecology"
+            ],
+            "Physics": [
+                "Mechanics",
+                "Thermodynamics",
+                "Electrodynamics",
+                "Optics"
+            ],
+            "Chemistry": [
+                "Physical Chemistry",
+                "Inorganic Chemistry",
+                "Organic Chemistry"
+            ]
         },
         "GATE": {
             "Computer Science": [
-                "Programming & Data Structures", "Theory of Computation",
-                "Systems (OS & Networks)", "Databases & Engineering Math"
+                "Programming & Data Structures",
+                "Theory of Computation",
+                "Systems (OS & Networks)",
+                "Databases & Engineering Math"
             ],
-            "Mechanical":  ["Mechanics & Design", "Thermal Sciences", "Manufacturing"],
-            "Electrical":  ["Circuits & Machines", "Power Systems", "Signals & Control"],
-            "Civil":       ["Structures & Geotechnical", "Fluid & Environmental", "Transportation"],
-            "Electronics": ["Circuits & Devices", "Signals & Control", "Communications"]
+            "Mechanical": [
+                "Mechanics & Design",
+                "Thermal Sciences",
+                "Manufacturing"
+            ],
+            "Electrical": [
+                "Circuits & Machines",
+                "Power Systems",
+                "Signals & Control"
+            ],
+            "Civil": [
+                "Structures & Geotechnical",
+                "Fluid & Environmental",
+                "Transportation"
+            ],
+            "Electronics": [
+                "Circuits & Devices",
+                "Signals & Control",
+                "Communications"
+            ]
         },
         "Banking/SSC": {
-            "Quantitative Aptitude": ["Arithmetic", "Algebra & Geometry", "Data Interpretation"],
-            "Reasoning":             ["Verbal Reasoning", "Non-Verbal Reasoning", "Puzzles"],
-            "English":               ["Comprehension & Vocabulary", "Grammar", "Writing"],
-            "General Awareness":     ["Current Affairs", "Static GK", "Banking & Finance"]
+            "Quantitative Aptitude": [
+                "Arithmetic",
+                "Algebra & Geometry",
+                "Data Interpretation"
+            ],
+            "Reasoning": [
+                "Verbal Reasoning",
+                "Non-Verbal Reasoning",
+                "Puzzles"
+            ],
+            "English": [
+                "Comprehension & Vocabulary",
+                "Grammar",
+                "Writing"
+            ],
+            "General Awareness": [
+                "Current Affairs",
+                "Static GK",
+                "Banking & Finance"
+            ]
         },
         "UPSC (Civil Services)": {
-            "General Studies 1":        ["History", "Geography", "Society"],
+            "General Studies 1": ["History", "Geography", "Society"],
             "General Studies 2 (CSAT)": ["Comprehension", "Reasoning", "Numeracy"],
-            "History Optional":         ["Ancient India", "Medieval India", "Modern India", "World History"],
-            "Geography Optional":       ["Physical Geography", "Human Geography", "Indian Geography"],
-            "Public Administration":    ["Administrative Theory", "Indian Administration"],
-            "Ethics":                   ["Ethics & Integrity", "Attitude & Aptitude", "Case Studies"]
+            "History Optional": [
+                "Ancient India",
+                "Medieval India",
+                "Modern India",
+                "World History"
+            ],
+            "Geography Optional": [
+                "Physical Geography",
+                "Human Geography",
+                "Indian Geography"
+            ],
+            "Public Administration": [
+                "Administrative Theory",
+                "Indian Administration"
+            ],
+            "Ethics": [
+                "Ethics & Integrity",
+                "Attitude & Aptitude",
+                "Case Studies"
+            ]
         }
     },
     "Engineering & Tech 💻": {
         "B.Tech / M.Tech": {
             "Computer Science (CSE)": [
-                "Programming Fundamentals", "Core CS (OS, Networks, DBMS)",
-                "Algorithms & Theory", "AI & Machine Learning"
+                "Programming Fundamentals",
+                "Core CS (OS, Networks, DBMS)",
+                "Algorithms & Theory",
+                "AI & Machine Learning"
             ],
-            "Information Technology (IT)": ["Networking & Security", "Web & Cloud", "Data & Analytics"],
-            "Electronics (ECE)":           ["Circuits & Devices", "Communication Systems", "Embedded Systems"],
-            "Mechanical (ME)":             ["Mechanics & Design", "Thermal Sciences", "Manufacturing"],
-            "Civil (CE)":                  ["Structures", "Geotechnical & Environmental", "Transportation"],
-            "AI & Data Science":           ["Statistics & Math", "Machine Learning", "Deep Learning & NLP", "Data Engineering"]
+            "Information Technology (IT)": [
+                "Networking & Security",
+                "Web & Cloud",
+                "Data & Analytics"
+            ],
+            "Electronics (ECE)": [
+                "Circuits & Devices",
+                "Communication Systems",
+                "Embedded Systems"
+            ],
+            "Mechanical (ME)": [
+                "Mechanics & Design",
+                "Thermal Sciences",
+                "Manufacturing"
+            ],
+            "Civil (CE)": [
+                "Structures",
+                "Geotechnical & Environmental",
+                "Transportation"
+            ],
+            "AI & Data Science": [
+                "Statistics & Math",
+                "Machine Learning",
+                "Deep Learning & NLP",
+                "Data Engineering"
+            ]
         },
         "Polytechnic Diploma": {
             "Mechanical": ["Mechanics", "Thermal", "Manufacturing"],
-            "Electrical":  ["Circuits", "Machines", "Power"],
-            "Civil":       ["Structures", "Construction", "Surveying"],
-            "Computer":    ["Programming", "Networking", "DBMS"]
+            "Electrical": ["Circuits", "Machines", "Power"],
+            "Civil": ["Structures", "Construction", "Surveying"],
+            "Computer": ["Programming", "Networking", "DBMS"]
         },
         "BCA / MCA": {
             "Programming in C/C++": ["Basics", "Functions & Arrays", "OOP Concepts"],
-            "Java & Python":        ["Core Java", "Python Basics", "OOP & Libraries"],
-            "Database Management":  ["ER Model & SQL", "Normalization", "Transactions"],
+            "Java & Python": ["Core Java", "Python Basics", "OOP & Libraries"],
+            "Database Management": ["ER Model & SQL", "Normalization", "Transactions"],
             "Software Engineering": ["SDLC Models", "Testing", "Agile"],
-            "Web Development":      ["Frontend", "Backend", "Deployment"]
+            "Web Development": ["Frontend", "Backend", "Deployment"]
         }
     },
     "Degree & Masters 🎓": {
         "Commerce (B.Com/M.Com)": {
-            "Financial Accounting":  ["Basic Accounts", "Partnership", "Company Accounts"],
-            "Corporate Tax":         ["Income Tax Basics", "Corporate Tax Planning"],
-            "Auditing":              ["Audit Basics", "Types of Audit", "Audit Report"],
-            "Costing":               ["Material & Labour", "Process Costing", "Marginal Costing"],
+            "Financial Accounting": ["Basic Accounts", "Partnership", "Company Accounts"],
+            "Corporate Tax": ["Income Tax Basics", "Corporate Tax Planning"],
+            "Auditing": ["Audit Basics", "Types of Audit", "Audit Report"],
+            "Costing": ["Material & Labour", "Process Costing", "Marginal Costing"],
             "Management Accounting": ["Ratio Analysis", "Budgeting", "Standard Costing"]
         },
         "Science (B.Sc/M.Sc)": {
-            "Physics":       ["Classical Mechanics", "Electromagnetism", "Quantum Mechanics", "Modern Physics"],
-            "Chemistry":     ["Physical", "Organic", "Inorganic", "Analytical"],
-            "Maths":         ["Analysis", "Algebra", "Differential Equations", "Topology"],
-            "Zoology":       ["Animal Diversity", "Physiology", "Genetics", "Ecology"],
-            "Botany":        ["Plant Diversity", "Physiology", "Genetics", "Ecology"],
-            "Biotechnology": ["Molecular Biology", "Genetic Engineering", "Bioprocess", "Bioinformatics"]
+            "Physics": [
+                "Classical Mechanics",
+                "Electromagnetism",
+                "Quantum Mechanics",
+                "Modern Physics"
+            ],
+            "Chemistry": ["Physical", "Organic", "Inorganic", "Analytical"],
+            "Maths": ["Analysis", "Algebra", "Differential Equations", "Topology"],
+            "Zoology": ["Animal Diversity", "Physiology", "Genetics", "Ecology"],
+            "Botany": ["Plant Diversity", "Physiology", "Genetics", "Ecology"],
+            "Biotechnology": [
+                "Molecular Biology",
+                "Genetic Engineering",
+                "Bioprocess",
+                "Bioinformatics"
+            ]
         },
         "Management (BBA/MBA)": {
-            "Marketing":  ["Basics & Consumer Behaviour", "Strategy & Mix", "Digital Marketing"],
-            "Finance":    ["Financial Management", "Investments", "Risk"],
-            "HR":         ["Recruitment & Training", "Performance & Compensation", "Employee Relations"],
+            "Marketing": [
+                "Basics & Consumer Behaviour",
+                "Strategy & Mix",
+                "Digital Marketing"
+            ],
+            "Finance": ["Financial Management", "Investments", "Risk"],
+            "HR": [
+                "Recruitment & Training",
+                "Performance & Compensation",
+                "Employee Relations"
+            ],
             "Operations": ["Process & Capacity", "Quality & Supply Chain"],
-            "Strategy":   ["Analysis & Positioning", "Corporate Strategy"]
+            "Strategy": ["Analysis & Positioning", "Corporate Strategy"]
         },
         "Arts (B.A/M.A)": {
-            "English Literature":  ["Poetry", "Drama", "Novel & Prose", "Literary Theory"],
-            "Political Science":   ["Political Theory", "Indian Politics", "International Relations"],
-            "Economics":           ["Micro & Macro", "Indian Economy", "Development Economics"],
-            "History":             ["Ancient", "Medieval", "Modern", "World History"],
-            "Psychology":          ["Cognitive & Social", "Developmental & Abnormal", "Research Methods"]
+            "English Literature": [
+                "Poetry",
+                "Drama",
+                "Novel & Prose",
+                "Literary Theory"
+            ],
+            "Political Science": [
+                "Political Theory",
+                "Indian Politics",
+                "International Relations"
+            ],
+            "Economics": ["Micro & Macro", "Indian Economy", "Development Economics"],
+            "History": ["Ancient", "Medieval", "Modern", "World History"],
+            "Psychology": [
+                "Cognitive & Social",
+                "Developmental & Abnormal",
+                "Research Methods"
+            ]
         }
     }
 }
 
-# =====================================================================
-# CHAPTER MAP   Category → Course → Subject → Topic → [Chapters]
-# All NCERT Class 10 chapters verified against 2025-26 syllabus
-# =====================================================================
+# =========================================================
+# CHAPTER MAP — COMPLETE (All NCERT verified)
+# =========================================================
 CHAPTER_MAP = {
     "School (K-12) 🏫": {
         "Class 10": {
@@ -330,7 +680,9 @@ CHAPTER_MAP = {
                     "Ch 8: Introduction to Trigonometry",
                     "Ch 9: Some Applications of Trigonometry"
                 ],
-                "Coordinate Geometry": ["Ch 7: Coordinate Geometry"],
+                "Coordinate Geometry": [
+                    "Ch 7: Coordinate Geometry"
+                ],
                 "Mensuration": [
                     "Ch 12: Areas Related to Circles",
                     "Ch 13: Surface Areas and Volumes"
@@ -483,12 +835,19 @@ CHAPTER_MAP = {
                     "संगतकार"
                 ],
                 "व्याकरण (Grammar)": [
-                    "पद परिचय", "रस", "अलंकार",
-                    "समास", "वाच्य", "वाक्य भेद", "मुहावरे"
+                    "पद परिचय",
+                    "रस",
+                    "अलंकार",
+                    "समास",
+                    "वाच्य",
+                    "वाक्य भेद",
+                    "मुहावरे"
                 ],
                 "लेखन (Writing)": [
-                    "पत्र लेखन", "निबंध लेखन",
-                    "सूचना लेखन", "विज्ञापन लेखन"
+                    "पत्र लेखन",
+                    "निबंध लेखन",
+                    "सूचना लेखन",
+                    "विज्ञापन लेखन"
                 ]
             }
         },
@@ -723,7 +1082,7 @@ CHAPTER_MAP = {
                 ],
                 "Indian Economic Development": [
                     "Ch 1: Indian Economy on the Eve of Independence",
-                    "Ch 2: Indian Economy 1950–1990",
+                    "Ch 2: Indian Economy 1950-1990",
                     "Ch 3: Liberalisation, Privatisation and Globalisation",
                     "Ch 4: Poverty",
                     "Ch 5: Human Capital Formation",
@@ -796,21 +1155,16 @@ CHAPTER_MAP = {
     }
 }
 
-# =====================================================================
+# =========================================================
 # HELPERS
-# =====================================================================
+# =========================================================
 def get_topics(category, course, subject):
-    """Return topic list. Works for both dict-of-dict and dict-of-list structures."""
     course_data = TOPIC_MAP.get(category, {}).get(course, {})
     if isinstance(course_data, dict):
-        topics = course_data.get(subject, [])
-    else:
-        topics = []
-    return topics if topics else ["General Topics"]
-
+        return course_data.get(subject, [])
+    return ["General Topics"]
 
 def get_chapters(category, course, subject, topic):
-    """Return chapter list from local map; fall back to AI only if missing."""
     chapters = (
         CHAPTER_MAP
         .get(category, {})
@@ -821,7 +1175,6 @@ def get_chapters(category, course, subject, topic):
     if chapters:
         return chapters
 
-    # AI fallback — only triggered when local data is absent
     prompt = (
         f"You are an academic syllabus expert. "
         f"List the standard chapter names for the topic area '{topic}' "
@@ -831,15 +1184,138 @@ def get_chapters(category, course, subject, topic):
     )
     result, _ = generate_with_fallback(prompt)
     if "failed" in result.lower() or not result.strip():
-        return [f"Introduction to {topic}", f"Core Concepts of {topic}", f"Advanced {topic}"]
-    chapters = [c.strip() for c in result.split(",") if c.strip() and len(c.strip()) > 2]
+        return [
+            f"Introduction to {topic}",
+            f"Core Concepts of {topic}",
+            f"Advanced {topic}"
+        ]
+    chapters = [
+        c.strip() for c in result.split(",")
+        if c.strip() and len(c.strip()) > 2
+    ]
     return chapters if chapters else [f"Introduction to {topic}"]
 
-# =====================================================================
+def build_prompt(tool, chap, topic, sub, audience, output_style):
+    style_instruction = {
+        "📄 Detailed": (
+            "Write a thorough, complete, well-explained answer with full detail. "
+            "Every section must have at least 3-5 bullet points or 3-4 full sentences."
+        ),
+        "⚡ Short & Quick": (
+            "Keep it concise but every section must still have real content. "
+            "Minimum 2 bullet points per section. Do NOT leave any section empty."
+        ),
+        "📋 Notes Format": (
+            "Use clean bullet points throughout. "
+            "Every section must have at least 2-3 bullet points. "
+            "Do NOT leave any section empty."
+        )
+    }[output_style]
+
+    if tool == "📝 Summary":
+        return f"""
+Act as a professional teacher preparing study material for {audience}.
+
+STYLE INSTRUCTION (apply to ALL 5 sections): {style_instruction}
+
+Create a COMPLETE and THOROUGH summary for the chapter '{chap}'
+under the topic '{topic}' in the subject '{sub}'.
+
+STRICT RULES:
+- You MUST write all 5 sections below.
+- Every section MUST have actual content below its heading.
+- Do NOT write a heading and leave it empty.
+- The section called "5. QUICK REVISION NOTES" must also have
+  at least 4-6 bullet points of real revision material.
+- Do not confuse the style instruction with the content.
+
+---
+
+1. OVERVIEW
+Explain what this chapter is about and why it matters.
+
+2. KEY CONCEPTS
+Define and explain all the important concepts in this chapter.
+
+3. IMPORTANT POINTS
+List the crucial facts, dates, formulas, or rules students must remember.
+
+4. EXAM FOCUS
+What types of questions are asked from this chapter in exams?
+What should the student pay special attention to?
+
+5. QUICK REVISION NOTES
+Write 5-6 short, sharp bullet points that help students revise
+this chapter in under 2 minutes before an exam.
+
+---
+
+Use LaTeX ($$...$$) for any mathematical expressions if needed.
+Keep the language simple, clear and student-friendly.
+""".strip()
+
+    if tool == "🧠 Quiz":
+        return f"""
+Act as a subject expert creating a quiz for {audience}.
+
+STYLE INSTRUCTION: {style_instruction}
+
+Generate exactly 5 high-quality MCQs for the chapter '{chap}'
+(Topic: {topic}) in '{sub}'.
+
+For EACH question provide:
+- The question
+- Option A
+- Option B
+- Option C
+- Option D
+- Correct Answer
+- Explanation (why this answer is correct)
+
+Use LaTeX ($$...$$) for any math if needed.
+""".strip()
+
+    if tool == "📌 Revision Notes":
+        return f"""
+Act as a revision coach for {audience}.
+
+STYLE INSTRUCTION: {style_instruction}
+
+Create detailed revision notes for '{chap}' (Topic: {topic}) in '{sub}'.
+
+STRICT RULES:
+- Use clear headings for each section.
+- Include all key definitions, formulas, important dates/facts.
+- Add memory tips and exam reminders where useful.
+- Do not leave any heading without content.
+
+Use LaTeX ($$...$$) for any math if needed.
+""".strip()
+
+    if tool == "❓ Exam Q&A":
+        return f"""
+Act as an exam coach for {audience}.
+
+STYLE INSTRUCTION: {style_instruction}
+
+Generate exactly 5 high-probability exam questions with complete
+model answers for '{chap}' (Topic: {topic}) in '{sub}'.
+
+STRICT RULES:
+- Provide exactly 5 questions.
+- Every answer must be complete and exam-ready.
+- Use bullet points in answers where helpful.
+- Do not leave any answer empty or incomplete.
+
+Use LaTeX ($$...$$) for any math if needed.
+""".strip()
+
+    return ""
+
+# =========================================================
 # MAIN APP
-# =====================================================================
+# =========================================================
 def main_app():
-    # ── Sidebar ───────────────────────────────────────────────────
     with st.sidebar:
         st.title("🎓 StudyFiesta")
         st.markdown(f"**Welcome, {st.session_state.username}** 👋")
@@ -851,120 +1327,67 @@ def main_app():
         st.divider()
         if st.button("Logout"):
             st.session_state.logged_in = False
-            st.session_state.username  = ""
+            st.session_state.username = ""
             st.rerun()
 
-    # ── Header ────────────────────────────────────────────────────
     st.markdown(f"# {tool}")
     st.write("Streamlining your preparation with AI precision.")
 
-    # ── Selection card ────────────────────────────────────────────
     st.markdown('<div class="card">', unsafe_allow_html=True)
 
-    col1, col2, col3 = st.columns(3)
-    with col1:
+    c1, c2, c3 = st.columns(3)
+    with c1:
         cat = st.selectbox("📚 Category", list(DATA_MAP.keys()))
-    with col2:
+    with c2:
         course = st.selectbox("🎓 Exam / Course", list(DATA_MAP[cat].keys()))
-    with col3:
+    with c3:
         if "School" in cat:
             board = st.selectbox("🏫 Education Board", BOARDS)
         else:
             board = "University / National Syllabus"
 
-    col4, col5 = st.columns(2)
-    with col4:
+    c4, c5 = st.columns(2)
+    with c4:
         sub = st.selectbox("📖 Subject", DATA_MAP[cat][course])
 
-    # Row 2: Topic  +  Chapter
-    col6, col7 = st.columns(2)
-
     topics_list = get_topics(cat, course, sub)
-    with col6:
+    with c5:
         topic = st.selectbox("🗂️ Topic / Unit", topics_list)
 
-    # Load chapters whenever cat/course/sub/topic changes
     chapter_key = f"{cat}||{course}||{sub}||{topic}"
-    if "last_chapter_key"   not in st.session_state: st.session_state.last_chapter_key   = ""
-    if "current_chapters"   not in st.session_state: st.session_state.current_chapters   = []
+    if "last_chapter_key" not in st.session_state:
+        st.session_state.last_chapter_key = ""
+    if "current_chapters" not in st.session_state:
+        st.session_state.current_chapters = []
 
     if st.session_state.last_chapter_key != chapter_key:
-        st.session_state.current_chapters   = get_chapters(cat, course, sub, topic)
-        st.session_state.last_chapter_key   = chapter_key
+        st.session_state.current_chapters = get_chapters(cat, course, sub, topic)
+        st.session_state.last_chapter_key = chapter_key
 
-    with col7:
-        chap = st.selectbox("📝 Chapter", st.session_state.current_chapters)
+    chap = st.selectbox("📝 Chapter", st.session_state.current_chapters)
 
     st.markdown('</div>', unsafe_allow_html=True)
 
-    # ── Output style selector ─────────────────────────────────────
     output_style = st.radio(
         "Output Style",
         ["📄 Detailed", "⚡ Short & Quick", "📋 Notes Format"],
         horizontal=True
     )
 
-    # ── Generate button ───────────────────────────────────────────
     if st.button(f"Generate {tool} ✨", use_container_width=True):
-
-        audience = f"{board} {course} students" if "School" in cat else f"{course} students"
-
-        style_instruction = {
-            "📄 Detailed":       "Give a thorough, well-structured detailed explanation.",
-            "⚡ Short & Quick":  "Keep it concise — key points only, no fluff.",
-            "📋 Notes Format":   "Format as clean bullet-point notes, easy to revise quickly."
-        }[output_style]
-
-        # Step 3 — improved structured prompts
-        prompt_map = {
-            "📝 Summary": (
-                f"Write a clear student-friendly summary for '{chap}' "
-                f"(Topic: {topic}) in '{sub}' for {audience}.\n"
-                f"Structure:\n"
-                f"1. Overview\n"
-                f"2. Key Concepts\n"
-                f"3. Important Points\n"
-                f"4. Exam Focus\n"
-                f"5. Quick Revision Notes\n"
-                f"{style_instruction}"
-            ),
-            "🧠 Quiz": (
-                f"Generate 5 high-quality MCQs for '{chap}' (Topic: {topic}) "
-                f"in '{sub}' for {audience}.\n"
-                f"For each question include:\n"
-                f"- The question\n"
-                f"- Options A, B, C, D\n"
-                f"- Correct answer\n"
-                f"- Brief explanation\n"
-                f"{style_instruction}"
-            ),
-            "📌 Revision Notes": (
-                f"Create revision notes for '{chap}' (Topic: {topic}) "
-                f"in '{sub}' for {audience}.\n"
-                f"Include: key definitions, important formulas, dates/facts, "
-                f"and quick memory tips.\n"
-                f"{style_instruction}"
-            ),
-            "❓ Exam Q&A": (
-                f"List 5 probable exam questions with detailed model answers for "
-                f"'{chap}' (Topic: {topic}) in '{sub}' for {audience}.\n"
-                f"Make them exam-ready and easy to revise.\n"
-                f"{style_instruction}"
-            )
-        }
-
-        final_prompt = (
-            f"{prompt_map[tool]}\n\n"
-            f"If mathematical expressions are needed, use LaTeX format. "
-            f"Keep the response accurate, structured and student-friendly."
+        audience = (
+            f"{board} {course} students"
+            if "School" in cat
+            else f"{course} students"
         )
+        final_prompt = build_prompt(tool, chap, topic, sub, audience, output_style)
 
-        # Step 3 — safe generation with visible error
-        with st.spinner(f"Generating {tool} for '{chap}'..."):
+        with st.spinner(f"Generating {tool} for '{chap}'... please wait ⏳"):
             try:
                 result, model_used = generate_with_fallback(final_prompt)
             except Exception as e:
-                result, model_used = f"Unexpected error: {e}", "None"
+                result = f"Unexpected error: {e}"
+                model_used = "None"
 
         st.markdown("---")
 
@@ -972,13 +1395,40 @@ def main_app():
             st.success(f"✅ Done! (Powered by {model_used})")
             st.markdown(f"### 📄 {tool} — {chap}")
             st.markdown(result)
+
+            # ── PDF Download ───────────────────────────────────
+            st.markdown("---")
+            st.markdown("#### 📥 Download Your Notes")
+
+            pdf_title   = f"{tool.replace('📝','').replace('🧠','').replace('📌','').replace('❓','').strip()} — {chap}"
+            pdf_subtitle = f"{sub} | {topic} | {course} | {board}"
+
+            try:
+                pdf_buffer = generate_pdf(pdf_title, pdf_subtitle, result)
+                safe_filename = (
+                    chap.replace(" ", "_")
+                        .replace(":", "")
+                        .replace("/", "-")
+                        .replace("—", "-")
+                ) + ".pdf"
+
+                st.download_button(
+                    label="⬇️ Download as PDF",
+                    data=pdf_buffer,
+                    file_name=safe_filename,
+                    mime="application/pdf",
+                    use_container_width=True
+                )
+            except Exception as pdf_err:
+                st.warning(f"PDF generation had an issue: {pdf_err}")
+
         else:
-            st.error("⚠️ AI service is currently unavailable.")
+            st.error("⚠️ AI service is currently unavailable. Please try again.")
             st.info(f"🔍 Debug info: {result}")
 
-# =====================================================================
+# =========================================================
 # AUTH UI
-# =====================================================================
+# =========================================================
 def auth_ui():
     st.title("📚 StudyFiesta AI")
     st.subheader("Your Smart Exam Preparation Platform 🎓")
@@ -990,7 +1440,7 @@ def auth_ui():
         p = st.text_input("Password", type="password", key="login_p")
         if st.button("Login", use_container_width=True):
             conn = sqlite3.connect("users.db")
-            c    = conn.cursor()
+            c = conn.cursor()
             c.execute(
                 "SELECT * FROM users WHERE username=? AND password=?",
                 (u, hash_p(p))
@@ -999,7 +1449,7 @@ def auth_ui():
             conn.close()
             if user:
                 st.session_state.logged_in = True
-                st.session_state.username  = u
+                st.session_state.username = u
                 st.rerun()
             else:
                 st.error("❌ Invalid username or password.")
@@ -1013,21 +1463,26 @@ def auth_ui():
             else:
                 try:
                     conn = sqlite3.connect("users.db")
-                    c    = conn.cursor()
-                    c.execute("INSERT INTO users VALUES (?, ?)", (nu.strip(), hash_p(np)))
+                    c = conn.cursor()
+                    c.execute(
+                        "INSERT INTO users VALUES (?, ?)",
+                        (nu.strip(), hash_p(np))
+                    )
                     conn.commit()
                     conn.close()
                     st.success("✅ Account created! Please go to the Login tab.")
                 except sqlite3.IntegrityError:
                     st.error("❌ Username already exists. Please choose another.")
 
-# =====================================================================
-# ENTRY POINT
-# =====================================================================
+# =========================================================
+# START
+# =========================================================
 init_db()
 
-if "logged_in"  not in st.session_state: st.session_state.logged_in  = False
-if "username"   not in st.session_state: st.session_state.username   = ""
+if "logged_in" not in st.session_state:
+    st.session_state.logged_in = False
+if "username" not in st.session_state:
+    st.session_state.username = ""
 
 if st.session_state.logged_in:
     main_app()
