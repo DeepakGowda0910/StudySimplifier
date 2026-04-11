@@ -36,9 +36,8 @@ st.markdown("""
         letter-spacing: 0.3px;
     }
 
-    /* ── PREMIUM GRADIENT BACKGROUND (LIGHTER DARK THEME) ── */
+    /* ── PREMIUM GRADIENT BACKGROUND ── */
     .stApp {
-        /* Adjusted to a lighter, softer navy/slate blue instead of harsh black */
         background: radial-gradient(circle at top right, #334155, #111827);
         min-height: 100vh;
     }
@@ -60,7 +59,7 @@ st.markdown("""
     /* ── STREAMLIT TABS OVERRIDE ── */
     .stTabs [data-baseweb="tab-list"] {
         background-color: transparent !important;
-        border-bottom: 1px solid rgba(255,255,255,0.05) !important; /* Softens the default grey bar */
+        border-bottom: 1px solid rgba(255,255,255,0.05) !important;
         gap: 20px;
     }
     .stTabs [data-baseweb="tab"] {
@@ -92,26 +91,27 @@ st.markdown("""
 
     .sf-header-subtitle {
         font-size: 1.2rem;
-        color: #cbd5e1; /* Made slightly lighter/brighter */
+        color: #cbd5e1;
         margin-top: 10px;
         font-weight: 400;
         letter-spacing: 0.5px;
     }
 
     /* ════════════════════════════════════════════════════════
-       THE WATERMARK — MOVED DOWN OVER THE GREY BAR
+       THE WATERMARK — CENTERED BETTER FOR DESKTOP + MOBILE
     ════════════════════════════════════════════════════════ */
     .sf-watermark {
-        font-size: 4.2rem; /* Matches header size */
+        font-size: 4.4rem;
         font-weight: 900;
-        color: rgba(255, 255, 255, 0.035); /* Highly transparent to blend perfectly */
+        color: rgba(255, 255, 255, 0.05);
         text-transform: uppercase;
         letter-spacing: 12px;
-        margin-top: 35px;       /* Pushes text down */
-        margin-bottom: -65px;   /* Pulls the card below UP so they overlap */
+        margin-top: 12px;
+        margin-bottom: -42px;
         position: relative;
-        z-index: 10;            /* Places text on top visually */
-        pointer-events: none;   /* CRITICAL: Clicks pass right through to the tabs! */
+        top: -8px;
+        z-index: 10;
+        pointer-events: none;
         user-select: none;
         text-align: center;
         width: 100%;
@@ -130,6 +130,15 @@ st.markdown("""
                     inset 0 1px 0 rgba(255, 255, 255, 0.1);
         margin-bottom: 25px;
         border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .sf-card-dark {
+        background: rgba(15, 23, 42, 0.4);
+        backdrop-filter: blur(10px);
+        border-radius: 18px;
+        padding: 24px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(59, 130, 246, 0.2);
     }
 
     /* ════════════════════════════════════════════════════════
@@ -291,12 +300,12 @@ st.markdown("""
         .sf-header-title { font-size: 2.8rem !important; }
         .sf-header-subtitle { font-size: 1rem !important; }
         
-        /* Adjusting Watermark for Phone Size */
         .sf-watermark { 
             font-size: 2.4rem !important; 
             letter-spacing: 6px !important; 
-            margin-top: 20px !important;
-            margin-bottom: -45px !important; /* Adjusted overlap for mobile */
+            margin-top: 6px !important;
+            margin-bottom: -28px !important;
+            top: -4px !important;
         }
         
         .sf-header { padding: 20px 0 10px 0 !important; }
@@ -1276,7 +1285,7 @@ def main_app():
         st.divider()
         if st.button("🚪 Logout", use_container_width=True):
             st.session_state.logged_in = False
-            st.session_state.username  = ""
+            st.session_state.username = ""
             st.rerun()
 
     # ── PREMIUM HEADER WITH WATERMARK ───────────────────────────────
@@ -1292,8 +1301,10 @@ def main_app():
     st.markdown('<div class="sf-card">', unsafe_allow_html=True)
 
     c1, c2, c3 = st.columns([1.2, 1.2, 1])
-    with c1: cat    = st.selectbox("📚 Category",      list(DATA_MAP.keys()))
-    with c2: course = st.selectbox("🎓 Exam / Course", list(DATA_MAP[cat].keys()))
+    with c1:
+        cat = st.selectbox("📚 Category", list(DATA_MAP.keys()))
+    with c2:
+        course = st.selectbox("🎓 Exam / Course", list(DATA_MAP[cat].keys()))
     with c3:
         if "School" in cat:
             board = st.selectbox("🏫 Board", BOARDS)
@@ -1302,9 +1313,12 @@ def main_app():
             st.info(f"📌 {board}")
 
     c4, c5 = st.columns(2)
-    with c4: sub = st.selectbox("📖 Subject", DATA_MAP[cat][course])
+    with c4:
+        sub = st.selectbox("📖 Subject", DATA_MAP[cat][course])
+
     topics_list = get_topics(cat, course, sub)
-    with c5: topic = st.selectbox("🗂️ Topic / Unit", topics_list)
+    with c5:
+        topic = st.selectbox("🗂️ Topic / Unit", topics_list)
 
     # Chapter auto-load with caching
     chapter_key = f"{cat}||{course}||{sub}||{topic}"
@@ -1313,8 +1327,8 @@ def main_app():
     if "current_chapters" not in st.session_state:
         st.session_state.current_chapters = []
     if st.session_state.last_chapter_key != chapter_key:
-        st.session_state.current_chapters  = get_chapters(cat, course, sub, topic)
-        st.session_state.last_chapter_key  = chapter_key
+        st.session_state.current_chapters = get_chapters(cat, course, sub, topic)
+        st.session_state.last_chapter_key = chapter_key
 
     chap = st.selectbox("📝 Chapter", st.session_state.current_chapters)
     st.markdown('</div>', unsafe_allow_html=True)
@@ -1354,16 +1368,18 @@ def main_app():
 
             # PDF Download
             st.markdown("---")
-            pdf_title    = f"{tool.replace('📝','').replace('🧠','').replace('📌','').replace('❓','').strip()} — {chap}"
+            pdf_title = f"{tool.replace('📝','').replace('🧠','').replace('📌','').replace('❓','').strip()} — {chap}"
             pdf_subtitle = f"{sub} | {topic} | {course} | {board}"
+
             try:
-                pdf_buffer    = generate_pdf(pdf_title, pdf_subtitle, result)
+                pdf_buffer = generate_pdf(pdf_title, pdf_subtitle, result)
                 safe_filename = (
                     chap.replace(" ", "_")
                         .replace(":", "")
                         .replace("/", "-")
                         .replace("—", "-")
                 ) + ".pdf"
+
                 st.download_button(
                     label="⬇️ Download as PDF",
                     data=pdf_buffer,
@@ -1377,6 +1393,7 @@ def main_app():
             st.error("⚠️ AI service unavailable. Please try again.")
             with st.expander("🔍 Debug Info"):
                 st.code(result)
+
 
 # =========================================================
 # AUTH UI — PREMIUM DESIGN
@@ -1400,13 +1417,14 @@ def auth_ui():
             p = st.text_input("Password", type="password", key="login_p", placeholder="Enter your password")
             if st.button("Sign In 🚀", use_container_width=True):
                 conn = sqlite3.connect("users.db")
-                c    = conn.cursor()
+                c = conn.cursor()
                 c.execute("SELECT * FROM users WHERE username=? AND password=?", (u, hash_p(p)))
                 user = c.fetchone()
                 conn.close()
+
                 if user:
                     st.session_state.logged_in = True
-                    st.session_state.username  = u
+                    st.session_state.username = u
                     st.rerun()
                 else:
                     st.error("❌ Invalid username or password.")
@@ -1420,28 +1438,34 @@ def auth_ui():
                 else:
                     try:
                         conn = sqlite3.connect("users.db")
-                        c    = conn.cursor()
+                        c = conn.cursor()
                         c.execute("INSERT INTO users VALUES (?, ?)", (nu.strip(), hash_p(np)))
                         conn.commit()
                         conn.close()
-                        
+
                         # 🚀 AUTO LOGIN AFTER REGISTRATION
                         st.success("✅ Account created! Logging you in...")
                         time.sleep(1)
                         st.session_state.logged_in = True
                         st.session_state.username = nu.strip()
                         st.rerun()
-                        
+
                     except sqlite3.IntegrityError:
                         st.error("❌ Username already exists. Try a different one.")
+
         st.markdown('</div>', unsafe_allow_html=True)
+
 
 # =========================================================
 # RUN
 # =========================================================
 init_db()
-if "logged_in" not in st.session_state: st.session_state.logged_in = False
-if "username"   not in st.session_state: st.session_state.username  = ""
+
+if "logged_in" not in st.session_state:
+    st.session_state.logged_in = False
+
+if "username" not in st.session_state:
+    st.session_state.username = ""
 
 if st.session_state.logged_in:
     main_app()
