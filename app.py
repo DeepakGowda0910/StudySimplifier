@@ -25,30 +25,41 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- AI CONFIG ---
-# Using latest confirmed working free-tier Gemini models (April 2025)
+# =====================================================================
+# AI CONFIG  —  Step 3 improved: stable model order + generation config
+# =====================================================================
 genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
 
-MODELS = [
-    "gemini-2.0-flash",        # Primary — fast, free, reliable
-    "gemini-2.5-flash",        # Secondary — latest, very capable
-    "gemini-1.5-flash",        # Tertiary fallback
-]
+PRIMARY_MODEL  = "gemini-2.0-flash"
+BACKUP_MODELS  = ["gemini-2.5-flash", "gemini-1.5-flash"]
 
 def generate_with_fallback(prompt):
-    last_error = ""
-    for model_name in MODELS:
+    model_list = [PRIMARY_MODEL] + BACKUP_MODELS
+    last_error  = None
+
+    for model_name in model_list:
         try:
-            model = genai.GenerativeModel(model_name)
+            model = genai.GenerativeModel(
+                model_name,
+                generation_config={
+                    "temperature":      0.4,
+                    "top_p":            0.9,
+                    "top_k":            40,
+                    "max_output_tokens": 2048,
+                },
+            )
             response = model.generate_content(prompt)
-            if response and hasattr(response, "text") and response.text.strip():
+            if response and hasattr(response, "text") and response.text and response.text.strip():
                 return response.text.strip(), model_name
         except Exception as e:
             last_error = str(e)
             continue
-    return f"AI is currently unavailable. Error: {last_error}", "None"
 
-# --- DATABASE ---
+    return f"AI generation failed. Last error: {last_error}", "None"
+
+# =====================================================================
+# DATABASE
+# =====================================================================
 def init_db():
     conn = sqlite3.connect("users.db")
     c = conn.cursor()
@@ -65,7 +76,7 @@ def hash_p(password):
     return hashlib.sha256(password.encode()).hexdigest()
 
 # =====================================================================
-# COURSE & SUBJECT MAP  (Category → Course → [Subjects])
+# COURSE / SUBJECT MAP   Category → Course → [Subjects]
 # =====================================================================
 DATA_MAP = {
     "Competitive Exams 🏆": {
@@ -77,70 +88,46 @@ DATA_MAP = {
             "Public Administration",
             "Ethics"
         ],
-        "JEE (Mains/Adv)": ["Physics", "Chemistry", "Mathematics"],
-        "NEET": ["Biology", "Physics", "Chemistry"],
-        "GATE": ["Computer Science", "Mechanical", "Electrical", "Civil", "Electronics"],
-        "Banking/SSC": ["Quantitative Aptitude", "Reasoning", "English", "General Awareness"]
+        "JEE (Mains/Adv)":  ["Physics", "Chemistry", "Mathematics"],
+        "NEET":              ["Biology", "Physics", "Chemistry"],
+        "GATE":              ["Computer Science", "Mechanical", "Electrical", "Civil", "Electronics"],
+        "Banking/SSC":       ["Quantitative Aptitude", "Reasoning", "English", "General Awareness"]
     },
     "Engineering & Tech 💻": {
         "B.Tech / M.Tech": [
-            "Computer Science (CSE)",
-            "Information Technology (IT)",
-            "Electronics (ECE)",
-            "Mechanical (ME)",
-            "Civil (CE)",
-            "AI & Data Science"
+            "Computer Science (CSE)", "Information Technology (IT)",
+            "Electronics (ECE)", "Mechanical (ME)", "Civil (CE)", "AI & Data Science"
         ],
         "Polytechnic Diploma": ["Mechanical", "Electrical", "Civil", "Computer"],
         "BCA / MCA": [
-            "Programming in C/C++",
-            "Java & Python",
-            "Database Management",
-            "Software Engineering",
-            "Web Development"
+            "Programming in C/C++", "Java & Python",
+            "Database Management", "Software Engineering", "Web Development"
         ]
     },
     "School (K-12) 🏫": {
         "Class 10": [
-            "Mathematics",
-            "Science",
+            "Mathematics", "Science",
             "Social Science — History",
             "Social Science — Geography",
             "Social Science — Civics (Political Science)",
             "Social Science — Economics",
-            "English",
-            "Hindi"
+            "English", "Hindi"
         ],
         "Class 11 & 12": [
-            "Physics",
-            "Chemistry",
-            "Mathematics",
-            "Biology",
-            "Accountancy",
-            "Business Studies",
-            "Economics",
-            "History",
-            "Psychology"
+            "Physics", "Chemistry", "Mathematics", "Biology",
+            "Accountancy", "Business Studies", "Economics", "History", "Psychology"
         ]
     },
     "Degree & Masters 🎓": {
         "Commerce (B.Com/M.Com)": [
-            "Financial Accounting",
-            "Corporate Tax",
-            "Auditing",
-            "Costing",
-            "Management Accounting"
+            "Financial Accounting", "Corporate Tax", "Auditing", "Costing", "Management Accounting"
         ],
         "Science (B.Sc/M.Sc)": [
-            "Physics", "Chemistry", "Maths",
-            "Zoology", "Botany", "Biotechnology"
+            "Physics", "Chemistry", "Maths", "Zoology", "Botany", "Biotechnology"
         ],
-        "Management (BBA/MBA)": [
-            "Marketing", "Finance", "HR", "Operations", "Strategy"
-        ],
+        "Management (BBA/MBA)": ["Marketing", "Finance", "HR", "Operations", "Strategy"],
         "Arts (B.A/M.A)": [
-            "English Literature", "Political Science",
-            "Economics", "History", "Psychology"
+            "English Literature", "Political Science", "Economics", "History", "Psychology"
         ]
     }
 }
@@ -152,25 +139,17 @@ BOARDS = [
 ]
 
 # =====================================================================
-# TOPIC MAP  (Category → Course → Subject → [Topics])
-# These are the broad topic areas / units within a subject
+# TOPIC MAP   Category → Course → Subject → [Topics / Units]
 # =====================================================================
 TOPIC_MAP = {
     "School (K-12) 🏫": {
         "Class 10": {
             "Mathematics": [
-                "Number Systems & Algebra",
-                "Geometry",
-                "Trigonometry",
-                "Statistics & Probability",
-                "Coordinate Geometry",
-                "Mensuration"
+                "Number Systems & Algebra", "Geometry",
+                "Trigonometry", "Coordinate Geometry",
+                "Mensuration", "Statistics & Probability"
             ],
-            "Science": [
-                "Chemistry",
-                "Biology",
-                "Physics"
-            ],
+            "Science": ["Chemistry", "Biology", "Physics"],
             "Social Science — History": [
                 "Events and Processes",
                 "Livelihoods Economies and Societies",
@@ -192,64 +171,39 @@ TOPIC_MAP = {
                 "Consumer Awareness"
             ],
             "English": [
-                "Literature — Prose",
-                "Literature — Poetry",
-                "Grammar",
-                "Writing Skills"
+                "Literature — Prose", "Literature — Poetry",
+                "Grammar", "Writing Skills"
             ],
             "Hindi": [
-                "गद्य (Prose)",
-                "पद्य (Poetry)",
-                "व्याकरण (Grammar)",
-                "लेखन (Writing)"
+                "गद्य (Prose)", "पद्य (Poetry)",
+                "व्याकरण (Grammar)", "लेखन (Writing)"
             ]
         },
         "Class 11 & 12": {
             "Physics": [
-                "Mechanics",
-                "Thermodynamics & Waves",
-                "Electromagnetism",
-                "Optics & Modern Physics"
+                "Mechanics", "Thermodynamics & Waves",
+                "Electromagnetism", "Optics & Modern Physics"
             ],
-            "Chemistry": [
-                "Physical Chemistry",
-                "Inorganic Chemistry",
-                "Organic Chemistry"
-            ],
+            "Chemistry": ["Physical Chemistry", "Inorganic Chemistry", "Organic Chemistry"],
             "Mathematics": [
-                "Algebra",
-                "Calculus",
-                "Coordinate Geometry",
-                "Statistics & Probability",
-                "Vectors & 3D"
+                "Algebra", "Calculus", "Coordinate Geometry",
+                "Vectors & 3D", "Statistics & Probability"
             ],
             "Biology": [
-                "Cell Biology & Diversity",
-                "Plant Physiology",
-                "Human Physiology",
-                "Genetics & Evolution",
-                "Ecology & Environment"
+                "Cell Biology & Diversity", "Plant Physiology",
+                "Human Physiology", "Genetics & Evolution", "Ecology & Environment"
             ],
             "Accountancy": [
-                "Basic Accounting",
-                "Partnership Accounts",
-                "Company Accounts",
-                "Analysis of Financial Statements"
+                "Basic Accounting", "Partnership Accounts",
+                "Company Accounts", "Analysis of Financial Statements"
             ],
             "Business Studies": [
                 "Nature and Forms of Business",
                 "Management Principles",
                 "Business Finance and Marketing"
             ],
-            "Economics": [
-                "Microeconomics",
-                "Macroeconomics",
-                "Indian Economic Development"
-            ],
-            "History": [
-                "Themes in Indian History",
-                "World History"
-            ],
+            "Economics": ["Microeconomics", "Macroeconomics", "Indian Economic Development"],
+            "History": ["Themes in Indian History", "World History"],
             "Psychology": [
                 "Foundations of Psychology",
                 "Human Behaviour and Processes",
@@ -259,127 +213,102 @@ TOPIC_MAP = {
     },
     "Competitive Exams 🏆": {
         "JEE (Mains/Adv)": {
-            "Physics": ["Mechanics", "Thermodynamics", "Electrodynamics", "Optics & Modern Physics"],
-            "Chemistry": ["Physical Chemistry", "Inorganic Chemistry", "Organic Chemistry"],
+            "Physics":     ["Mechanics", "Thermodynamics", "Electrodynamics", "Optics & Modern Physics"],
+            "Chemistry":   ["Physical Chemistry", "Inorganic Chemistry", "Organic Chemistry"],
             "Mathematics": ["Algebra", "Calculus", "Coordinate Geometry", "Trigonometry", "Probability"]
         },
         "NEET": {
-            "Biology": ["Cell Biology", "Plant Biology", "Human Physiology", "Genetics & Evolution", "Ecology"],
-            "Physics": ["Mechanics", "Thermodynamics", "Electrodynamics", "Optics"],
+            "Biology":   ["Cell Biology", "Plant Biology", "Human Physiology", "Genetics & Evolution", "Ecology"],
+            "Physics":   ["Mechanics", "Thermodynamics", "Electrodynamics", "Optics"],
             "Chemistry": ["Physical Chemistry", "Inorganic Chemistry", "Organic Chemistry"]
         },
         "GATE": {
             "Computer Science": [
-                "Programming & Data Structures",
-                "Theory of Computation",
-                "Systems (OS & Networks)",
-                "Databases & Engineering Math"
+                "Programming & Data Structures", "Theory of Computation",
+                "Systems (OS & Networks)", "Databases & Engineering Math"
             ],
-            "Mechanical": ["Mechanics & Design", "Thermal Sciences", "Manufacturing"],
-            "Electrical": ["Circuits & Machines", "Power Systems", "Signals & Control"],
-            "Civil": ["Structures & Geotechnical", "Fluid & Environmental", "Transportation"],
+            "Mechanical":  ["Mechanics & Design", "Thermal Sciences", "Manufacturing"],
+            "Electrical":  ["Circuits & Machines", "Power Systems", "Signals & Control"],
+            "Civil":       ["Structures & Geotechnical", "Fluid & Environmental", "Transportation"],
             "Electronics": ["Circuits & Devices", "Signals & Control", "Communications"]
         },
         "Banking/SSC": {
             "Quantitative Aptitude": ["Arithmetic", "Algebra & Geometry", "Data Interpretation"],
-            "Reasoning": ["Verbal Reasoning", "Non-Verbal Reasoning", "Puzzles"],
-            "English": ["Comprehension & Vocabulary", "Grammar", "Writing"],
-            "General Awareness": ["Current Affairs", "Static GK", "Banking & Finance"]
+            "Reasoning":             ["Verbal Reasoning", "Non-Verbal Reasoning", "Puzzles"],
+            "English":               ["Comprehension & Vocabulary", "Grammar", "Writing"],
+            "General Awareness":     ["Current Affairs", "Static GK", "Banking & Finance"]
         },
         "UPSC (Civil Services)": {
-            "General Studies 1": ["History", "Geography", "Society"],
+            "General Studies 1":        ["History", "Geography", "Society"],
             "General Studies 2 (CSAT)": ["Comprehension", "Reasoning", "Numeracy"],
-            "History Optional": ["Ancient India", "Medieval India", "Modern India", "World History"],
-            "Geography Optional": ["Physical Geography", "Human Geography", "Indian Geography"],
-            "Public Administration": ["Administrative Theory", "Indian Administration"],
-            "Ethics": ["Ethics & Integrity", "Attitude & Aptitude", "Case Studies"]
+            "History Optional":         ["Ancient India", "Medieval India", "Modern India", "World History"],
+            "Geography Optional":       ["Physical Geography", "Human Geography", "Indian Geography"],
+            "Public Administration":    ["Administrative Theory", "Indian Administration"],
+            "Ethics":                   ["Ethics & Integrity", "Attitude & Aptitude", "Case Studies"]
         }
     },
     "Engineering & Tech 💻": {
         "B.Tech / M.Tech": {
             "Computer Science (CSE)": [
-                "Programming Fundamentals",
-                "Core CS (OS, Networks, DBMS)",
-                "Algorithms & Theory",
-                "AI & Machine Learning"
+                "Programming Fundamentals", "Core CS (OS, Networks, DBMS)",
+                "Algorithms & Theory", "AI & Machine Learning"
             ],
-            "Information Technology (IT)": [
-                "Networking & Security",
-                "Web & Cloud",
-                "Data & Analytics"
-            ],
-            "Electronics (ECE)": [
-                "Circuits & Devices",
-                "Communication Systems",
-                "Embedded Systems"
-            ],
-            "Mechanical (ME)": [
-                "Mechanics & Design",
-                "Thermal Sciences",
-                "Manufacturing"
-            ],
-            "Civil (CE)": [
-                "Structures",
-                "Geotechnical & Environmental",
-                "Transportation"
-            ],
-            "AI & Data Science": [
-                "Statistics & Math",
-                "Machine Learning",
-                "Deep Learning & NLP",
-                "Data Engineering"
-            ]
+            "Information Technology (IT)": ["Networking & Security", "Web & Cloud", "Data & Analytics"],
+            "Electronics (ECE)":           ["Circuits & Devices", "Communication Systems", "Embedded Systems"],
+            "Mechanical (ME)":             ["Mechanics & Design", "Thermal Sciences", "Manufacturing"],
+            "Civil (CE)":                  ["Structures", "Geotechnical & Environmental", "Transportation"],
+            "AI & Data Science":           ["Statistics & Math", "Machine Learning", "Deep Learning & NLP", "Data Engineering"]
         },
         "Polytechnic Diploma": {
             "Mechanical": ["Mechanics", "Thermal", "Manufacturing"],
-            "Electrical": ["Circuits", "Machines", "Power"],
-            "Civil": ["Structures", "Construction", "Surveying"],
-            "Computer": ["Programming", "Networking", "DBMS"]
+            "Electrical":  ["Circuits", "Machines", "Power"],
+            "Civil":       ["Structures", "Construction", "Surveying"],
+            "Computer":    ["Programming", "Networking", "DBMS"]
         },
         "BCA / MCA": {
             "Programming in C/C++": ["Basics", "Functions & Arrays", "OOP Concepts"],
-            "Java & Python": ["Core Java", "Python Basics", "OOP & Libraries"],
-            "Database Management": ["ER Model & SQL", "Normalization", "Transactions"],
+            "Java & Python":        ["Core Java", "Python Basics", "OOP & Libraries"],
+            "Database Management":  ["ER Model & SQL", "Normalization", "Transactions"],
             "Software Engineering": ["SDLC Models", "Testing", "Agile"],
-            "Web Development": ["Frontend", "Backend", "Deployment"]
+            "Web Development":      ["Frontend", "Backend", "Deployment"]
         }
     },
     "Degree & Masters 🎓": {
         "Commerce (B.Com/M.Com)": {
-            "Financial Accounting": ["Basic Accounts", "Partnership", "Company Accounts"],
-            "Corporate Tax": ["Income Tax Basics", "Corporate Tax Planning"],
-            "Auditing": ["Audit Basics", "Types of Audit", "Audit Report"],
-            "Costing": ["Material & Labour", "Process Costing", "Marginal Costing"],
+            "Financial Accounting":  ["Basic Accounts", "Partnership", "Company Accounts"],
+            "Corporate Tax":         ["Income Tax Basics", "Corporate Tax Planning"],
+            "Auditing":              ["Audit Basics", "Types of Audit", "Audit Report"],
+            "Costing":               ["Material & Labour", "Process Costing", "Marginal Costing"],
             "Management Accounting": ["Ratio Analysis", "Budgeting", "Standard Costing"]
         },
         "Science (B.Sc/M.Sc)": {
-            "Physics": ["Classical Mechanics", "Electromagnetism", "Quantum Mechanics", "Modern Physics"],
-            "Chemistry": ["Physical", "Organic", "Inorganic", "Analytical"],
-            "Maths": ["Analysis", "Algebra", "Differential Equations", "Topology"],
-            "Zoology": ["Animal Diversity", "Physiology", "Genetics", "Ecology"],
-            "Botany": ["Plant Diversity", "Physiology", "Genetics", "Ecology"],
+            "Physics":       ["Classical Mechanics", "Electromagnetism", "Quantum Mechanics", "Modern Physics"],
+            "Chemistry":     ["Physical", "Organic", "Inorganic", "Analytical"],
+            "Maths":         ["Analysis", "Algebra", "Differential Equations", "Topology"],
+            "Zoology":       ["Animal Diversity", "Physiology", "Genetics", "Ecology"],
+            "Botany":        ["Plant Diversity", "Physiology", "Genetics", "Ecology"],
             "Biotechnology": ["Molecular Biology", "Genetic Engineering", "Bioprocess", "Bioinformatics"]
         },
         "Management (BBA/MBA)": {
-            "Marketing": ["Basics & Consumer Behaviour", "Strategy & Mix", "Digital Marketing"],
-            "Finance": ["Financial Management", "Investments", "Risk"],
-            "HR": ["Recruitment & Training", "Performance & Compensation", "Employee Relations"],
+            "Marketing":  ["Basics & Consumer Behaviour", "Strategy & Mix", "Digital Marketing"],
+            "Finance":    ["Financial Management", "Investments", "Risk"],
+            "HR":         ["Recruitment & Training", "Performance & Compensation", "Employee Relations"],
             "Operations": ["Process & Capacity", "Quality & Supply Chain"],
-            "Strategy": ["Analysis & Positioning", "Corporate Strategy"]
+            "Strategy":   ["Analysis & Positioning", "Corporate Strategy"]
         },
         "Arts (B.A/M.A)": {
-            "English Literature": ["Poetry", "Drama", "Novel & Prose", "Literary Theory"],
-            "Political Science": ["Political Theory", "Indian Politics", "International Relations"],
-            "Economics": ["Micro & Macro", "Indian Economy", "Development Economics"],
-            "History": ["Ancient", "Medieval", "Modern", "World History"],
-            "Psychology": ["Cognitive & Social", "Developmental & Abnormal", "Research Methods"]
+            "English Literature":  ["Poetry", "Drama", "Novel & Prose", "Literary Theory"],
+            "Political Science":   ["Political Theory", "Indian Politics", "International Relations"],
+            "Economics":           ["Micro & Macro", "Indian Economy", "Development Economics"],
+            "History":             ["Ancient", "Medieval", "Modern", "World History"],
+            "Psychology":          ["Cognitive & Social", "Developmental & Abnormal", "Research Methods"]
         }
     }
 }
 
 # =====================================================================
-# CHAPTER MAP  (Category → Course → Subject → Topic → [Chapters])
-# Accurate NCERT / standard syllabus chapters
+# CHAPTER MAP   Category → Course → Subject → Topic → [Chapters]
+# All NCERT Class 10 chapters verified against 2025-26 syllabus
 # =====================================================================
 CHAPTER_MAP = {
     "School (K-12) 🏫": {
@@ -401,9 +330,7 @@ CHAPTER_MAP = {
                     "Ch 8: Introduction to Trigonometry",
                     "Ch 9: Some Applications of Trigonometry"
                 ],
-                "Coordinate Geometry": [
-                    "Ch 7: Coordinate Geometry"
-                ],
+                "Coordinate Geometry": ["Ch 7: Coordinate Geometry"],
                 "Mensuration": [
                     "Ch 12: Areas Related to Circles",
                     "Ch 13: Surface Areas and Volumes"
@@ -556,19 +483,12 @@ CHAPTER_MAP = {
                     "संगतकार"
                 ],
                 "व्याकरण (Grammar)": [
-                    "पद परिचय",
-                    "रस",
-                    "अलंकार",
-                    "समास",
-                    "वाच्य",
-                    "वाक्य भेद",
-                    "मुहावरे"
+                    "पद परिचय", "रस", "अलंकार",
+                    "समास", "वाच्य", "वाक्य भेद", "मुहावरे"
                 ],
                 "लेखन (Writing)": [
-                    "पत्र लेखन",
-                    "निबंध लेखन",
-                    "सूचना लेखन",
-                    "विज्ञापन लेखन"
+                    "पत्र लेखन", "निबंध लेखन",
+                    "सूचना लेखन", "विज्ञापन लेखन"
                 ]
             }
         },
@@ -594,22 +514,22 @@ CHAPTER_MAP = {
                     "Ch 15: Waves"
                 ],
                 "Electromagnetism": [
-                    "Ch 1: Electric Charges and Fields",
-                    "Ch 2: Electrostatic Potential and Capacitance",
-                    "Ch 3: Current Electricity",
-                    "Ch 4: Moving Charges and Magnetism",
-                    "Ch 5: Magnetism and Matter",
-                    "Ch 6: Electromagnetic Induction",
-                    "Ch 7: Alternating Current",
-                    "Ch 8: Electromagnetic Waves"
+                    "Ch 1 (XII): Electric Charges and Fields",
+                    "Ch 2 (XII): Electrostatic Potential and Capacitance",
+                    "Ch 3 (XII): Current Electricity",
+                    "Ch 4 (XII): Moving Charges and Magnetism",
+                    "Ch 5 (XII): Magnetism and Matter",
+                    "Ch 6 (XII): Electromagnetic Induction",
+                    "Ch 7 (XII): Alternating Current",
+                    "Ch 8 (XII): Electromagnetic Waves"
                 ],
                 "Optics & Modern Physics": [
-                    "Ch 9: Ray Optics and Optical Instruments",
-                    "Ch 10: Wave Optics",
-                    "Ch 11: Dual Nature of Radiation and Matter",
-                    "Ch 12: Atoms",
-                    "Ch 13: Nuclei",
-                    "Ch 14: Semiconductor Electronics"
+                    "Ch 9 (XII): Ray Optics and Optical Instruments",
+                    "Ch 10 (XII): Wave Optics",
+                    "Ch 11 (XII): Dual Nature of Radiation and Matter",
+                    "Ch 12 (XII): Atoms",
+                    "Ch 13 (XII): Nuclei",
+                    "Ch 14 (XII): Semiconductor Electronics"
                 ]
             },
             "Chemistry": {
@@ -789,7 +709,7 @@ CHAPTER_MAP = {
                     "Ch 1: Introduction to Microeconomics",
                     "Ch 2: Theory of Consumer Behaviour",
                     "Ch 3: Production and Costs",
-                    "Ch 4: The Theory of the Firm under Perfect Competition",
+                    "Ch 4: Theory of the Firm under Perfect Competition",
                     "Ch 5: Market Equilibrium",
                     "Ch 6: Non-Competitive Markets"
                 ],
@@ -816,14 +736,14 @@ CHAPTER_MAP = {
             },
             "History": {
                 "Themes in Indian History": [
-                    "Ch 1: Bricks Beads and Bones (Harappan Civilisation)",
-                    "Ch 2: Kings Farmers and Towns",
-                    "Ch 3: Kinship Caste and Class",
-                    "Ch 4: Thinkers Beliefs and Buildings",
+                    "Ch 1: Bricks, Beads and Bones (Harappan Civilisation)",
+                    "Ch 2: Kings, Farmers and Towns",
+                    "Ch 3: Kinship, Caste and Class",
+                    "Ch 4: Thinkers, Beliefs and Buildings",
                     "Ch 5: Through the Eyes of Travellers",
-                    "Ch 6: Bhakti Sufi Traditions",
-                    "Ch 7: An Imperial Capital Vijayanagara",
-                    "Ch 8: Peasants Zamindars and the State",
+                    "Ch 6: Bhakti-Sufi Traditions",
+                    "Ch 7: An Imperial Capital — Vijayanagara",
+                    "Ch 8: Peasants, Zamindars and the State",
                     "Ch 9: Kings and Chronicles",
                     "Ch 10: Colonialism and the Countryside",
                     "Ch 11: Rebels and the Raj",
@@ -854,7 +774,7 @@ CHAPTER_MAP = {
                 ],
                 "Human Behaviour and Processes": [
                     "Ch 4: Human Development",
-                    "Ch 5: Sensory Attentional and Perceptual Processes",
+                    "Ch 5: Sensory, Attentional and Perceptual Processes",
                     "Ch 6: Learning",
                     "Ch 7: Human Memory",
                     "Ch 8: Thinking",
@@ -876,97 +796,24 @@ CHAPTER_MAP = {
     }
 }
 
-# Generic fallback chapters for Engineering and other categories
-# (AI will fill in details at generation time — chapters are standard)
-GENERIC_CHAPTERS = {
-    "Engineering & Tech 💻": {
-        "B.Tech / M.Tech": {
-            "Computer Science (CSE)": {
-                "Programming Fundamentals": [
-                    "Introduction to Programming", "Variables, Data Types and Operators",
-                    "Control Structures", "Functions and Recursion",
-                    "Arrays and Strings", "Pointers and Memory Management",
-                    "File Handling", "Introduction to OOP"
-                ],
-                "Core CS (OS, Networks, DBMS)": [
-                    "Process Management", "Memory Management", "File Systems",
-                    "CPU Scheduling", "Deadlocks",
-                    "Network Models and Protocols", "TCP/IP and UDP",
-                    "Routing and Switching", "Network Security",
-                    "ER Model and Relational Algebra", "SQL and Normalization",
-                    "Transaction Management and Indexing"
-                ],
-                "Algorithms & Theory": [
-                    "Sorting and Searching Algorithms", "Greedy Algorithms",
-                    "Divide and Conquer", "Dynamic Programming",
-                    "Graph Algorithms", "Complexity Analysis",
-                    "Finite Automata", "Pushdown Automata",
-                    "Turing Machines", "Compiler Phases",
-                    "Parsing and Code Generation"
-                ],
-                "AI & Machine Learning": [
-                    "Introduction to AI", "Search Algorithms", "Knowledge Representation",
-                    "Supervised Learning", "Unsupervised Learning",
-                    "Neural Networks", "Deep Learning Basics",
-                    "Model Evaluation and Tuning", "NLP Basics",
-                    "Computer Vision Basics"
-                ]
-            },
-            "AI & Data Science": {
-                "Statistics & Math": [
-                    "Descriptive Statistics", "Probability Theory",
-                    "Statistical Inference", "Linear Algebra Basics",
-                    "Calculus for ML", "Optimization"
-                ],
-                "Machine Learning": [
-                    "Supervised Learning — Regression",
-                    "Supervised Learning — Classification",
-                    "Unsupervised Learning — Clustering",
-                    "Dimensionality Reduction",
-                    "Ensemble Methods",
-                    "Model Selection and Evaluation"
-                ],
-                "Deep Learning & NLP": [
-                    "Neural Networks and Backpropagation",
-                    "CNNs for Image Processing",
-                    "RNNs and LSTMs",
-                    "Transformers and Attention",
-                    "Text Processing and Embeddings",
-                    "Generative Models"
-                ],
-                "Data Engineering": [
-                    "Data Collection and Preprocessing",
-                    "Feature Engineering",
-                    "Data Pipelines",
-                    "Big Data Basics",
-                    "Database for Data Science",
-                    "Deployment and MLOps"
-                ]
-            }
-        }
-    }
-}
-
 # =====================================================================
-# HELPER: Get Topics
+# HELPERS
 # =====================================================================
 def get_topics(category, course, subject):
-    topics = (
-        TOPIC_MAP.get(category, {})
-        .get(course, {})
-        .get(subject, [])
-    )
-    if topics:
-        return topics
-    return ["General Topics"]
+    """Return topic list. Works for both dict-of-dict and dict-of-list structures."""
+    course_data = TOPIC_MAP.get(category, {}).get(course, {})
+    if isinstance(course_data, dict):
+        topics = course_data.get(subject, [])
+    else:
+        topics = []
+    return topics if topics else ["General Topics"]
 
-# =====================================================================
-# HELPER: Get Chapters (local first, AI fallback)
-# =====================================================================
+
 def get_chapters(category, course, subject, topic):
-    # Check main chapter map (School)
+    """Return chapter list from local map; fall back to AI only if missing."""
     chapters = (
-        CHAPTER_MAP.get(category, {})
+        CHAPTER_MAP
+        .get(category, {})
         .get(course, {})
         .get(subject, {})
         .get(topic, [])
@@ -974,26 +821,16 @@ def get_chapters(category, course, subject, topic):
     if chapters:
         return chapters
 
-    # Check generic chapters (Engineering etc)
-    chapters = (
-        GENERIC_CHAPTERS.get(category, {})
-        .get(course, {})
-        .get(subject, {})
-        .get(topic, [])
-    )
-    if chapters:
-        return chapters
-
-    # AI fallback — only used if topic not in local map
+    # AI fallback — only triggered when local data is absent
     prompt = (
         f"You are an academic syllabus expert. "
         f"List the standard chapter names for the topic area '{topic}' "
-        f"in the subject '{subject}' for {course}. "
+        f"in '{subject}' for {course}. "
         f"Return ONLY a comma-separated list of chapter names. "
         f"No numbers, no explanation, no extra text."
     )
     result, _ = generate_with_fallback(prompt)
-    if "unavailable" in result.lower() or not result.strip():
+    if "failed" in result.lower() or not result.strip():
         return [f"Introduction to {topic}", f"Core Concepts of {topic}", f"Advanced {topic}"]
     chapters = [c.strip() for c in result.split(",") if c.strip() and len(c.strip()) > 2]
     return chapters if chapters else [f"Introduction to {topic}"]
@@ -1002,6 +839,7 @@ def get_chapters(category, course, subject, topic):
 # MAIN APP
 # =====================================================================
 def main_app():
+    # ── Sidebar ───────────────────────────────────────────────────
     with st.sidebar:
         st.title("🎓 StudyFiesta")
         st.markdown(f"**Welcome, {st.session_state.username}** 👋")
@@ -1013,13 +851,14 @@ def main_app():
         st.divider()
         if st.button("Logout"):
             st.session_state.logged_in = False
-            st.session_state.username = ""
+            st.session_state.username  = ""
             st.rerun()
 
+    # ── Header ────────────────────────────────────────────────────
     st.markdown(f"# {tool}")
     st.write("Streamlining your preparation with AI precision.")
 
-    # ── Selection Card ─────────────────────────────────────────────
+    # ── Selection card ────────────────────────────────────────────
     st.markdown('<div class="card">', unsafe_allow_html=True)
 
     col1, col2, col3 = st.columns(3)
@@ -1037,73 +876,105 @@ def main_app():
     with col4:
         sub = st.selectbox("📖 Subject", DATA_MAP[cat][course])
 
-    # ── Topics Dropdown ────────────────────────────────────────────
-    topics_list = get_topics(cat, course, sub)
+    # Row 2: Topic  +  Chapter
     col6, col7 = st.columns(2)
+
+    topics_list = get_topics(cat, course, sub)
     with col6:
         topic = st.selectbox("🗂️ Topic / Unit", topics_list)
 
-    # ── Chapters Dropdown (based on selected topic) ────────────────
+    # Load chapters whenever cat/course/sub/topic changes
     chapter_key = f"{cat}||{course}||{sub}||{topic}"
-    if "last_chapter_key" not in st.session_state:
-        st.session_state.last_chapter_key = ""
-    if "current_chapters" not in st.session_state:
-        st.session_state.current_chapters = []
+    if "last_chapter_key"   not in st.session_state: st.session_state.last_chapter_key   = ""
+    if "current_chapters"   not in st.session_state: st.session_state.current_chapters   = []
 
     if st.session_state.last_chapter_key != chapter_key:
-        st.session_state.current_chapters = get_chapters(cat, course, sub, topic)
-        st.session_state.last_chapter_key = chapter_key
+        st.session_state.current_chapters   = get_chapters(cat, course, sub, topic)
+        st.session_state.last_chapter_key   = chapter_key
 
     with col7:
         chap = st.selectbox("📝 Chapter", st.session_state.current_chapters)
 
     st.markdown('</div>', unsafe_allow_html=True)
 
-    # ── Generate Button ────────────────────────────────────────────
+    # ── Output style selector ─────────────────────────────────────
+    output_style = st.radio(
+        "Output Style",
+        ["📄 Detailed", "⚡ Short & Quick", "📋 Notes Format"],
+        horizontal=True
+    )
+
+    # ── Generate button ───────────────────────────────────────────
     if st.button(f"Generate {tool} ✨", use_container_width=True):
+
         audience = f"{board} {course} students" if "School" in cat else f"{course} students"
 
+        style_instruction = {
+            "📄 Detailed":       "Give a thorough, well-structured detailed explanation.",
+            "⚡ Short & Quick":  "Keep it concise — key points only, no fluff.",
+            "📋 Notes Format":   "Format as clean bullet-point notes, easy to revise quickly."
+        }[output_style]
+
+        # Step 3 — improved structured prompts
         prompt_map = {
             "📝 Summary": (
-                f"Generate a clear, professional, student-friendly summary for the chapter "
-                f"'{chap}' (Topic: {topic}) in '{sub}' for {audience}. "
-                f"Use headings, bullet points, key concepts, and simple explanations."
+                f"Write a clear student-friendly summary for '{chap}' "
+                f"(Topic: {topic}) in '{sub}' for {audience}.\n"
+                f"Structure:\n"
+                f"1. Overview\n"
+                f"2. Key Concepts\n"
+                f"3. Important Points\n"
+                f"4. Exam Focus\n"
+                f"5. Quick Revision Notes\n"
+                f"{style_instruction}"
             ),
             "🧠 Quiz": (
                 f"Generate 5 high-quality MCQs for '{chap}' (Topic: {topic}) "
-                f"in '{sub}' for {audience}. "
-                f"Include options A–D, the correct answer, and a brief explanation."
+                f"in '{sub}' for {audience}.\n"
+                f"For each question include:\n"
+                f"- The question\n"
+                f"- Options A, B, C, D\n"
+                f"- Correct answer\n"
+                f"- Brief explanation\n"
+                f"{style_instruction}"
             ),
             "📌 Revision Notes": (
-                f"Create concise revision notes for '{chap}' (Topic: {topic}) "
-                f"in '{sub}' for {audience}. "
-                f"Highlight key definitions, formulas, dates/facts and quick memory tips."
+                f"Create revision notes for '{chap}' (Topic: {topic}) "
+                f"in '{sub}' for {audience}.\n"
+                f"Include: key definitions, important formulas, dates/facts, "
+                f"and quick memory tips.\n"
+                f"{style_instruction}"
             ),
             "❓ Exam Q&A": (
-                f"List 5 probable exam questions and detailed model answers for "
-                f"'{chap}' (Topic: {topic}) in '{sub}' for {audience}. "
-                f"Make them exam-ready and easy to revise."
+                f"List 5 probable exam questions with detailed model answers for "
+                f"'{chap}' (Topic: {topic}) in '{sub}' for {audience}.\n"
+                f"Make them exam-ready and easy to revise.\n"
+                f"{style_instruction}"
             )
         }
 
         final_prompt = (
-            f"{prompt_map[tool]} "
+            f"{prompt_map[tool]}\n\n"
             f"If mathematical expressions are needed, use LaTeX format. "
             f"Keep the response accurate, structured and student-friendly."
         )
 
-        with st.spinner(f"Generating {tool} for {chap}..."):
-            result, model_used = generate_with_fallback(final_prompt)
+        # Step 3 — safe generation with visible error
+        with st.spinner(f"Generating {tool} for '{chap}'..."):
+            try:
+                result, model_used = generate_with_fallback(final_prompt)
+            except Exception as e:
+                result, model_used = f"Unexpected error: {e}", "None"
 
         st.markdown("---")
 
         if model_used != "None":
-            st.success(f"✅ Ready! (Powered by {model_used})")
-            st.markdown("### 📄 Output")
+            st.success(f"✅ Done! (Powered by {model_used})")
+            st.markdown(f"### 📄 {tool} — {chap}")
             st.markdown(result)
         else:
-            st.error("⚠️ AI service is currently unavailable. Please wait a moment and try again.")
-            st.info(f"Debug info: {result}")
+            st.error("⚠️ AI service is currently unavailable.")
+            st.info(f"🔍 Debug info: {result}")
 
 # =====================================================================
 # AUTH UI
@@ -1119,7 +990,7 @@ def auth_ui():
         p = st.text_input("Password", type="password", key="login_p")
         if st.button("Login", use_container_width=True):
             conn = sqlite3.connect("users.db")
-            c = conn.cursor()
+            c    = conn.cursor()
             c.execute(
                 "SELECT * FROM users WHERE username=? AND password=?",
                 (u, hash_p(p))
@@ -1128,7 +999,7 @@ def auth_ui():
             conn.close()
             if user:
                 st.session_state.logged_in = True
-                st.session_state.username = u
+                st.session_state.username  = u
                 st.rerun()
             else:
                 st.error("❌ Invalid username or password.")
@@ -1142,7 +1013,7 @@ def auth_ui():
             else:
                 try:
                     conn = sqlite3.connect("users.db")
-                    c = conn.cursor()
+                    c    = conn.cursor()
                     c.execute("INSERT INTO users VALUES (?, ?)", (nu.strip(), hash_p(np)))
                     conn.commit()
                     conn.close()
@@ -1155,10 +1026,8 @@ def auth_ui():
 # =====================================================================
 init_db()
 
-if "logged_in" not in st.session_state:
-    st.session_state.logged_in = False
-if "username" not in st.session_state:
-    st.session_state.username = ""
+if "logged_in"  not in st.session_state: st.session_state.logged_in  = False
+if "username"   not in st.session_state: st.session_state.username   = ""
 
 if st.session_state.logged_in:
     main_app()
