@@ -17,67 +17,67 @@ from reportlab.lib.enums import TA_LEFT, TA_CENTER
 # =========================================================
 st.set_page_config(
     page_title="StudySmart AI",
-    page_icon="ðŸŽ“",
+    page_icon="🎓",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
 
 # =========================================================
-# PREMIUM PROFESSIONAL CSS THEME
+# PROFESSIONAL MODERN CSS — LIGHT THEME WITH SOFT GRADIENTS
 # =========================================================
 st.markdown("""
     <style>
-    /* â”€â”€ IMPORT PROFESSIONAL FONTS â”€â”€ */
-    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
+    /* ── IMPORT PROFESSIONAL FONTS ── */
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap');
 
-    /* â”€â”€ GLOBAL STYLING â”€â”€ */
+    /* ── GLOBAL STYLING ── */
     html, body, [class*="css"], [class*="st-"] {
         font-family: 'Inter', 'Poppins', sans-serif !important;
-        letter-spacing: 0.2px;
+        letter-spacing: 0.3px;
     }
 
-    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    /* ════════════════════════════════════════════════════════
        PROFESSIONAL LIGHT GRADIENT BACKGROUND
-    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+    ════════════════════════════════════════════════════════ */
     .stApp {
-        background: linear-gradient(135deg, #f8fafc 0%, #eef2f5 50%, #e0e7ff 100%);
+        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #e8f0f7 100%);
         min-height: 100vh;
     }
 
-    /* â”€â”€ BETTER SCREEN PADDING â”€â”€ */
+    /* ── SCREEN PADDING ── */
     .block-container {
-        padding-top: 2rem !important;
+        padding-top: 1.5rem !important;
         padding-bottom: 2rem !important;
-        padding-left: 1.5rem !important;
-        padding-right: 1.5rem !important;
+        padding-left: 1.2rem !important;
+        padding-right: 1.2rem !important;
         max-width: 1300px;
     }
 
-    /* â”€â”€ HIDE STREAMLIT CHROME â”€â”€ */
+    /* ── HIDE STREAMLIT CHROME ── */
     #MainMenu  { visibility: hidden; }
     footer     { visibility: hidden; }
     header     { visibility: hidden; }
 
-    /* â”€â”€ STREAMLIT TABS OVERRIDE â”€â”€ */
+    /* ── STREAMLIT TABS STYLING ── */
     .stTabs [data-baseweb="tab-list"] {
         background-color: transparent !important;
-        border-bottom: 2px solid rgba(59, 130, 246, 0.15) !important;
+        border-bottom: 2px solid #e2e8f0 !important;
         gap: 20px;
     }
     .stTabs [data-baseweb="tab"] {
         background-color: transparent !important;
         border: none !important;
         color: #64748b !important;
-        font-weight: 600 !important;
+        font-weight: 500 !important;
     }
-    .stTabs [data-baseweb="tab"][aria-selected="true"] {
-        color: #3b82f6 !important;
+    .stTabs [aria-selected="true"] {
+        color: #0f172a !important;
         border-bottom: 3px solid #3b82f6 !important;
     }
 
-    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    /* ════════════════════════════════════════════════════════
        PREMIUM HEADER DESIGN WITH GRADIENT TEXT
-    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+    ════════════════════════════════════════════════════════ */
     .sf-header {
         text-align: center;
         padding: 50px 0 15px 0;
@@ -85,38 +85,38 @@ st.markdown("""
     }
 
     .sf-header-title {
-        font-size: 4.5rem;
+        font-size: 4.2rem;
         font-weight: 800;
-        background: linear-gradient(135deg, #2563eb 0%, #3b82f6 50%, #0ea5e9 100%);
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
         margin: 0;
-        line-height: 1;
-        letter-spacing: -0.5px;
+        line-height: 1.1;
+        letter-spacing: -1.5px;
     }
 
     .sf-header-subtitle {
-        font-size: 1.3rem;
-        color: #475569;
+        font-size: 1.1rem;
+        color: #64748b;
         margin-top: 12px;
         font-weight: 500;
-        letter-spacing: 0.3px;
+        letter-spacing: 0.4px;
     }
 
-    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-       THE WATERMARK â€” PROFESSIONAL & SUBTLE
-    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+    /* ════════════════════════════════════════════════════════
+       THE WATERMARK — CENTERED & SUBTLE ON LIGHT THEME
+    ════════════════════════════════════════════════════════ */
     .sf-watermark {
-        font-size: 4.8rem;
+        font-size: 4.4rem;
         font-weight: 900;
         color: rgba(59, 130, 246, 0.08);
         text-transform: uppercase;
-        letter-spacing: 14px;
-        margin-top: 20px;
-        margin-bottom: -50px;
+        letter-spacing: 12px;
+        margin-top: 12px;
+        margin-bottom: -42px;
         position: relative;
-        top: -12px;
+        top: -8px;
         z-index: 10;
         pointer-events: none;
         user-select: none;
@@ -125,23 +125,23 @@ st.markdown("""
         line-height: 1;
     }
 
-    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    /* ════════════════════════════════════════════════════════
        PREMIUM GLASS CARD COMPONENT
-    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+    ════════════════════════════════════════════════════════ */
     .sf-card {
-        background: rgba(255, 255, 255, 0.85);
+        background: rgba(255, 255, 255, 0.75);
         backdrop-filter: blur(10px);
         border-radius: 20px;
-        padding: 35px;
-        box-shadow: 0 8px 32px rgba(59, 130, 246, 0.1),
-                    inset 0 1px 0 rgba(255, 255, 255, 0.8);
-        margin-bottom: 25px;
-        border: 1.5px solid rgba(59, 130, 246, 0.15);
+        padding: 32px;
+        box-shadow: 0 4px 30px rgba(15, 23, 42, 0.08),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+        margin-bottom: 28px;
+        border: 1px solid rgba(59, 130, 246, 0.15);
     }
 
-    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-       PREMIUM BUTTONS
-    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+    /* ════════════════════════════════════════════════════════
+       PREMIUM BUTTONS WITH GRADIENT & SHADOWS
+    ════════════════════════════════════════════════════════ */
     .stButton > button {
         width: 100% !important;
         border-radius: 12px !important;
@@ -149,14 +149,14 @@ st.markdown("""
         background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
         color: #ffffff !important;
         border: none !important;
-        font-weight: 700 !important;
+        font-weight: 600 !important;
         font-size: 15px !important;
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
         box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3) !important;
-        letter-spacing: 0.5px !important;
+        letter-spacing: 0.4px !important;
     }
     .stButton > button:hover {
-        opacity: 0.92 !important;
+        opacity: 0.9 !important;
         transform: translateY(-2px) !important;
         box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4) !important;
     }
@@ -164,7 +164,7 @@ st.markdown("""
         transform: translateY(0px) !important;
     }
 
-    /* â”€â”€ DOWNLOAD BUTTON (GREEN) â”€â”€ */
+    /* ── DOWNLOAD BUTTON (GREEN GRADIENT) ── */
     .stDownloadButton > button {
         background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
         color: #ffffff !important;
@@ -175,42 +175,41 @@ st.markdown("""
         transform: translateY(-2px) !important;
     }
 
-    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    /* ════════════════════════════════════════════════════════
        PREMIUM SELECTBOX & INPUTS
-    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+    ════════════════════════════════════════════════════════ */
     div[data-baseweb="select"] > div {
         border-radius: 10px !important;
-        border: 1.5px solid rgba(59, 130, 246, 0.25) !important;
-        background: rgba(255, 255, 255, 0.9) !important;
+        border: 1.5px solid #e2e8f0 !important;
+        background: #ffffff !important;
         color: #1e293b !important;
     }
 
     input[type="text"], input[type="password"] {
-        background: rgba(255, 255, 255, 0.9) !important;
+        background: #ffffff !important;
         color: #1e293b !important;
-        border: 1.5px solid rgba(59, 130, 246, 0.25) !important;
+        border: 1.5px solid #e2e8f0 !important;
         border-radius: 10px !important;
     }
 
     input[type="text"]::placeholder, input[type="password"]::placeholder {
-        color: #94a3b8 !important;
+        color: #cbd5e1 !important;
     }
 
-    /* â”€â”€ PREMIUM LABELS â”€â”€ */
+    /* ── PREMIUM LABELS ── */
     div.stSelectbox label, div.stTextInput label, div.stRadio label {
-        font-weight: 700 !important;
+        font-weight: 600 !important;
         color: #1e293b !important;
-        font-size: 0.85rem !important;
+        font-size: 0.9rem !important;
         letter-spacing: 0.3px !important;
-        text-transform: uppercase;
     }
 
-    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-       PREMIUM SIDEBAR
-    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+    /* ════════════════════════════════════════════════════════
+       PREMIUM SIDEBAR — CLEAN LIGHT GRADIENT
+    ════════════════════════════════════════════════════════ */
     [data-testid="stSidebar"] {
-        background: linear-gradient(180deg, #ffffff 0%, #f1f5f9 100%) !important;
-        border-right: 1px solid rgba(59, 130, 246, 0.15) !important;
+        background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%) !important;
+        border-right: 1px solid #e2e8f0 !important;
     }
 
     [data-testid="stSidebar"] * {
@@ -226,99 +225,104 @@ st.markdown("""
     }
 
     [data-testid="stSidebar"] .stButton > button:hover {
-        background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
-        box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4) !important;
+        box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3) !important;
+        transform: translateY(-2px) !important;
     }
 
-    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    /* ════════════════════════════════════════════════════════
        OUTPUT CONTENT AREA
-    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+    ════════════════════════════════════════════════════════ */
     .sf-output {
-        background: rgba(240, 249, 255, 0.9);
-        backdrop-filter: blur(10px);
-        border-radius: 16px;
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(37, 99, 235, 0.05) 100%);
+        border-radius: 18px;
         padding: 28px;
         border-left: 5px solid #3b82f6;
-        box-shadow: 0 4px 16px rgba(59, 130, 246, 0.12);
-        margin-top: 10px;
+        box-shadow: 0 2px 15px rgba(59, 130, 246, 0.1);
+        margin-top: 12px;
         border: 1px solid rgba(59, 130, 246, 0.2);
         color: #1e293b;
     }
 
     .sf-output h3, .sf-output h2 {
-        color: #2563eb !important;
+        color: #3b82f6 !important;
         margin-top: 0;
+        font-weight: 700;
     }
 
-    /* â”€â”€ SUCCESS / INFO / ERROR / WARNING MESSAGES â”€â”€ */
+    /* ── SUCCESS / INFO / ERROR / WARNING MESSAGES ── */
     div[data-testid="stSuccessMessage"] {
-        background: rgba(16, 185, 129, 0.1) !important;
-        border: 1.5px solid rgba(16, 185, 129, 0.4) !important;
+        background: rgba(16, 185, 129, 0.08) !important;
+        border: 1.5px solid rgba(16, 185, 129, 0.3) !important;
         border-radius: 10px !important;
         color: #047857 !important;
     }
 
     div[data-testid="stErrorMessage"] {
-        background: rgba(239, 68, 68, 0.1) !important;
-        border: 1.5px solid rgba(239, 68, 68, 0.4) !important;
+        background: rgba(239, 68, 68, 0.08) !important;
+        border: 1.5px solid rgba(239, 68, 68, 0.3) !important;
         border-radius: 10px !important;
-        color: #dc2626 !important;
+        color: #b91c1c !important;
     }
 
     div[data-testid="stInfoMessage"] {
-        background: rgba(59, 130, 246, 0.1) !important;
-        border: 1.5px solid rgba(59, 130, 246, 0.4) !important;
+        background: rgba(59, 130, 246, 0.08) !important;
+        border: 1.5px solid rgba(59, 130, 246, 0.3) !important;
         border-radius: 10px !important;
-        color: #1d4ed8 !important;
+        color: #1e40af !important;
     }
 
     div[data-testid="stWarningMessage"] {
-        background: rgba(251, 146, 60, 0.1) !important;
-        border: 1.5px solid rgba(251, 146, 60, 0.4) !important;
+        background: rgba(251, 146, 60, 0.08) !important;
+        border: 1.5px solid rgba(251, 146, 60, 0.3) !important;
         border-radius: 10px !important;
-        color: #b45309 !important;
+        color: #92400e !important;
     }
 
-    /* â”€â”€ DIVIDER â”€â”€ */
+    /* ── DIVIDER ── */
     hr {
         border: none;
-        border-top: 1px solid rgba(59, 130, 246, 0.2);
+        border-top: 1px solid #e2e8f0;
         margin: 20px 0;
     }
 
-    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-       ðŸ“± MOBILE RESPONSIVE STYLES (768px and below)
-    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+    /* ── RADIO BUTTONS ── */
+    div[data-testid="stHorizontalBlock"] {
+        gap: 12px;
+    }
+
+    /* ════════════════════════════════════════════════════════
+       📱 MOBILE RESPONSIVE STYLES (768px and below)
+    ════════════════════════════════════════════════════════ */
     @media (max-width: 768px) {
-        .sf-header-title { font-size: 3.2rem !important; }
-        .sf-header-subtitle { font-size: 1.1rem !important; }
-        
-        .sf-watermark { 
-            font-size: 2.8rem !important; 
-            letter-spacing: 8px !important; 
-            margin-top: 10px !important;
-            margin-bottom: -30px !important;
-            top: -6px !important;
+        .sf-header-title  { font-size: 2.8rem !important; }
+        .sf-header-subtitle { font-size: 1rem !important; }
+
+        .sf-watermark {
+            font-size: 2.4rem !important;
+            letter-spacing: 6px !important;
+            margin-top: 6px !important;
+            margin-bottom: -28px !important;
+            top: -4px !important;
         }
-        
+
         .sf-header { padding: 30px 0 10px 0 !important; }
 
-        .sf-card { 
-            padding: 24px !important; 
-            border-radius: 16px !important; 
-            margin-bottom: 15px !important;
+        .sf-card {
+            padding: 24px !important;
+            border-radius: 16px !important;
+            margin-bottom: 18px !important;
         }
 
         .sf-output { padding: 18px !important; }
 
-        .stButton > button { 
-            height: 3.4rem !important; 
-            font-size: 14px !important; 
+        .stButton > button {
+            height: 3.2rem !important;
+            font-size: 14px !important;
         }
 
         input[type="text"], input[type="password"] {
-            font-size: 16px !important; 
-            padding: 12px !important;
+            font-size: 16px !important;
+            padding: 10px !important;
         }
 
         .block-container {
@@ -327,28 +331,30 @@ st.markdown("""
         }
     }
 
-    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-       ðŸ“± EXTRA SMALL DEVICES (480px and below)
-    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+    /* ════════════════════════════════════════════════════════
+       📱 EXTRA SMALL DEVICES (480px and below)
+    ════════════════════════════════════════════════════════ */
     @media (max-width: 480px) {
-        .sf-header-title { font-size: 2.4rem !important; }
-        .sf-header-subtitle { font-size: 0.95rem !important; }
-        .sf-watermark { 
-            font-size: 2rem !important; 
-            letter-spacing: 5px !important; 
-            margin-bottom: -25px !important;
+        .sf-header-title    { font-size: 2.2rem !important; }
+        .sf-header-subtitle { font-size: 0.9rem !important; }
+
+        .sf-watermark {
+            font-size: 1.8rem !important;
+            letter-spacing: 4px !important;
+            margin-bottom: -35px !important;
         }
 
         .sf-card { padding: 16px !important; }
 
-        .stButton > button { 
-            height: 3.6rem !important; 
-            font-size: 13px !important; 
+        .stButton > button {
+            height: 3.2rem !important;
+            font-size: 13px !important;
         }
     }
 
     </style>
 """, unsafe_allow_html=True)
+
 # =========================================================
 # AI CONFIG — DYNAMIC MULTI-MODEL FALLBACK
 # =========================================================
@@ -1250,38 +1256,42 @@ Every answer must be complete. Use LaTeX for math."""
 # MAIN APPLICATION
 # =========================================================
 def main_app():
-    # â”€â”€ SIDEBAR â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # ── SIDEBAR ──────────────────────────────────────────
     with st.sidebar:
         st.markdown(f"""
-            <div style="text-align:center; padding: 25px 0 20px 0;">
-                <div style="font-size:3.5rem; margin-bottom: 10px;">ðŸŽ“</div>
-                <div style="font-size:1.5rem; font-weight:800; background: linear-gradient(135deg, #2563eb 0%, #3b82f6 50%, #0ea5e9 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">StudySmart</div>
-                <div style="font-size:0.95rem; color: #64748b; margin-top: 8px; font-weight: 500;">Welcome, <span style="color: #2563eb; font-weight: 700;">{st.session_state.username}</span></div>
+            <div style="text-align:center; padding: 20px 0 15px 0;">
+                <div style="font-size:3rem; margin-bottom: 8px;">🎓</div>
+                <div style="font-size:1.4rem; font-weight:800;
+                     background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+                     -webkit-background-clip: text;
+                     -webkit-text-fill-color: transparent;
+                     background-clip: text;">StudySmart</div>
+                <div style="font-size:0.9rem; color:#64748b;
+                     margin-top: 6px;">Welcome, {st.session_state.username} 👋</div>
             </div>
         """, unsafe_allow_html=True)
         st.divider()
 
         tool = st.radio(
-            "ðŸ“š SELECT TOOL",
-            ["ðŸ“ Summary", "ðŸ§  Quiz", "ðŸ“Œ Revision Notes", "â“ Exam Q&A"],
-            label_visibility="collapsed"
+            "SELECT TOOL",
+            ["📝 Summary", "🧠 Quiz", "📌 Revision Notes", "❓ Exam Q&A"]
         )
         st.divider()
 
-        with st.expander("ðŸ¤– AI Model Status"):
+        with st.expander("🤖 AI Model Status"):
             if st.button("Check Models", use_container_width=True):
                 with st.spinner("Checking..."):
                     models = get_available_models()
                 for m in models:
-                    st.write(f"âœ… {m}")
+                    st.write(f"✅ {m}")
 
         st.divider()
-        if st.button("ðŸšª Logout", use_container_width=True):
+        if st.button("🚪 Logout", use_container_width=True):
             st.session_state.logged_in = False
             st.session_state.username = ""
             st.rerun()
 
-    # â”€â”€ PREMIUM HEADER WITH WATERMARK â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # ── PREMIUM HEADER WITH WATERMARK ────────────────────
     st.markdown("""
         <div class="sf-header">
             <div class="sf-header-title">StudySmart</div>
@@ -1290,30 +1300,30 @@ def main_app():
         <div class="sf-watermark">POWERED BY AI</div>
     """, unsafe_allow_html=True)
 
-    # â”€â”€ SELECTION CARD â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # ── SELECTION CARD ────────────────────────────────────
     st.markdown('<div class="sf-card">', unsafe_allow_html=True)
 
     c1, c2, c3 = st.columns([1.2, 1.2, 1])
     with c1:
-        cat = st.selectbox("ðŸ“š Category", list(DATA_MAP.keys()))
+        cat = st.selectbox("📚 Category", list(DATA_MAP.keys()))
     with c2:
-        course = st.selectbox("ðŸŽ“ Exam / Course", list(DATA_MAP[cat].keys()))
+        course = st.selectbox("🎓 Exam / Course", list(DATA_MAP[cat].keys()))
     with c3:
         if "School" in cat:
-            board = st.selectbox("ðŸ« Board", BOARDS)
+            board = st.selectbox("🏫 Board", BOARDS)
         else:
             board = "University / National Syllabus"
-            st.info(f"ðŸ“Œ {board}")
+            st.info(f"📌 {board}")
 
     c4, c5 = st.columns(2)
     with c4:
-        sub = st.selectbox("ðŸ“– Subject", DATA_MAP[cat][course])
+        sub = st.selectbox("📖 Subject", DATA_MAP[cat][course])
 
     topics_list = get_topics(cat, course, sub)
     with c5:
-        topic = st.selectbox("ðŸ—‚ï¸ Topic / Unit", topics_list)
+        topic = st.selectbox("🗂️ Topic / Unit", topics_list)
 
-    # Chapter auto-load with caching
+    # ── CHAPTER AUTO-LOAD WITH CACHING ───────────────────
     chapter_key = f"{cat}||{course}||{sub}||{topic}"
     if "last_chapter_key" not in st.session_state:
         st.session_state.last_chapter_key = ""
@@ -1323,18 +1333,18 @@ def main_app():
         st.session_state.current_chapters = get_chapters(cat, course, sub, topic)
         st.session_state.last_chapter_key = chapter_key
 
-    chap = st.selectbox("ðŸ“ Chapter", st.session_state.current_chapters)
+    chap = st.selectbox("📝 Chapter", st.session_state.current_chapters)
     st.markdown('</div>', unsafe_allow_html=True)
 
-    # â”€â”€ OUTPUT STYLE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # ── OUTPUT STYLE ──────────────────────────────────────
     output_style = st.radio(
-        "âš™ï¸ Output Style",
-        ["ðŸ“„ Detailed", "âš¡ Short & Quick", "ðŸ“‹ Notes Format"],
+        "⚙️ Output Style",
+        ["📄 Detailed", "⚡ Short & Quick", "📋 Notes Format"],
         horizontal=True
     )
 
-    # â”€â”€ GENERATE BUTTON â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    if st.button(f"âœ¨ Generate {tool}", use_container_width=True):
+    # ── GENERATE BUTTON ───────────────────────────────────
+    if st.button(f"✨ Generate {tool}", use_container_width=True):
         audience = (
             f"{board} {course} students"
             if "School" in cat
@@ -1342,7 +1352,7 @@ def main_app():
         )
         final_prompt = build_prompt(tool, chap, topic, sub, audience, output_style)
 
-        with st.spinner(f"ðŸ§  Generating {tool} for '{chap}'... please wait â³"):
+        with st.spinner(f"🧠 Generating {tool} for '{chap}'... please wait ⏳"):
             try:
                 result, model_used = generate_with_fallback(final_prompt)
             except Exception as e:
@@ -1351,17 +1361,21 @@ def main_app():
         st.markdown("---")
 
         if model_used != "None":
-            st.success(f"âœ… Generated using **{model_used}**")
+            st.success(f"✅ Generated using **{model_used}**")
 
-            # Output card
-            st.markdown(f'<div class="sf-output">', unsafe_allow_html=True)
-            st.markdown(f"### ðŸ“„ {tool} â€” {chap}")
+            # ── OUTPUT CARD ───────────────────────────────
+            st.markdown('<div class="sf-output">', unsafe_allow_html=True)
+            st.markdown(f"### 📄 {tool} — {chap}")
             st.markdown(result)
             st.markdown('</div>', unsafe_allow_html=True)
 
-            # PDF Download
+            # ── PDF DOWNLOAD ──────────────────────────────
             st.markdown("---")
-            pdf_title = f"{tool.replace('ðŸ“','').replace('ðŸ§ ','').replace('ðŸ“Œ','').replace('â“','').strip()} â€” {chap}"
+            pdf_title = (
+                tool.replace("📝","").replace("🧠","")
+                    .replace("📌","").replace("❓","").strip()
+                + f" — {chap}"
+            )
             pdf_subtitle = f"{sub} | {topic} | {course} | {board}"
 
             try:
@@ -1370,11 +1384,11 @@ def main_app():
                     chap.replace(" ", "_")
                         .replace(":", "")
                         .replace("/", "-")
-                        .replace("â€”", "-")
+                        .replace("—", "-")
                 ) + ".pdf"
 
                 st.download_button(
-                    label="â¬‡ï¸ Download as PDF",
+                    label="⬇️ Download as PDF",
                     data=pdf_buffer,
                     file_name=safe_filename,
                     mime="application/pdf",
@@ -1383,13 +1397,13 @@ def main_app():
             except Exception as pdf_err:
                 st.warning(f"PDF generation issue: {pdf_err}")
         else:
-            st.error("âš ï¸ AI service unavailable. Please try again.")
-            with st.expander("ðŸ” Debug Info"):
+            st.error("⚠️ AI service unavailable. Please try again.")
+            with st.expander("🔍 Debug Info"):
                 st.code(result)
 
 
 # =========================================================
-# AUTH UI â€” PREMIUM DESIGN
+# AUTH UI — PROFESSIONAL LIGHT DESIGN
 # =========================================================
 def auth_ui():
     col_l, col_c, col_r = st.columns([1, 2, 1])
@@ -1403,48 +1417,56 @@ def auth_ui():
         """, unsafe_allow_html=True)
 
         st.markdown('<div class="sf-card">', unsafe_allow_html=True)
-        tab1, tab2 = st.tabs(["ðŸ” Login", "ðŸ“ Register"])
+        tab1, tab2 = st.tabs(["🔐 Login", "📝 Register"])
 
+        # ── LOGIN TAB ─────────────────────────────────────
         with tab1:
-            u = st.text_input("Username", key="login_u", placeholder="Enter your username")
-            p = st.text_input("Password", type="password", key="login_p", placeholder="Enter your password")
-            if st.button("Sign In ðŸš€", use_container_width=True):
+            u = st.text_input("Username", key="login_u",
+                              placeholder="Enter your username")
+            p = st.text_input("Password", type="password", key="login_p",
+                              placeholder="Enter your password")
+            if st.button("Sign In 🚀", use_container_width=True):
                 conn = sqlite3.connect("users.db")
                 c = conn.cursor()
-                c.execute("SELECT * FROM users WHERE username=? AND password=?", (u, hash_p(p)))
+                c.execute(
+                    "SELECT * FROM users WHERE username=? AND password=?",
+                    (u, hash_p(p))
+                )
                 user = c.fetchone()
                 conn.close()
-
                 if user:
                     st.session_state.logged_in = True
                     st.session_state.username = u
                     st.rerun()
                 else:
-                    st.error("âŒ Invalid username or password.")
+                    st.error("❌ Invalid username or password.")
 
+        # ── REGISTER TAB ──────────────────────────────────
         with tab2:
-            nu = st.text_input("Choose Username", key="reg_u", placeholder="Pick a unique username")
-            np = st.text_input("Choose Password", type="password", key="reg_p", placeholder="Create a strong password")
-            if st.button("Create Account âœ¨", use_container_width=True):
+            nu = st.text_input("Choose Username", key="reg_u",
+                               placeholder="Pick a unique username")
+            np = st.text_input("Choose Password", type="password", key="reg_p",
+                               placeholder="Create a strong password")
+            if st.button("Create Account ✨", use_container_width=True):
                 if not nu.strip() or not np.strip():
                     st.error("Username and password cannot be empty.")
                 else:
                     try:
                         conn = sqlite3.connect("users.db")
                         c = conn.cursor()
-                        c.execute("INSERT INTO users VALUES (?, ?)", (nu.strip(), hash_p(np)))
+                        c.execute(
+                            "INSERT INTO users VALUES (?, ?)",
+                            (nu.strip(), hash_p(np))
+                        )
                         conn.commit()
                         conn.close()
-
-                        # ðŸš€ AUTO LOGIN AFTER REGISTRATION
-                        st.success("âœ… Account created! Logging you in...")
+                        st.success("✅ Account created! Logging you in...")
                         time.sleep(1)
                         st.session_state.logged_in = True
                         st.session_state.username = nu.strip()
                         st.rerun()
-
                     except sqlite3.IntegrityError:
-                        st.error("âŒ Username already exists. Try a different one.")
+                        st.error("❌ Username already exists. Try a different one.")
 
         st.markdown('</div>', unsafe_allow_html=True)
 
@@ -1456,7 +1478,6 @@ init_db()
 
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
-
 if "username" not in st.session_state:
     st.session_state.username = ""
 
