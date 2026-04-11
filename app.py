@@ -14,47 +14,230 @@ from reportlab.lib.enums import TA_LEFT, TA_CENTER
 # =========================================================
 # PAGE CONFIG
 # =========================================================
-st.set_page_config(page_title="StudyFiesta AI", page_icon="🎓", layout="wide")
+st.set_page_config(
+    page_title="StudyFiesta AI",
+    page_icon="🎓",
+    layout="wide",
+    initial_sidebar_state="collapsed"
+)
 
 # =========================================================
-# CUSTOM CSS
+# PROFESSIONAL CSS — MOBILE + DESKTOP RESPONSIVE
 # =========================================================
 st.markdown("""
     <style>
-    .main { background-color: #f8f9fa; }
-    .stButton>button {
-        width: 100%;
-        border-radius: 8px;
-        height: 3em;
-        background-color: #007bff;
-        color: white;
-        border: none;
-        font-weight: bold;
+    /* ── GOOGLE FONT ── */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+    html, body, [class*="css"], [class*="st-"] {
+        font-family: 'Inter', sans-serif !important;
     }
-    .stButton>button:hover {
-        background-color: #0056b3;
-        color: white;
+
+    /* ── GLOBAL BACKGROUND ── */
+    .stApp {
+        background: linear-gradient(135deg, #f0f4ff 0%, #dce8ff 100%);
+        min-height: 100vh;
     }
-    .reportview-container .main .block-container {
-        padding-top: 2rem;
+
+    /* ── HIDE STREAMLIT CHROME ── */
+    #MainMenu  { visibility: hidden; }
+    footer     { visibility: hidden; }
+    header     { visibility: hidden; }
+
+    /* ── CARD COMPONENT ── */
+    .sf-card {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 18px;
+        padding: 24px 28px;
+        box-shadow: 0 8px 30px rgba(30, 60, 114, 0.10);
+        margin-bottom: 20px;
+        border: 1px solid rgba(255,255,255,0.6);
     }
+
+    /* ── PAGE HEADER ── */
+    .sf-header {
+        text-align: center;
+        padding: 28px 0 10px 0;
+    }
+    .sf-header h1 {
+        font-size: 2.4rem;
+        font-weight: 700;
+        color: #1e3c72;
+        margin-bottom: 4px;
+    }
+    .sf-header p {
+        font-size: 1.0rem;
+        color: #5a6a8a;
+    }
+
+    /* ── BUTTONS ── */
+    .stButton > button {
+        width: 100% !important;
+        border-radius: 12px !important;
+        height: 3.4rem !important;
+        background: linear-gradient(90deg, #1e3c72 0%, #2a5298 100%) !important;
+        color: #ffffff !important;
+        border: none !important;
+        font-weight: 700 !important;
+        font-size: 15px !important;
+        letter-spacing: 0.4px !important;
+        transition: all 0.25s ease !important;
+    }
+    .stButton > button:hover {
+        opacity: 0.9 !important;
+        transform: translateY(-2px) !important;
+        box-shadow: 0 6px 18px rgba(30,60,114,0.35) !important;
+    }
+
+    /* ── DOWNLOAD BUTTON ── */
+    .stDownloadButton > button {
+        width: 100% !important;
+        border-radius: 12px !important;
+        height: 3.2rem !important;
+        background: linear-gradient(90deg, #11998e 0%, #38ef7d 100%) !important;
+        color: #ffffff !important;
+        font-weight: 700 !important;
+        border: none !important;
+        transition: all 0.25s ease !important;
+    }
+    .stDownloadButton > button:hover {
+        opacity: 0.9 !important;
+        transform: translateY(-2px) !important;
+    }
+
+    /* ── SELECTBOX ── */
+    div[data-baseweb="select"] > div {
+        border-radius: 10px !important;
+        border: 1.5px solid #d0d9f0 !important;
+        background: #f8faff !important;
+    }
+
+    /* ── RADIO BUTTONS ── */
+    div[data-testid="stHorizontalBlock"] label {
+        font-weight: 500;
+    }
+
+    /* ── LABELS ── */
     div.stSelectbox label,
     div.stTextInput label,
     div.stRadio label {
-        font-weight: bold;
-        color: #1f1f1f;
+        font-weight: 600 !important;
+        color: #1e3c72 !important;
+        font-size: 0.88rem !important;
+        letter-spacing: 0.3px !important;
     }
-    .card {
-        background-color: white;
-        padding: 20px;
+
+    /* ── SIDEBAR ── */
+    [data-testid="stSidebar"] {
+        background: linear-gradient(160deg, #1e3c72 0%, #2a5298 100%);
+        min-width: 220px;
+    }
+    [data-testid="stSidebar"] * {
+        color: #ffffff !important;
+    }
+    [data-testid="stSidebar"] .stButton > button {
+        background: rgba(255,255,255,0.15) !important;
+        border: 1px solid rgba(255,255,255,0.3) !important;
+        border-radius: 10px !important;
+        color: #fff !important;
+        font-weight: 600 !important;
+        margin-top: 6px;
+    }
+    [data-testid="stSidebar"] .stButton > button:hover {
+        background: rgba(255,255,255,0.25) !important;
+    }
+    [data-testid="stSidebar"] .stRadio > label,
+    [data-testid="stSidebar"] div.stRadio label {
+        color: #ffffff !important;
+    }
+
+    /* ── SUCCESS / INFO / ERROR ── */
+    div[data-testid="stSuccessMessage"] {
         border-radius: 10px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.08);
-        margin-bottom: 20px;
     }
-    h1, h2, h3 { color: #0e1117; }
+
+    /* ── OUTPUT CONTENT AREA ── */
+    .sf-output {
+        background: #fff;
+        border-radius: 16px;
+        padding: 24px 28px;
+        border-left: 5px solid #2a5298;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.07);
+        margin-top: 10px;
+    }
+
+    /* ── DIVIDER ── */
+    hr {
+        border: none;
+        border-top: 1.5px solid #e0e8ff;
+        margin: 18px 0;
+    }
+
+    /* ============================================
+       📱 MOBILE RESPONSIVE STYLES
+    ============================================ */
+    @media (max-width: 768px) {
+
+        /* Header shrink */
+        .sf-header h1 {
+            font-size: 1.7rem !important;
+        }
+        .sf-header p {
+            font-size: 0.88rem !important;
+        }
+
+        /* Cards compact on mobile */
+        .sf-card {
+            padding: 14px 14px !important;
+            border-radius: 14px !important;
+            margin-bottom: 12px !important;
+        }
+
+        /* Output area */
+        .sf-output {
+            padding: 14px 14px !important;
+        }
+
+        /* Buttons bigger tap area */
+        .stButton > button {
+            height: 3.8rem !important;
+            font-size: 16px !important;
+        }
+
+        /* Stack columns properly */
+        div[data-testid="column"] {
+            min-width: 100% !important;
+        }
+
+        /* Reduce sidebar icon area */
+        [data-testid="stSidebar"] {
+            min-width: 100% !important;
+        }
+
+        /* Font base */
+        html, body {
+            font-size: 15px !important;
+        }
+
+        /* Input padding */
+        input[type="text"],
+        input[type="password"] {
+            font-size: 16px !important;
+            padding: 12px !important;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .sf-header h1 {
+            font-size: 1.4rem !important;
+        }
+        .sf-card {
+            padding: 10px 10px !important;
+        }
+    }
+
     </style>
 """, unsafe_allow_html=True)
-
 # =========================================================
 # AI CONFIG — DYNAMIC MULTI-MODEL FALLBACK
 # =========================================================
@@ -71,27 +254,22 @@ PREFERRED_MODELS = [
 
 @st.cache_data(ttl=1800, show_spinner=False)
 def get_available_models():
-    """Fetch models from API that support generateContent."""
     try:
         available = []
         for m in genai.list_models():
-            name = getattr(m, "name", "")
+            name    = getattr(m, "name", "")
             methods = getattr(m, "supported_generation_methods", [])
             if "generateContent" in methods and "gemini" in name:
-                short = name.replace("models/", "")
-                available.append(short)
-        # sort by preferred order
+                available.append(name.replace("models/", ""))
         ordered = [m for m in PREFERRED_MODELS if m in available]
         others  = [m for m in available if m not in ordered]
         return ordered + others
     except Exception:
-        return PREFERRED_MODELS  # fallback to static list
+        return PREFERRED_MODELS
 
 def generate_with_fallback(prompt):
-    """Try each available model until one returns a valid response."""
     models_to_try = get_available_models()
     errors = []
-
     for model_name in models_to_try:
         try:
             model = genai.GenerativeModel(
@@ -110,11 +288,7 @@ def generate_with_fallback(prompt):
         except Exception as e:
             errors.append(f"{model_name}: {str(e)}")
             continue
-
-    return (
-        "AI generation failed.\n" + "\n".join(errors[-3:]),
-        "None"
-    )
+    return "AI generation failed.\n" + "\n".join(errors[-3:]), "None"
 
 # =========================================================
 # PDF GENERATOR
@@ -122,53 +296,55 @@ def generate_with_fallback(prompt):
 def generate_pdf(title, subtitle, content_text):
     buffer = io.BytesIO()
     doc = SimpleDocTemplate(
-        buffer,
-        pagesize=A4,
-        rightMargin=2 * cm, leftMargin=2 * cm,
-        topMargin=2 * cm,   bottomMargin=2 * cm,
+        buffer, pagesize=A4,
+        rightMargin=2*cm, leftMargin=2*cm,
+        topMargin=2*cm,   bottomMargin=2*cm,
     )
     styles = getSampleStyleSheet()
 
-    style_title = ParagraphStyle(
-        "CustomTitle", parent=styles["Title"],
-        fontSize=20, textColor=colors.HexColor("#007bff"),
-        spaceAfter=6, alignment=TA_CENTER, fontName="Helvetica-Bold",
+    s_title = ParagraphStyle(
+        "T", parent=styles["Title"],
+        fontSize=22, textColor=colors.HexColor("#1e3c72"),
+        spaceAfter=8, alignment=TA_CENTER, fontName="Helvetica-Bold",
     )
-    style_subtitle = ParagraphStyle(
-        "CustomSubtitle", parent=styles["Normal"],
+    s_sub = ParagraphStyle(
+        "S", parent=styles["Normal"],
         fontSize=11, textColor=colors.HexColor("#555555"),
-        spaceAfter=14, alignment=TA_CENTER, fontName="Helvetica",
+        spaceAfter=16, alignment=TA_CENTER,
     )
-    style_heading = ParagraphStyle(
-        "CustomHeading", parent=styles["Heading2"],
-        fontSize=13, textColor=colors.HexColor("#0056b3"),
-        spaceBefore=14, spaceAfter=4, fontName="Helvetica-Bold",
+    s_head = ParagraphStyle(
+        "H", parent=styles["Heading2"],
+        fontSize=13, textColor=colors.HexColor("#2a5298"),
+        spaceBefore=14, spaceAfter=5, fontName="Helvetica-Bold",
     )
-    style_body = ParagraphStyle(
-        "CustomBody", parent=styles["Normal"],
-        fontSize=10, leading=16, textColor=colors.HexColor("#1a1a1a"),
-        spaceAfter=4, fontName="Helvetica", alignment=TA_LEFT,
+    s_body = ParagraphStyle(
+        "B", parent=styles["Normal"],
+        fontSize=10, leading=16,
+        textColor=colors.HexColor("#1a1a1a"), spaceAfter=4,
     )
-    style_bullet = ParagraphStyle(
-        "CustomBullet", parent=styles["Normal"],
-        fontSize=10, leading=16, textColor=colors.HexColor("#1a1a1a"),
-        spaceAfter=3, leftIndent=16, fontName="Helvetica", bulletIndent=6,
+    s_bullet = ParagraphStyle(
+        "Bu", parent=styles["Normal"],
+        fontSize=10, leading=16,
+        textColor=colors.HexColor("#1a1a1a"),
+        leftIndent=16, bulletIndent=6, spaceAfter=3,
     )
-    style_footer = ParagraphStyle(
-        "Footer", parent=styles["Normal"],
-        fontSize=8, textColor=colors.HexColor("#aaaaaa"), alignment=TA_CENTER,
+    s_footer = ParagraphStyle(
+        "F", parent=styles["Normal"],
+        fontSize=8, textColor=colors.HexColor("#aaaaaa"),
+        alignment=TA_CENTER,
     )
 
-    story = []
-    story.append(Paragraph(title, style_title))
-    story.append(Paragraph(subtitle, style_subtitle))
-    story.append(HRFlowable(width="100%", thickness=1.2, color=colors.HexColor("#007bff")))
-    story.append(Spacer(1, 0.4 * cm))
+    story = [
+        Paragraph(title, s_title),
+        Paragraph(subtitle, s_sub),
+        HRFlowable(width="100%", thickness=1.2, color=colors.HexColor("#1e3c72")),
+        Spacer(1, 0.4*cm),
+    ]
 
     for line in content_text.split("\n"):
         s = line.strip()
         if not s:
-            story.append(Spacer(1, 0.2 * cm))
+            story.append(Spacer(1, 0.2*cm))
             continue
         s = re.sub(r"\*\*(.+?)\*\*", r"\1", s)
         s = re.sub(r"\*(.+?)\*",     r"\1", s)
@@ -177,24 +353,23 @@ def generate_pdf(title, subtitle, content_text):
         s = s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
 
         if s.startswith("## ") or s.startswith("### "):
-            story.append(Spacer(1, 0.15 * cm))
-            story.append(Paragraph(s.lstrip("#").strip(), style_heading))
+            story.append(Paragraph(s.lstrip("#").strip(), s_head))
         elif re.match(r"^\d+\.\s+[A-Z0-9 ()\-]{4,}$", s):
-            story.append(Spacer(1, 0.15 * cm))
-            story.append(Paragraph(s, style_heading))
-        elif s.startswith("- ") or s.startswith("• "):
-            story.append(Paragraph(f"• {s[2:].strip()}", style_bullet))
-        elif s.startswith("* "):
-            story.append(Paragraph(f"• {s[2:].strip()}", style_bullet))
+            story.append(Paragraph(s, s_head))
+        elif s.startswith("- ") or s.startswith("• ") or s.startswith("* "):
+            story.append(Paragraph(f"• {s[2:].strip()}", s_bullet))
         elif re.match(r"^\d+\.\s", s) and len(s) < 120:
-            story.append(Paragraph(s, style_bullet))
+            story.append(Paragraph(s, s_bullet))
         else:
-            story.append(Paragraph(s, style_body))
+            story.append(Paragraph(s, s_body))
 
-    story.append(Spacer(1, 0.6 * cm))
-    story.append(HRFlowable(width="100%", thickness=0.5, color=colors.HexColor("#cccccc")))
-    story.append(Spacer(1, 0.2 * cm))
-    story.append(Paragraph("Generated by StudyFiesta AI | Your Smart Exam Preparation Platform", style_footer))
+    story.extend([
+        Spacer(1, 0.6*cm),
+        HRFlowable(width="100%", thickness=0.5, color=colors.HexColor("#cccccc")),
+        Spacer(1, 0.2*cm),
+        Paragraph("Generated by StudyFiesta AI 🎓 | Your Smart Exam Preparation Platform", s_footer),
+    ])
+
     doc.build(story)
     buffer.seek(0)
     return buffer
@@ -216,7 +391,6 @@ def init_db():
 
 def hash_p(password):
     return hashlib.sha256(password.encode()).hexdigest()
-
 # =========================================================
 # DATA MAP
 # =========================================================
@@ -309,11 +483,13 @@ TOPIC_MAP = {
         },
         "Class 11 & 12": {
             "Physics": [
-                "Mechanics", "Thermodynamics & Waves", "Electromagnetism", "Optics & Modern Physics"
+                "Mechanics", "Thermodynamics & Waves",
+                "Electromagnetism", "Optics & Modern Physics"
             ],
             "Chemistry": ["Physical Chemistry", "Inorganic Chemistry", "Organic Chemistry"],
             "Mathematics": [
-                "Algebra", "Calculus", "Coordinate Geometry", "Vectors & 3D", "Statistics & Probability"
+                "Algebra", "Calculus", "Coordinate Geometry",
+                "Vectors & 3D", "Statistics & Probability"
             ],
             "Biology": [
                 "Cell Biology & Diversity", "Plant Physiology", "Human Physiology",
@@ -324,7 +500,8 @@ TOPIC_MAP = {
                 "Company Accounts", "Analysis of Financial Statements"
             ],
             "Business Studies": [
-                "Nature and Forms of Business", "Management Principles", "Business Finance and Marketing"
+                "Nature and Forms of Business", "Management Principles",
+                "Business Finance and Marketing"
             ],
             "Economics": ["Microeconomics", "Macroeconomics", "Indian Economic Development"],
             "History":   ["Themes in Indian History", "World History"],
@@ -404,19 +581,19 @@ TOPIC_MAP = {
             "Management Accounting":   ["Ratio Analysis", "Budgeting", "Standard Costing"],
         },
         "Science (B.Sc/M.Sc)": {
-            "Physics":        ["Classical Mechanics", "Electromagnetism", "Quantum Mechanics", "Modern Physics"],
-            "Chemistry":      ["Physical", "Organic", "Inorganic", "Analytical"],
-            "Maths":          ["Analysis", "Algebra", "Differential Equations", "Topology"],
-            "Zoology":        ["Animal Diversity", "Physiology", "Genetics", "Ecology"],
-            "Botany":         ["Plant Diversity", "Physiology", "Genetics", "Ecology"],
-            "Biotechnology":  ["Molecular Biology", "Genetic Engineering", "Bioprocess", "Bioinformatics"],
+            "Physics":       ["Classical Mechanics", "Electromagnetism", "Quantum Mechanics", "Modern Physics"],
+            "Chemistry":     ["Physical", "Organic", "Inorganic", "Analytical"],
+            "Maths":         ["Analysis", "Algebra", "Differential Equations", "Topology"],
+            "Zoology":       ["Animal Diversity", "Physiology", "Genetics", "Ecology"],
+            "Botany":        ["Plant Diversity", "Physiology", "Genetics", "Ecology"],
+            "Biotechnology": ["Molecular Biology", "Genetic Engineering", "Bioprocess", "Bioinformatics"],
         },
         "Management (BBA/MBA)": {
-            "Marketing":   ["Basics & Consumer Behaviour", "Strategy & Mix", "Digital Marketing"],
-            "Finance":     ["Financial Management", "Investments", "Risk"],
-            "HR":          ["Recruitment & Training", "Performance & Compensation", "Employee Relations"],
-            "Operations":  ["Process & Capacity", "Quality & Supply Chain"],
-            "Strategy":    ["Analysis & Positioning", "Corporate Strategy"],
+            "Marketing":  ["Basics & Consumer Behaviour", "Strategy & Mix", "Digital Marketing"],
+            "Finance":    ["Financial Management", "Investments", "Risk"],
+            "HR":         ["Recruitment & Training", "Performance & Compensation", "Employee Relations"],
+            "Operations": ["Process & Capacity", "Quality & Supply Chain"],
+            "Strategy":   ["Analysis & Positioning", "Corporate Strategy"],
         },
         "Arts (B.A/M.A)": {
             "English Literature": ["Poetry", "Drama", "Novel & Prose", "Literary Theory"],
@@ -429,7 +606,7 @@ TOPIC_MAP = {
 }
 
 # =========================================================
-# CHAPTER MAP — COMPLETE NCERT VERIFIED
+# CHAPTER MAP — FULL NCERT VERIFIED
 # =========================================================
 CHAPTER_MAP = {
     "School (K-12) 🏫": {
@@ -905,7 +1082,6 @@ def get_chapters(category, course, subject, topic):
     )
     if chapters:
         return chapters
-
     prompt = (
         f"You are an academic syllabus expert. "
         f"List the standard chapter names for the topic '{topic}' "
@@ -920,153 +1096,135 @@ def get_chapters(category, course, subject, topic):
 
 def build_prompt(tool, chap, topic, sub, audience, output_style):
     style_map = {
-        "📄 Detailed":     "Write thoroughly with full detail. Every section needs at least 3-5 bullet points or 3-4 sentences.",
-        "⚡ Short & Quick": "Keep concise but every section must have real content. Minimum 2 bullets per section. No empty sections.",
-        "📋 Notes Format":  "Use bullet points throughout. Every section needs at least 2-3 bullets. No empty sections.",
+        "📄 Detailed":      "Write thoroughly. Every section needs at least 3-5 bullets or 3-4 sentences.",
+        "⚡ Short & Quick": "Keep concise. Minimum 2 bullets per section. No empty sections.",
+        "📋 Notes Format":  "Use bullet points throughout. At least 2-3 bullets per section.",
     }
     si = style_map[output_style]
 
     if tool == "📝 Summary":
-        return f"""Act as a professional teacher preparing study material for {audience}.
-
-STYLE INSTRUCTION (apply to ALL 5 sections): {si}
-
-Create a COMPLETE and THOROUGH summary for chapter '{chap}' under topic '{topic}' in subject '{sub}'.
-
-STRICT RULES:
-- Write ALL 5 sections below without exception.
-- Every section MUST have actual content under its heading — never leave a heading empty.
-- Section 5 (QUICK REVISION NOTES) must have at least 5 real bullet points.
-
-1. OVERVIEW
-Explain what this chapter is about and why it matters.
-
-2. KEY CONCEPTS
-Define and explain all important concepts in this chapter.
-
-3. IMPORTANT POINTS
-List crucial facts, dates, formulas, or rules students must remember.
-
-4. EXAM FOCUS
-What question types come from this chapter? What should students pay special attention to?
-
-5. QUICK REVISION NOTES
-Write 5-6 short sharp bullet points to help revise this chapter in under 2 minutes.
-
-Use LaTeX for any math expressions. Keep language simple and student-friendly."""
+        return f"""Act as a professional teacher for {audience}.
+STYLE: {si}
+Create a COMPLETE summary for chapter '{chap}' (topic: '{topic}') in '{sub}'.
+Include ALL 5 sections:
+1. OVERVIEW — what this chapter is about
+2. KEY CONCEPTS — all important definitions
+3. IMPORTANT POINTS — facts, formulas, dates
+4. EXAM FOCUS — what to study for exams
+5. QUICK REVISION NOTES — 5-6 short bullets
+Use LaTeX for math. Keep language student-friendly."""
 
     if tool == "🧠 Quiz":
-        return f"""Act as a subject expert creating a quiz for {audience}.
-
+        return f"""Act as an expert for {audience}.
 STYLE: {si}
-
-Generate exactly 5 high-quality MCQs for chapter '{chap}' (Topic: {topic}) in '{sub}'.
-
-For EACH question provide:
-- Question
-- Option A / B / C / D
-- Correct Answer
-- Explanation (why this answer is correct)
-
-Use LaTeX for any math."""
+Generate exactly 5 MCQs for '{chap}' (topic: {topic}) in '{sub}'.
+Each question: Question, Options A-D, Correct Answer, Explanation.
+Use LaTeX for math."""
 
     if tool == "📌 Revision Notes":
         return f"""Act as a revision coach for {audience}.
-
 STYLE: {si}
-
-Create detailed revision notes for '{chap}' (Topic: {topic}) in '{sub}'.
-
-Include:
-- Clear section headings
-- Key definitions, formulas, important dates/facts
-- Memory tips and exam reminders
-- No heading left without content
-
-Use LaTeX for any math."""
+Create detailed revision notes for '{chap}' (topic: {topic}) in '{sub}'.
+Include: headings, definitions, formulas, memory tips. No empty sections.
+Use LaTeX for math."""
 
     if tool == "❓ Exam Q&A":
         return f"""Act as an exam coach for {audience}.
-
 STYLE: {si}
-
-Generate exactly 5 high-probability exam questions with complete model answers for '{chap}' (Topic: {topic}) in '{sub}'.
-
-Rules:
-- 5 questions — no more, no less
-- Every answer must be complete and exam-ready
-- Use bullet points where helpful
-- No answer left empty
-
-Use LaTeX for any math."""
+Generate exactly 5 exam questions with complete model answers for '{chap}' (topic: {topic}) in '{sub}'.
+Every answer must be complete. Use LaTeX for math."""
 
     return ""
-
 # =========================================================
-# MAIN APP
+# MAIN APPLICATION
 # =========================================================
 def main_app():
+    # ── SIDEBAR ──────────────────────────────────────────
     with st.sidebar:
-        st.title("🎓 StudyFiesta")
-        st.markdown(f"**Welcome, {st.session_state.username}** 👋")
+        st.markdown(f"""
+            <div style="text-align:center; padding: 20px 0 10px 0;">
+                <div style="font-size:2.5rem;">🎓</div>
+                <div style="font-size:1.1rem; font-weight:700;">StudyFiesta AI</div>
+                <div style="font-size:0.85rem; opacity:0.8;">Welcome, {st.session_state.username}</div>
+            </div>
+        """, unsafe_allow_html=True)
         st.divider()
+
         tool = st.radio(
             "SELECT TOOL",
             ["📝 Summary", "🧠 Quiz", "📌 Revision Notes", "❓ Exam Q&A"]
         )
         st.divider()
+
         with st.expander("🤖 AI Model Status"):
-            if st.button("Check Available Models"):
+            if st.button("Check Models", use_container_width=True):
                 with st.spinner("Checking..."):
                     models = get_available_models()
-                if models:
-                    st.success(f"{len(models)} model(s) available:")
-                    for m in models:
-                        st.write(f"• {m}")
-                else:
-                    st.warning("Could not retrieve model list.")
+                for m in models:
+                    st.write(f"✅ {m}")
+
         st.divider()
-        if st.button("Logout"):
+        if st.button("🚪 Logout", use_container_width=True):
             st.session_state.logged_in = False
             st.session_state.username  = ""
             st.rerun()
 
-    st.markdown(f"# {tool}")
-    st.write("Streamlining your preparation with AI precision.")
+    # ── HEADER ───────────────────────────────────────────
+    st.markdown("""
+        <div class="sf-header">
+            <h1>StudyFiesta AI 🎓</h1>
+            <p>Your Smart Exam Preparation Platform • Mobile & Desktop Ready</p>
+        </div>
+    """, unsafe_allow_html=True)
 
-    st.markdown('<div class="card">', unsafe_allow_html=True)
-    c1, c2, c3 = st.columns(3)
-    with c1: cat    = st.selectbox("📚 Category",       list(DATA_MAP.keys()))
-    with c2: course = st.selectbox("🎓 Exam / Course",  list(DATA_MAP[cat].keys()))
+    # ── SELECTION CARD ────────────────────────────────────
+    st.markdown('<div class="sf-card">', unsafe_allow_html=True)
+
+    c1, c2, c3 = st.columns([1.2, 1.2, 1])
+    with c1: cat    = st.selectbox("📚 Category",      list(DATA_MAP.keys()))
+    with c2: course = st.selectbox("🎓 Exam / Course", list(DATA_MAP[cat].keys()))
     with c3:
-        board = st.selectbox("🏫 Education Board", BOARDS) if "School" in cat else "University / National Syllabus"
+        if "School" in cat:
+            board = st.selectbox("🏫 Board", BOARDS)
+        else:
+            board = "University / National Syllabus"
+            st.info(f"📌 {board}")
 
     c4, c5 = st.columns(2)
     with c4: sub = st.selectbox("📖 Subject", DATA_MAP[cat][course])
     topics_list = get_topics(cat, course, sub)
     with c5: topic = st.selectbox("🗂️ Topic / Unit", topics_list)
 
+    # Chapter auto-load with caching
     chapter_key = f"{cat}||{course}||{sub}||{topic}"
-    if "last_chapter_key"  not in st.session_state: st.session_state.last_chapter_key  = ""
-    if "current_chapters"  not in st.session_state: st.session_state.current_chapters  = []
+    if "last_chapter_key" not in st.session_state:
+        st.session_state.last_chapter_key = ""
+    if "current_chapters" not in st.session_state:
+        st.session_state.current_chapters = []
     if st.session_state.last_chapter_key != chapter_key:
-        st.session_state.current_chapters = get_chapters(cat, course, sub, topic)
-        st.session_state.last_chapter_key = chapter_key
+        st.session_state.current_chapters  = get_chapters(cat, course, sub, topic)
+        st.session_state.last_chapter_key  = chapter_key
 
     chap = st.selectbox("📝 Chapter", st.session_state.current_chapters)
     st.markdown('</div>', unsafe_allow_html=True)
 
+    # ── OUTPUT STYLE ──────────────────────────────────────
     output_style = st.radio(
-        "Output Style",
+        "⚙️ Output Style",
         ["📄 Detailed", "⚡ Short & Quick", "📋 Notes Format"],
         horizontal=True
     )
 
-    if st.button(f"Generate {tool} ✨", use_container_width=True):
-        audience     = f"{board} {course} students" if "School" in cat else f"{course} students"
+    # ── GENERATE BUTTON ───────────────────────────────────
+    if st.button(f"✨ Generate {tool}", use_container_width=True):
+        audience = (
+            f"{board} {course} students"
+            if "School" in cat
+            else f"{course} students"
+        )
         final_prompt = build_prompt(tool, chap, topic, sub, audience, output_style)
 
-        with st.spinner(f"Generating {tool} for '{chap}'... please wait ⏳"):
+        with st.spinner(f"🧠 Generating {tool} for '{chap}'... please wait ⏳"):
             try:
                 result, model_used = generate_with_fallback(final_prompt)
             except Exception as e:
@@ -1075,20 +1233,25 @@ def main_app():
         st.markdown("---")
 
         if model_used != "None":
-            st.success(f"✅ Done! (Powered by {model_used})")
+            st.success(f"✅ Generated using **{model_used}**")
+
+            # Output card
+            st.markdown(f'<div class="sf-output">', unsafe_allow_html=True)
             st.markdown(f"### 📄 {tool} — {chap}")
             st.markdown(result)
+            st.markdown('</div>', unsafe_allow_html=True)
 
-            # ── PDF Download ─────────────────────────────────
+            # PDF Download
             st.markdown("---")
-            st.markdown("#### 📥 Download Your Notes")
-            pdf_title    = f"{tool.replace('📝','').replace('🧠','').replace('📌','').replace('❓','').strip()} - {chap}"
+            pdf_title    = f"{tool.replace('📝','').replace('🧠','').replace('📌','').replace('❓','').strip()} — {chap}"
             pdf_subtitle = f"{sub} | {topic} | {course} | {board}"
             try:
                 pdf_buffer    = generate_pdf(pdf_title, pdf_subtitle, result)
                 safe_filename = (
-                    chap.replace(" ", "_").replace(":", "")
-                        .replace("/", "-").replace("—", "-")
+                    chap.replace(" ", "_")
+                        .replace(":", "")
+                        .replace("/", "-")
+                        .replace("—", "-")
                 ) + ".pdf"
                 st.download_button(
                     label="⬇️ Download as PDF",
@@ -1100,52 +1263,62 @@ def main_app():
             except Exception as pdf_err:
                 st.warning(f"PDF generation issue: {pdf_err}")
         else:
-            st.error("⚠️ AI service is currently unavailable. Please try again.")
-            st.info(f"🔍 Debug info:\n{result}")
+            st.error("⚠️ AI service unavailable. Please try again.")
+            with st.expander("🔍 Debug Info"):
+                st.code(result)
 
 # =========================================================
 # AUTH UI
 # =========================================================
 def auth_ui():
-    st.title("📚 StudyFiesta AI")
-    st.subheader("Your Smart Exam Preparation Platform 🎓")
-    tab1, tab2 = st.tabs(["🔐 Login", "📝 Register"])
+    col_l, col_c, col_r = st.columns([1, 2, 1])
+    with col_c:
+        st.markdown("""
+            <div class="sf-header">
+                <h1>🎓 StudyFiesta AI</h1>
+                <p>Your Smart Exam Preparation Platform</p>
+            </div>
+        """, unsafe_allow_html=True)
 
-    with tab1:
-        u = st.text_input("Username", key="login_u")
-        p = st.text_input("Password", type="password", key="login_p")
-        if st.button("Login", use_container_width=True):
-            conn = sqlite3.connect("users.db")
-            c    = conn.cursor()
-            c.execute("SELECT * FROM users WHERE username=? AND password=?", (u, hash_p(p)))
-            user = c.fetchone()
-            conn.close()
-            if user:
-                st.session_state.logged_in = True
-                st.session_state.username  = u
-                st.rerun()
-            else:
-                st.error("❌ Invalid username or password.")
+        st.markdown('<div class="sf-card">', unsafe_allow_html=True)
+        tab1, tab2 = st.tabs(["🔐 Login", "📝 Register"])
 
-    with tab2:
-        nu = st.text_input("Choose a Username", key="reg_u")
-        np = st.text_input("Choose a Password", type="password", key="reg_p")
-        if st.button("Create Account", use_container_width=True):
-            if not nu.strip() or not np.strip():
-                st.error("Username and password cannot be empty.")
-            else:
-                try:
-                    conn = sqlite3.connect("users.db")
-                    c    = conn.cursor()
-                    c.execute("INSERT INTO users VALUES (?, ?)", (nu.strip(), hash_p(np)))
-                    conn.commit()
-                    conn.close()
-                    st.success("✅ Account created! Please go to the Login tab.")
-                except sqlite3.IntegrityError:
-                    st.error("❌ Username already exists. Please choose another.")
+        with tab1:
+            u = st.text_input("Username", key="login_u", placeholder="Enter your username")
+            p = st.text_input("Password", type="password", key="login_p", placeholder="Enter your password")
+            if st.button("Sign In 🚀", use_container_width=True):
+                conn = sqlite3.connect("users.db")
+                c    = conn.cursor()
+                c.execute("SELECT * FROM users WHERE username=? AND password=?", (u, hash_p(p)))
+                user = c.fetchone()
+                conn.close()
+                if user:
+                    st.session_state.logged_in = True
+                    st.session_state.username  = u
+                    st.rerun()
+                else:
+                    st.error("❌ Invalid username or password.")
+
+        with tab2:
+            nu = st.text_input("Choose Username", key="reg_u", placeholder="Pick a unique username")
+            np = st.text_input("Choose Password", type="password", key="reg_p", placeholder="Create a strong password")
+            if st.button("Create Account ✨", use_container_width=True):
+                if not nu.strip() or not np.strip():
+                    st.error("Username and password cannot be empty.")
+                else:
+                    try:
+                        conn = sqlite3.connect("users.db")
+                        c    = conn.cursor()
+                        c.execute("INSERT INTO users VALUES (?, ?)", (nu.strip(), hash_p(np)))
+                        conn.commit()
+                        conn.close()
+                        st.success("✅ Account created! Please go to Login tab.")
+                    except sqlite3.IntegrityError:
+                        st.error("❌ Username already exists.")
+        st.markdown('</div>', unsafe_allow_html=True)
 
 # =========================================================
-# START
+# RUN
 # =========================================================
 init_db()
 if "logged_in" not in st.session_state: st.session_state.logged_in = False
