@@ -4,6 +4,7 @@ import sqlite3
 import hashlib
 import io
 import re
+import time
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import cm
@@ -22,7 +23,7 @@ st.set_page_config(
 )
 
 # =========================================================
-# PROFESSIONAL CSS — MOBILE + DESKTOP RESPONSIVE
+# PROFESSIONAL CSS — FIXED FOR MOBILE
 # =========================================================
 st.markdown("""
     <style>
@@ -38,6 +39,15 @@ st.markdown("""
         background: linear-gradient(135deg, #f0f4ff 0%, #dce8ff 100%);
         min-height: 100vh;
     }
+    
+    /* ── BETTER SCREEN PADDING FOR MOBILE ── */
+    .block-container {
+        padding-top: 2rem !important;
+        padding-bottom: 2rem !important;
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+        max-width: 1200px;
+    }
 
     /* ── HIDE STREAMLIT CHROME ── */
     #MainMenu  { visibility: hidden; }
@@ -48,7 +58,7 @@ st.markdown("""
     .sf-card {
         background: rgba(255, 255, 255, 0.95);
         border-radius: 18px;
-        padding: 24px 28px;
+        padding: 24px;
         box-shadow: 0 8px 30px rgba(30, 60, 114, 0.10);
         margin-bottom: 20px;
         border: 1px solid rgba(255,255,255,0.6);
@@ -57,16 +67,16 @@ st.markdown("""
     /* ── PAGE HEADER ── */
     .sf-header {
         text-align: center;
-        padding: 28px 0 10px 0;
+        padding: 10px 0 20px 0;
     }
     .sf-header h1 {
-        font-size: 2.4rem;
+        font-size: 2.2rem;
         font-weight: 700;
         color: #1e3c72;
         margin-bottom: 4px;
     }
     .sf-header p {
-        font-size: 1.0rem;
+        font-size: 0.95rem;
         color: #5a6a8a;
     }
 
@@ -74,13 +84,12 @@ st.markdown("""
     .stButton > button {
         width: 100% !important;
         border-radius: 12px !important;
-        height: 3.4rem !important;
+        height: 3.2rem !important;
         background: linear-gradient(90deg, #1e3c72 0%, #2a5298 100%) !important;
         color: #ffffff !important;
         border: none !important;
         font-weight: 700 !important;
         font-size: 15px !important;
-        letter-spacing: 0.4px !important;
         transition: all 0.25s ease !important;
     }
     .stButton > button:hover {
@@ -91,18 +100,8 @@ st.markdown("""
 
     /* ── DOWNLOAD BUTTON ── */
     .stDownloadButton > button {
-        width: 100% !important;
-        border-radius: 12px !important;
-        height: 3.2rem !important;
         background: linear-gradient(90deg, #11998e 0%, #38ef7d 100%) !important;
         color: #ffffff !important;
-        font-weight: 700 !important;
-        border: none !important;
-        transition: all 0.25s ease !important;
-    }
-    .stDownloadButton > button:hover {
-        opacity: 0.9 !important;
-        transform: translateY(-2px) !important;
     }
 
     /* ── SELECTBOX ── */
@@ -112,25 +111,16 @@ st.markdown("""
         background: #f8faff !important;
     }
 
-    /* ── RADIO BUTTONS ── */
-    div[data-testid="stHorizontalBlock"] label {
-        font-weight: 500;
-    }
-
     /* ── LABELS ── */
-    div.stSelectbox label,
-    div.stTextInput label,
-    div.stRadio label {
+    div.stSelectbox label, div.stTextInput label, div.stRadio label {
         font-weight: 600 !important;
         color: #1e3c72 !important;
         font-size: 0.88rem !important;
-        letter-spacing: 0.3px !important;
     }
 
     /* ── SIDEBAR ── */
     [data-testid="stSidebar"] {
-        background: linear-gradient(160deg, #1e3c72 0%, #2a5298 100%);
-        min-width: 220px;
+        background: linear-gradient(160deg, #1e3c72 0%, #2a5298 100%) !important;
     }
     [data-testid="stSidebar"] * {
         color: #ffffff !important;
@@ -138,106 +128,37 @@ st.markdown("""
     [data-testid="stSidebar"] .stButton > button {
         background: rgba(255,255,255,0.15) !important;
         border: 1px solid rgba(255,255,255,0.3) !important;
-        border-radius: 10px !important;
-        color: #fff !important;
-        font-weight: 600 !important;
-        margin-top: 6px;
-    }
-    [data-testid="stSidebar"] .stButton > button:hover {
-        background: rgba(255,255,255,0.25) !important;
-    }
-    [data-testid="stSidebar"] .stRadio > label,
-    [data-testid="stSidebar"] div.stRadio label {
-        color: #ffffff !important;
-    }
-
-    /* ── SUCCESS / INFO / ERROR ── */
-    div[data-testid="stSuccessMessage"] {
-        border-radius: 10px;
     }
 
     /* ── OUTPUT CONTENT AREA ── */
     .sf-output {
         background: #fff;
         border-radius: 16px;
-        padding: 24px 28px;
+        padding: 20px;
         border-left: 5px solid #2a5298;
         box-shadow: 0 4px 20px rgba(0,0,0,0.07);
         margin-top: 10px;
-    }
-
-    /* ── DIVIDER ── */
-    hr {
-        border: none;
-        border-top: 1.5px solid #e0e8ff;
-        margin: 18px 0;
     }
 
     /* ============================================
        📱 MOBILE RESPONSIVE STYLES
     ============================================ */
     @media (max-width: 768px) {
-
-        /* Header shrink */
-        .sf-header h1 {
-            font-size: 1.7rem !important;
-        }
-        .sf-header p {
-            font-size: 0.88rem !important;
-        }
-
-        /* Cards compact on mobile */
-        .sf-card {
-            padding: 14px 14px !important;
-            border-radius: 14px !important;
-            margin-bottom: 12px !important;
-        }
-
-        /* Output area */
-        .sf-output {
-            padding: 14px 14px !important;
-        }
-
-        /* Buttons bigger tap area */
-        .stButton > button {
-            height: 3.8rem !important;
-            font-size: 16px !important;
-        }
-
-        /* Stack columns properly */
-        div[data-testid="column"] {
-            min-width: 100% !important;
-        }
-
-        /* Reduce sidebar icon area */
-        [data-testid="stSidebar"] {
-            min-width: 100% !important;
-        }
-
-        /* Font base */
-        html, body {
-            font-size: 15px !important;
-        }
-
-        /* Input padding */
-        input[type="text"],
-        input[type="password"] {
-            font-size: 16px !important;
+        .sf-header h1 { font-size: 1.8rem !important; }
+        .sf-header p { font-size: 0.85rem !important; }
+        .sf-card { padding: 16px !important; border-radius: 14px !important; }
+        .sf-output { padding: 16px !important; }
+        .stButton > button { height: 3.5rem !important; font-size: 16px !important; }
+        
+        /* Fix inputs on mobile */
+        input[type="text"], input[type="password"] {
+            font-size: 16px !important; 
             padding: 12px !important;
         }
     }
-
-    @media (max-width: 480px) {
-        .sf-header h1 {
-            font-size: 1.4rem !important;
-        }
-        .sf-card {
-            padding: 10px 10px !important;
-        }
-    }
-
     </style>
 """, unsafe_allow_html=True)
+
 # =========================================================
 # AI CONFIG — DYNAMIC MULTI-MODEL FALLBACK
 # =========================================================
