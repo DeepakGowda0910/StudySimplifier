@@ -16,37 +16,39 @@ from reportlab.lib.enums import TA_LEFT, TA_CENTER
 # PAGE CONFIG
 # =========================================================
 st.set_page_config(
-    page_title="StudyFiesta AI",
+    page_title="StudySmart AI",
     page_icon="🎓",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
 
 # =========================================================
-# PROFESSIONAL CSS — FIXED FOR MOBILE
+# PROFESSIONAL PREMIUM CSS — REDESIGNED
 # =========================================================
 st.markdown("""
     <style>
-    /* ── GOOGLE FONT ── */
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    /* ── IMPORT PROFESSIONAL FONTS ── */
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Sora:wght@400;500;600;700&display=swap');
 
+    /* ── GLOBAL STYLING ── */
     html, body, [class*="css"], [class*="st-"] {
-        font-family: 'Inter', sans-serif !important;
+        font-family: 'Sora', 'Poppins', sans-serif !important;
+        letter-spacing: 0.3px;
     }
 
-    /* ── GLOBAL BACKGROUND ── */
+    /* ── PREMIUM GRADIENT BACKGROUND ── */
     .stApp {
-        background: linear-gradient(135deg, #f0f4ff 0%, #dce8ff 100%);
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f3460 100%);
         min-height: 100vh;
     }
-    
+
     /* ── BETTER SCREEN PADDING FOR MOBILE ── */
     .block-container {
-        padding-top: 2rem !important;
+        padding-top: 1.5rem !important;
         padding-bottom: 2rem !important;
         padding-left: 1rem !important;
         padding-right: 1rem !important;
-        max-width: 1200px;
+        max-width: 1300px;
     }
 
     /* ── HIDE STREAMLIT CHROME ── */
@@ -54,108 +56,278 @@ st.markdown("""
     footer     { visibility: hidden; }
     header     { visibility: hidden; }
 
-    /* ── CARD COMPONENT ── */
+    /* ════════════════════════════════════════════════════════
+       PREMIUM CARD COMPONENT WITH GLASS MORPHISM
+    ════════════════════════════════════════════════════════ */
     .sf-card {
-        background: rgba(255, 255, 255, 0.95);
+        background: rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 28px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2), 
+                    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        margin-bottom: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .sf-card-dark {
+        background: rgba(15, 23, 42, 0.4);
+        backdrop-filter: blur(10px);
         border-radius: 18px;
         padding: 24px;
-        box-shadow: 0 8px 30px rgba(30, 60, 114, 0.10);
-        margin-bottom: 20px;
-        border: 1px solid rgba(255,255,255,0.6);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(59, 130, 246, 0.2);
     }
 
-    /* ── PAGE HEADER ── */
+    /* ════════════════════════════════════════════════════════
+       PREMIUM HEADER WITH GRADIENT TEXT
+    ════════════════════════════════════════════════════════ */
     .sf-header {
         text-align: center;
-        padding: 10px 0 20px 0;
-    }
-    .sf-header h1 {
-        font-size: 2.2rem;
-        font-weight: 700;
-        color: #1e3c72;
-        margin-bottom: 4px;
-    }
-    .sf-header p {
-        font-size: 0.95rem;
-        color: #5a6a8a;
+        padding: 20px 0 30px 0;
+        background: linear-gradient(180deg, rgba(59, 130, 246, 0.15) 0%, transparent 100%);
+        border-radius: 20px;
+        margin-bottom: 10px;
     }
 
-    /* ── BUTTONS ── */
+    .sf-header-title {
+        font-size: 3.2rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 50%, #1e40af 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin: 0;
+        letter-spacing: -1px;
+    }
+
+    .sf-header-subtitle {
+        font-size: 1.1rem;
+        color: #e0f2fe;
+        margin-top: 6px;
+        font-weight: 500;
+        letter-spacing: 0.5px;
+    }
+
+    .sf-header-tagline {
+        font-size: 0.95rem;
+        color: #cbd5e1;
+        margin-top: 8px;
+        font-weight: 400;
+    }
+
+    /* ════════════════════════════════════════════════════════
+       PREMIUM BUTTONS WITH GRADIENT
+    ════════════════════════════════════════════════════════ */
     .stButton > button {
         width: 100% !important;
-        border-radius: 12px !important;
-        height: 3.2rem !important;
-        background: linear-gradient(90deg, #1e3c72 0%, #2a5298 100%) !important;
+        border-radius: 14px !important;
+        height: 3.4rem !important;
+        background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%) !important;
         color: #ffffff !important;
         border: none !important;
         font-weight: 700 !important;
         font-size: 15px !important;
-        transition: all 0.25s ease !important;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3) !important;
+        letter-spacing: 0.5px !important;
     }
     .stButton > button:hover {
-        opacity: 0.9 !important;
-        transform: translateY(-2px) !important;
-        box-shadow: 0 6px 18px rgba(30,60,114,0.35) !important;
+        opacity: 0.95 !important;
+        transform: translateY(-3px) !important;
+        box-shadow: 0 8px 25px rgba(59, 130, 246, 0.5) !important;
+    }
+    .stButton > button:active {
+        transform: translateY(-1px) !important;
     }
 
-    /* ── DOWNLOAD BUTTON ── */
+    /* ── DOWNLOAD BUTTON (GREEN GRADIENT) ── */
     .stDownloadButton > button {
-        background: linear-gradient(90deg, #11998e 0%, #38ef7d 100%) !important;
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
         color: #ffffff !important;
+        box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3) !important;
+    }
+    .stDownloadButton > button:hover {
+        box-shadow: 0 8px 25px rgba(16, 185, 129, 0.5) !important;
     }
 
-    /* ── SELECTBOX ── */
+    /* ════════════════════════════════════════════════════════
+       PREMIUM SELECTBOX & INPUTS
+    ════════════════════════════════════════════════════════ */
     div[data-baseweb="select"] > div {
-        border-radius: 10px !important;
-        border: 1.5px solid #d0d9f0 !important;
-        background: #f8faff !important;
+        border-radius: 12px !important;
+        border: 1.5px solid rgba(59, 130, 246, 0.3) !important;
+        background: rgba(255, 255, 255, 0.05) !important;
+        color: #e0e7ff !important;
     }
 
-    /* ── LABELS ── */
+    input[type="text"], input[type="password"] {
+        background: rgba(255, 255, 255, 0.05) !important;
+        color: #e0e7ff !important;
+        border: 1.5px solid rgba(59, 130, 246, 0.3) !important;
+        border-radius: 12px !important;
+    }
+
+    input[type="text"]::placeholder, input[type="password"]::placeholder {
+        color: #94a3b8 !important;
+    }
+
+    /* ── PREMIUM LABELS ── */
     div.stSelectbox label, div.stTextInput label, div.stRadio label {
-        font-weight: 600 !important;
-        color: #1e3c72 !important;
+        font-weight: 700 !important;
+        color: #e0e7ff !important;
         font-size: 0.88rem !important;
+        letter-spacing: 0.4px !important;
+        text-transform: uppercase;
     }
 
-    /* ── SIDEBAR ── */
+    /* ════════════════════════════════════════════════════════
+       PREMIUM SIDEBAR — DARK GRADIENT
+    ════════════════════════════════════════════════════════ */
     [data-testid="stSidebar"] {
-        background: linear-gradient(160deg, #1e3c72 0%, #2a5298 100%) !important;
+        background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%) !important;
+        border-right: 1px solid rgba(59, 130, 246, 0.2) !important;
     }
+
     [data-testid="stSidebar"] * {
-        color: #ffffff !important;
+        color: #e0e7ff !important;
     }
+
     [data-testid="stSidebar"] .stButton > button {
-        background: rgba(255,255,255,0.15) !important;
-        border: 1px solid rgba(255,255,255,0.3) !important;
+        background: rgba(59, 130, 246, 0.15) !important;
+        border: 1px solid rgba(59, 130, 246, 0.3) !important;
+        border-radius: 10px !important;
+        color: #60a5fa !important;
+        font-weight: 600 !important;
     }
 
-    /* ── OUTPUT CONTENT AREA ── */
+    [data-testid="stSidebar"] .stButton > button:hover {
+        background: rgba(59, 130, 246, 0.25) !important;
+        box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3) !important;
+    }
+
+    /* ════════════════════════════════════════════════════════
+       OUTPUT CONTENT AREA
+    ════════════════════════════════════════════════════════ */
     .sf-output {
-        background: #fff;
+        background: rgba(255, 255, 255, 0.06);
+        backdrop-filter: blur(10px);
         border-radius: 16px;
-        padding: 20px;
-        border-left: 5px solid #2a5298;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.07);
+        padding: 24px;
+        border-left: 4px solid #3b82f6;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
         margin-top: 10px;
+        border: 1px solid rgba(59, 130, 246, 0.2);
+        color: #e0e7ff;
     }
 
-    /* ============================================
-       📱 MOBILE RESPONSIVE STYLES
-    ============================================ */
+    .sf-output h3, .sf-output h2 {
+        color: #60a5fa !important;
+        margin-top: 0;
+    }
+
+    /* ── SUCCESS / INFO / ERROR MESSAGES ── */
+    div[data-testid="stSuccessMessage"] {
+        background: rgba(16, 185, 129, 0.1) !important;
+        border: 1px solid rgba(16, 185, 129, 0.3) !important;
+        border-radius: 12px !important;
+        color: #86efac !important;
+    }
+
+    div[data-testid="stErrorMessage"] {
+        background: rgba(239, 68, 68, 0.1) !important;
+        border: 1px solid rgba(239, 68, 68, 0.3) !important;
+        border-radius: 12px !important;
+        color: #fca5a5 !important;
+    }
+
+    div[data-testid="stInfoMessage"] {
+        background: rgba(59, 130, 246, 0.1) !important;
+        border: 1px solid rgba(59, 130, 246, 0.3) !important;
+        border-radius: 12px !important;
+        color: #93c5fd !important;
+    }
+
+    div[data-testid="stWarningMessage"] {
+        background: rgba(251, 146, 60, 0.1) !important;
+        border: 1px solid rgba(251, 146, 60, 0.3) !important;
+        border-radius: 12px !important;
+        color: #fed7aa !important;
+    }
+
+    /* ── DIVIDER ── */
+    hr {
+        border: none;
+        border-top: 1px solid rgba(59, 130, 246, 0.2);
+        margin: 20px 0;
+    }
+
+    /* ── RADIO BUTTONS ── */
+    div[data-testid="stHorizontalBlock"] {
+        gap: 12px;
+    }
+
+    /* ── TABS ── */
+    button[data-baseweb="tab"] {
+        color: #cbd5e1 !important;
+        border-bottom: 2px solid transparent !important;
+        transition: all 0.3s ease !important;
+    }
+
+    button[aria-selected="true"] {
+        color: #60a5fa !important;
+        border-bottom: 2px solid #3b82f6 !important;
+    }
+
+    /* ════════════════════════════════════════════════════════
+       📱 MOBILE RESPONSIVE STYLES (768px and below)
+    ════════════════════════════════════════════════════════ */
     @media (max-width: 768px) {
-        .sf-header h1 { font-size: 1.8rem !important; }
-        .sf-header p { font-size: 0.85rem !important; }
-        .sf-card { padding: 16px !important; border-radius: 14px !important; }
+        .sf-header-title { font-size: 2.2rem !important; }
+        .sf-header-subtitle { font-size: 1rem !important; }
+        .sf-header-tagline { font-size: 0.9rem !important; }
+        .sf-header { padding: 16px 0 20px 0 !important; }
+
+        .sf-card { 
+            padding: 18px !important; 
+            border-radius: 14px !important; 
+            margin-bottom: 12px !important;
+        }
+
         .sf-output { padding: 16px !important; }
-        .stButton > button { height: 3.5rem !important; font-size: 16px !important; }
-        
-        /* Fix inputs on mobile */
+
+        .stButton > button { 
+            height: 3.6rem !important; 
+            font-size: 15px !important; 
+        }
+
         input[type="text"], input[type="password"] {
             font-size: 16px !important; 
             padding: 12px !important;
         }
+
+        .block-container {
+            padding-left: 0.8rem !important;
+            padding-right: 0.8rem !important;
+        }
     }
+
+    /* ════════════════════════════════════════════════════════
+       📱 EXTRA SMALL DEVICES (480px and below)
+    ════════════════════════════════════════════════════════ */
+    @media (max-width: 480px) {
+        .sf-header-title { font-size: 1.8rem !important; }
+        .sf-header-subtitle { font-size: 0.9rem !important; }
+        .sf-header-tagline { font-size: 0.8rem !important; }
+
+        .sf-card { padding: 14px !important; }
+
+        .stButton > button { 
+            height: 3.8rem !important; 
+            font-size: 14px !important; 
+        }
+    }
+
     </style>
 """, unsafe_allow_html=True)
 
@@ -1063,10 +1235,10 @@ def main_app():
     # ── SIDEBAR ──────────────────────────────────────────
     with st.sidebar:
         st.markdown(f"""
-            <div style="text-align:center; padding: 20px 0 10px 0;">
-                <div style="font-size:2.5rem;">🎓</div>
-                <div style="font-size:1.1rem; font-weight:700;">StudyFiesta AI</div>
-                <div style="font-size:0.85rem; opacity:0.8;">Welcome, {st.session_state.username}</div>
+            <div style="text-align:center; padding: 20px 0 15px 0;">
+                <div style="font-size:2.8rem; margin-bottom: 8px;">🎓</div>
+                <div style="font-size:1.2rem; font-weight:800; background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">StudySmart</div>
+                <div style="font-size:0.88rem; opacity:0.7; margin-top: 4px;">Welcome, {st.session_state.username}</div>
             </div>
         """, unsafe_allow_html=True)
         st.divider()
@@ -1090,11 +1262,12 @@ def main_app():
             st.session_state.username  = ""
             st.rerun()
 
-    # ── HEADER ───────────────────────────────────────────
+    # ── PREMIUM HEADER ───────────────────────────────────
     st.markdown("""
         <div class="sf-header">
-            <h1>StudyFiesta AI 🎓</h1>
-            <p>Your Smart Exam Preparation Platform • Mobile & Desktop Ready</p>
+            <div class="sf-header-title">StudySmart</div>
+            <div class="sf-header-subtitle">Your Smart Exam Preparation Platform</div>
+            <div class="sf-header-tagline">Powered by AI 🚀</div>
         </div>
     """, unsafe_allow_html=True)
 
@@ -1189,15 +1362,16 @@ def main_app():
                 st.code(result)
 
 # =========================================================
-# AUTH UI
+# AUTH UI — PREMIUM DESIGN
 # =========================================================
 def auth_ui():
     col_l, col_c, col_r = st.columns([1, 2, 1])
     with col_c:
         st.markdown("""
             <div class="sf-header">
-                <h1>🎓 StudyFiesta AI</h1>
-                <p>Your Smart Exam Preparation Platform</p>
+                <div class="sf-header-title">StudySmart</div>
+                <div class="sf-header-subtitle">Your Smart Exam Preparation Platform</div>
+                <div class="sf-header-tagline">Powered by AI 🚀</div>
             </div>
         """, unsafe_allow_html=True)
 
@@ -1234,9 +1408,9 @@ def auth_ui():
                         conn.commit()
                         conn.close()
                         
-                        # 🚀 NEW FEATURE: AUTO LOGIN AFTER REGISTRATION
+                        # 🚀 AUTO LOGIN AFTER REGISTRATION
                         st.success("✅ Account created! Logging you in...")
-                        time.sleep(1) # Quick pause so they can read the success message
+                        time.sleep(1)
                         st.session_state.logged_in = True
                         st.session_state.username = nu.strip()
                         st.rerun()
