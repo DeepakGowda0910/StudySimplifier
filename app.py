@@ -23,7 +23,7 @@ st.set_page_config(
 )
 
 # =========================================================
-# PROFESSIONAL MODERN CSS — LIGHT THEME WITH SOFT GRADIENTS
+# PROFESSIONAL MODERN CSS — LIGHT THEME + MOBILE FIX
 # =========================================================
 st.markdown("""
     <style>
@@ -233,7 +233,9 @@ st.markdown("""
        OUTPUT CONTENT AREA
     ════════════════════════════════════════════════════════ */
     .sf-output {
-        background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(37, 99, 235, 0.05) 100%);
+        background: linear-gradient(135deg,
+            rgba(59, 130, 246, 0.05) 0%,
+            rgba(37, 99, 235, 0.05) 100%);
         border-radius: 18px;
         padding: 28px;
         border-left: 5px solid #3b82f6;
@@ -294,7 +296,7 @@ st.markdown("""
        📱 MOBILE RESPONSIVE STYLES (768px and below)
     ════════════════════════════════════════════════════════ */
     @media (max-width: 768px) {
-        .sf-header-title  { font-size: 2.8rem !important; }
+        .sf-header-title    { font-size: 2.8rem !important; }
         .sf-header-subtitle { font-size: 1rem !important; }
 
         .sf-watermark {
@@ -329,6 +331,69 @@ st.markdown("""
             padding-left: 1rem !important;
             padding-right: 1rem !important;
         }
+
+        /* ══════════════════════════════════════════════════
+           🔧 MOBILE DROPDOWN KEYBOARD / SCROLL JUMP FIX
+        ══════════════════════════════════════════════════ */
+
+        /* Stop the whole page from jumping when dropdown opens */
+        html, body, .stApp {
+            overflow-x: hidden !important;
+            overscroll-behavior: none !important;
+            scroll-behavior: auto !important;
+            position: relative !important;
+        }
+
+        /* Force font-size 16px on ALL select inputs —
+           this is the #1 fix: iOS/Android won't zoom-in
+           or scroll-jump if font-size is >= 16px          */
+        div[data-baseweb="select"] input,
+        div[data-baseweb="select"] [role="combobox"],
+        div[data-baseweb="select"] > div {
+            font-size: 16px !important;
+            -webkit-text-size-adjust: 100% !important;
+        }
+
+        /* Prevent keyboard from forcing a huge viewport shift */
+        input, textarea, select,
+        [contenteditable="true"],
+        [role="combobox"] {
+            font-size: 16px !important;
+            -webkit-text-size-adjust: 100% !important;
+            touch-action: manipulation !important;
+        }
+
+        /* Give the dropdown list a max height so it stays
+           within view and doesn't go off screen           */
+        div[role="listbox"] {
+            max-height: 38vh !important;
+            overflow-y: auto !important;
+            -webkit-overflow-scrolling: touch !important;
+            position: fixed !important;
+            z-index: 9999 !important;
+        }
+
+        /* Make each option tall enough to tap comfortably */
+        div[role="option"] {
+            min-height: 48px !important;
+            padding: 12px 16px !important;
+            font-size: 15px !important;
+            display: flex !important;
+            align-items: center !important;
+        }
+
+        /* Keep the dropdown trigger stable */
+        div[data-baseweb="select"] {
+            margin-bottom: 0.75rem !important;
+            touch-action: manipulation !important;
+        }
+
+        /* Prevent card from jumping */
+        .sf-card {
+            transform: translateZ(0) !important;
+            will-change: auto !important;
+            -webkit-overflow-scrolling: touch !important;
+        }
     }
 
     /* ════════════════════════════════════════════════════════
@@ -349,6 +414,16 @@ st.markdown("""
         .stButton > button {
             height: 3.2rem !important;
             font-size: 13px !important;
+        }
+
+        /* Extra-small screen dropdown fix */
+        div[role="listbox"] {
+            max-height: 42vh !important;
+        }
+
+        div[role="option"] {
+            min-height: 52px !important;
+            font-size: 14px !important;
         }
     }
 
