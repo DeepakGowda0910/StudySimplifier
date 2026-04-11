@@ -23,12 +23,12 @@ st.set_page_config(
 )
 
 # =========================================================
-# PROFESSIONAL PREMIUM CSS — REDESIGNED
+# PREMIUM ULTRA-MODERN CSS — FULL VERSION
 # =========================================================
 st.markdown("""
     <style>
     /* ── IMPORT PROFESSIONAL FONTS ── */
-    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Sora:wght@400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Sora:wght@400;500;600;700;800&display=swap');
 
     /* ── GLOBAL STYLING ── */
     html, body, [class*="css"], [class*="st-"] {
@@ -38,7 +38,7 @@ st.markdown("""
 
     /* ── PREMIUM GRADIENT BACKGROUND ── */
     .stApp {
-        background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f3460 100%);
+        background: radial-gradient(circle at top right, #1e293b, #0f172a);
         min-height: 100vh;
     }
 
@@ -56,18 +56,77 @@ st.markdown("""
     footer     { visibility: hidden; }
     header     { visibility: hidden; }
 
+    /* ── REMOVE THE GREY TABS BAR ── */
+    .stTabs [data-baseweb="tab-list"] {
+        background-color: transparent !important;
+        border-bottom: none !important;
+        gap: 20px;
+    }
+    .stTabs [data-baseweb="tab"] {
+        background-color: transparent !important;
+        border: none !important;
+        color: #94a3b8 !important;
+    }
+
     /* ════════════════════════════════════════════════════════
-       PREMIUM CARD COMPONENT WITH GLASS MORPHISM
+       PREMIUM HEADER DESIGN WITH GRADIENT TEXT
+    ════════════════════════════════════════════════════════ */
+    .sf-header {
+        text-align: center;
+        padding: 40px 0 10px 0;
+        position: relative;
+    }
+
+    .sf-header-title {
+        font-size: 4rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin: 0;
+        line-height: 1;
+        letter-spacing: -1px;
+    }
+
+    .sf-header-subtitle {
+        font-size: 1.2rem;
+        color: #94a3b8;
+        margin-top: 10px;
+        font-weight: 400;
+        letter-spacing: 0.5px;
+    }
+
+    /* ════════════════════════════════════════════════════════
+       THE WATERMARK — MERGED WITH BACKGROUND
+    ════════════════════════════════════════════════════════ */
+    .sf-watermark {
+        font-size: 5.5rem;
+        font-weight: 900;
+        color: rgba(255, 255, 255, 0.03);
+        text-transform: uppercase;
+        letter-spacing: 15px;
+        margin-top: -20px;
+        margin-bottom: 20px;
+        user-select: none;
+        pointer-events: none;
+        text-align: center;
+        width: 100%;
+        line-height: 1;
+    }
+
+    /* ════════════════════════════════════════════════════════
+       PREMIUM GLASS CARD COMPONENT WITH GLASS MORPHISM
     ════════════════════════════════════════════════════════ */
     .sf-card {
-        background: rgba(255, 255, 255, 0.08);
-        backdrop-filter: blur(10px);
-        border-radius: 20px;
-        padding: 28px;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2), 
+        background: rgba(255, 255, 255, 0.03);
+        backdrop-filter: blur(15px);
+        border-radius: 24px;
+        padding: 30px;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3), 
                     inset 0 1px 0 rgba(255, 255, 255, 0.1);
-        margin-bottom: 20px;
-        border: 1px solid rgba(255, 255, 255, 0.15);
+        margin-bottom: 25px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
     }
 
     .sf-card-dark {
@@ -80,62 +139,25 @@ st.markdown("""
     }
 
     /* ════════════════════════════════════════════════════════
-       PREMIUM HEADER WITH GRADIENT TEXT
-    ════════════════════════════════════════════════════════ */
-    .sf-header {
-        text-align: center;
-        padding: 20px 0 30px 0;
-        background: linear-gradient(180deg, rgba(59, 130, 246, 0.15) 0%, transparent 100%);
-        border-radius: 20px;
-        margin-bottom: 10px;
-    }
-
-    .sf-header-title {
-        font-size: 3.2rem;
-        font-weight: 800;
-        background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 50%, #1e40af 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        margin: 0;
-        letter-spacing: -1px;
-    }
-
-    .sf-header-subtitle {
-        font-size: 1.1rem;
-        color: #e0f2fe;
-        margin-top: 6px;
-        font-weight: 500;
-        letter-spacing: 0.5px;
-    }
-
-    .sf-header-tagline {
-        font-size: 0.95rem;
-        color: #cbd5e1;
-        margin-top: 8px;
-        font-weight: 400;
-    }
-
-    /* ════════════════════════════════════════════════════════
-       PREMIUM BUTTONS WITH GRADIENT
+       PREMIUM BUTTONS WITH GRADIENT & SHADOWS
     ════════════════════════════════════════════════════════ */
     .stButton > button {
         width: 100% !important;
-        border-radius: 14px !important;
+        border-radius: 15px !important;
         height: 3.4rem !important;
-        background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%) !important;
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
         color: #ffffff !important;
         border: none !important;
         font-weight: 700 !important;
         font-size: 15px !important;
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-        box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3) !important;
+        box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4) !important;
         letter-spacing: 0.5px !important;
     }
     .stButton > button:hover {
         opacity: 0.95 !important;
         transform: translateY(-3px) !important;
-        box-shadow: 0 8px 25px rgba(59, 130, 246, 0.5) !important;
+        box-shadow: 0 8px 25px rgba(37, 99, 235, 0.5) !important;
     }
     .stButton > button:active {
         transform: translateY(-1px) !important;
@@ -149,6 +171,7 @@ st.markdown("""
     }
     .stDownloadButton > button:hover {
         box-shadow: 0 8px 25px rgba(16, 185, 129, 0.5) !important;
+        transform: translateY(-3px) !important;
     }
 
     /* ════════════════════════════════════════════════════════
@@ -210,15 +233,15 @@ st.markdown("""
        OUTPUT CONTENT AREA
     ════════════════════════════════════════════════════════ */
     .sf-output {
-        background: rgba(255, 255, 255, 0.06);
+        background: rgba(15, 23, 42, 0.6);
         backdrop-filter: blur(10px);
-        border-radius: 16px;
-        padding: 24px;
+        border-radius: 20px;
+        padding: 25px;
         border-left: 4px solid #3b82f6;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
         margin-top: 10px;
         border: 1px solid rgba(59, 130, 246, 0.2);
-        color: #e0e7ff;
+        color: #e2e8f0;
     }
 
     .sf-output h3, .sf-output h2 {
@@ -267,31 +290,19 @@ st.markdown("""
         gap: 12px;
     }
 
-    /* ── TABS ── */
-    button[data-baseweb="tab"] {
-        color: #cbd5e1 !important;
-        border-bottom: 2px solid transparent !important;
-        transition: all 0.3s ease !important;
-    }
-
-    button[aria-selected="true"] {
-        color: #60a5fa !important;
-        border-bottom: 2px solid #3b82f6 !important;
-    }
-
     /* ════════════════════════════════════════════════════════
        📱 MOBILE RESPONSIVE STYLES (768px and below)
     ════════════════════════════════════════════════════════ */
     @media (max-width: 768px) {
-        .sf-header-title { font-size: 2.2rem !important; }
+        .sf-header-title { font-size: 2.5rem !important; }
         .sf-header-subtitle { font-size: 1rem !important; }
-        .sf-header-tagline { font-size: 0.9rem !important; }
-        .sf-header { padding: 16px 0 20px 0 !important; }
+        .sf-watermark { font-size: 2.2rem !important; letter-spacing: 5px !important; margin-top: 0; }
+        .sf-header { padding: 20px 0 10px 0 !important; }
 
         .sf-card { 
-            padding: 18px !important; 
-            border-radius: 14px !important; 
-            margin-bottom: 12px !important;
+            padding: 20px !important; 
+            border-radius: 18px !important; 
+            margin-bottom: 15px !important;
         }
 
         .sf-output { padding: 16px !important; }
@@ -318,7 +329,7 @@ st.markdown("""
     @media (max-width: 480px) {
         .sf-header-title { font-size: 1.8rem !important; }
         .sf-header-subtitle { font-size: 0.9rem !important; }
-        .sf-header-tagline { font-size: 0.8rem !important; }
+        .sf-watermark { font-size: 1.8rem !important; letter-spacing: 3px !important; }
 
         .sf-card { padding: 14px !important; }
 
@@ -1236,9 +1247,9 @@ def main_app():
     with st.sidebar:
         st.markdown(f"""
             <div style="text-align:center; padding: 20px 0 15px 0;">
-                <div style="font-size:2.8rem; margin-bottom: 8px;">🎓</div>
-                <div style="font-size:1.2rem; font-weight:800; background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">StudySmart</div>
-                <div style="font-size:0.88rem; opacity:0.7; margin-top: 4px;">Welcome, {st.session_state.username}</div>
+                <div style="font-size:3rem; margin-bottom: 8px;">🎓</div>
+                <div style="font-size:1.4rem; font-weight:800; background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">StudySmart</div>
+                <div style="font-size:0.9rem; opacity:0.8; margin-top: 6px;">Welcome, {st.session_state.username}</div>
             </div>
         """, unsafe_allow_html=True)
         st.divider()
@@ -1262,13 +1273,13 @@ def main_app():
             st.session_state.username  = ""
             st.rerun()
 
-    # ── PREMIUM HEADER ───────────────────────────────────
+    # ── PREMIUM HEADER WITH WATERMARK ───────────────────────────────
     st.markdown("""
         <div class="sf-header">
             <div class="sf-header-title">StudySmart</div>
             <div class="sf-header-subtitle">Your Smart Exam Preparation Platform</div>
-            <div class="sf-header-tagline">Powered by AI 🚀</div>
         </div>
+        <div class="sf-watermark">POWERED BY AI</div>
     """, unsafe_allow_html=True)
 
     # ── SELECTION CARD ────────────────────────────────────
@@ -1371,8 +1382,8 @@ def auth_ui():
             <div class="sf-header">
                 <div class="sf-header-title">StudySmart</div>
                 <div class="sf-header-subtitle">Your Smart Exam Preparation Platform</div>
-                <div class="sf-header-tagline">Powered by AI 🚀</div>
             </div>
+            <div class="sf-watermark">POWERED BY AI</div>
         """, unsafe_allow_html=True)
 
         st.markdown('<div class="sf-card">', unsafe_allow_html=True)
