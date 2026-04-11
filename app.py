@@ -1312,9 +1312,16 @@ def auth_ui():
                         c.execute("INSERT INTO users VALUES (?, ?)", (nu.strip(), hash_p(np)))
                         conn.commit()
                         conn.close()
-                        st.success("✅ Account created! Please go to Login tab.")
+                        
+                        # 🚀 NEW FEATURE: AUTO LOGIN AFTER REGISTRATION
+                        st.success("✅ Account created! Logging you in...")
+                        time.sleep(1) # Quick pause so they can read the success message
+                        st.session_state.logged_in = True
+                        st.session_state.username = nu.strip()
+                        st.rerun()
+                        
                     except sqlite3.IntegrityError:
-                        st.error("❌ Username already exists.")
+                        st.error("❌ Username already exists. Try a different one.")
         st.markdown('</div>', unsafe_allow_html=True)
 
 # =========================================================
