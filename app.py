@@ -36,9 +36,10 @@ st.markdown("""
         letter-spacing: 0.3px;
     }
 
-    /* ── PREMIUM GRADIENT BACKGROUND ── */
+    /* ── PREMIUM GRADIENT BACKGROUND (LIGHTER DARK THEME) ── */
     .stApp {
-        background: radial-gradient(circle at top right, #1e293b, #0f172a);
+        /* Adjusted to a lighter, softer navy/slate blue instead of harsh black */
+        background: radial-gradient(circle at top right, #334155, #111827);
         min-height: 100vh;
     }
 
@@ -56,10 +57,10 @@ st.markdown("""
     footer     { visibility: hidden; }
     header     { visibility: hidden; }
 
-    /* ── REMOVE THE GREY TABS BAR ── */
+    /* ── STREAMLIT TABS OVERRIDE ── */
     .stTabs [data-baseweb="tab-list"] {
         background-color: transparent !important;
-        border-bottom: none !important;
+        border-bottom: 1px solid rgba(255,255,255,0.05) !important; /* Softens the default grey bar */
         gap: 20px;
     }
     .stTabs [data-baseweb="tab"] {
@@ -78,7 +79,7 @@ st.markdown("""
     }
 
     .sf-header-title {
-        font-size: 4rem;
+        font-size: 4.2rem;
         font-weight: 800;
         background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
         -webkit-background-clip: text;
@@ -91,25 +92,27 @@ st.markdown("""
 
     .sf-header-subtitle {
         font-size: 1.2rem;
-        color: #94a3b8;
+        color: #cbd5e1; /* Made slightly lighter/brighter */
         margin-top: 10px;
         font-weight: 400;
         letter-spacing: 0.5px;
     }
 
     /* ════════════════════════════════════════════════════════
-       THE WATERMARK — MERGED WITH BACKGROUND
+       THE WATERMARK — MOVED DOWN OVER THE GREY BAR
     ════════════════════════════════════════════════════════ */
     .sf-watermark {
-        font-size: 5.5rem;
+        font-size: 4.2rem; /* Matches header size */
         font-weight: 900;
-        color: rgba(255, 255, 255, 0.03);
+        color: rgba(255, 255, 255, 0.035); /* Highly transparent to blend perfectly */
         text-transform: uppercase;
-        letter-spacing: 15px;
-        margin-top: -20px;
-        margin-bottom: 20px;
+        letter-spacing: 12px;
+        margin-top: 35px;       /* Pushes text down */
+        margin-bottom: -65px;   /* Pulls the card below UP so they overlap */
+        position: relative;
+        z-index: 10;            /* Places text on top visually */
+        pointer-events: none;   /* CRITICAL: Clicks pass right through to the tabs! */
         user-select: none;
-        pointer-events: none;
         text-align: center;
         width: 100%;
         line-height: 1;
@@ -119,7 +122,7 @@ st.markdown("""
        PREMIUM GLASS CARD COMPONENT WITH GLASS MORPHISM
     ════════════════════════════════════════════════════════ */
     .sf-card {
-        background: rgba(255, 255, 255, 0.03);
+        background: rgba(255, 255, 255, 0.04);
         backdrop-filter: blur(15px);
         border-radius: 24px;
         padding: 30px;
@@ -127,15 +130,6 @@ st.markdown("""
                     inset 0 1px 0 rgba(255, 255, 255, 0.1);
         margin-bottom: 25px;
         border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .sf-card-dark {
-        background: rgba(15, 23, 42, 0.4);
-        backdrop-filter: blur(10px);
-        border-radius: 18px;
-        padding: 24px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-        border: 1px solid rgba(59, 130, 246, 0.2);
     }
 
     /* ════════════════════════════════════════════════════════
@@ -294,9 +288,17 @@ st.markdown("""
        📱 MOBILE RESPONSIVE STYLES (768px and below)
     ════════════════════════════════════════════════════════ */
     @media (max-width: 768px) {
-        .sf-header-title { font-size: 2.5rem !important; }
+        .sf-header-title { font-size: 2.8rem !important; }
         .sf-header-subtitle { font-size: 1rem !important; }
-        .sf-watermark { font-size: 2.2rem !important; letter-spacing: 5px !important; margin-top: 0; }
+        
+        /* Adjusting Watermark for Phone Size */
+        .sf-watermark { 
+            font-size: 2.4rem !important; 
+            letter-spacing: 6px !important; 
+            margin-top: 20px !important;
+            margin-bottom: -45px !important; /* Adjusted overlap for mobile */
+        }
+        
         .sf-header { padding: 20px 0 10px 0 !important; }
 
         .sf-card { 
@@ -327,9 +329,13 @@ st.markdown("""
        📱 EXTRA SMALL DEVICES (480px and below)
     ════════════════════════════════════════════════════════ */
     @media (max-width: 480px) {
-        .sf-header-title { font-size: 1.8rem !important; }
+        .sf-header-title { font-size: 2.2rem !important; }
         .sf-header-subtitle { font-size: 0.9rem !important; }
-        .sf-watermark { font-size: 1.8rem !important; letter-spacing: 3px !important; }
+        .sf-watermark { 
+            font-size: 1.8rem !important; 
+            letter-spacing: 4px !important; 
+            margin-bottom: -35px !important;
+        }
 
         .sf-card { padding: 14px !important; }
 
