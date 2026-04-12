@@ -707,7 +707,7 @@ def main_app():
             st.stop()
         category = st.selectbox("📚 Category", list(STUDY_DATA.keys()))
     with c2:
-       
+        st.info("📌 Select your options below")
 
     course = st.selectbox("🎓 Program / Class", get_courses(category))
     stream = st.selectbox("📖 Stream", get_streams(category, course))
