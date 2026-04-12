@@ -57,14 +57,12 @@ st.markdown("""
 
     html, body, [class*="css"], [class*="st-"] {
         font-family: 'Inter', 'Poppins', sans-serif !important;
-        color: #111827 !important;
-        letter-spacing: 0.2px;
+        letter-spacing: 0.3px;
     }
 
     .stApp {
-        background: #f8fafc !important;
+        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #e8f0f7 100%);
         min-height: 100vh;
-        color: #111827 !important;
     }
 
     .block-container {
@@ -75,44 +73,79 @@ st.markdown("""
         max-width: 1300px;
     }
 
-    #MainMenu { visibility: hidden; }
-    footer { visibility: hidden; }
-    header { visibility: hidden; }
-
-    /* Remove banner / watermark styling */
-    .sf-header,
-    .sf-header-title,
-    .sf-header-subtitle,
-    .sf-watermark {
-        display: none !important;
-    }
-
-    .sf-card {
-        background: #ffffff;
-        border-radius: 20px;
-        padding: 32px;
-        box-shadow: 0 4px 30px rgba(15, 23, 42, 0.08);
-        margin-bottom: 28px;
-        border: 1px solid #e2e8f0;
-        color: #111827 !important;
-    }
+    #MainMenu  { visibility: hidden; }
+    footer     { visibility: hidden; }
+    header     { visibility: hidden; }
 
     .stTabs [data-baseweb="tab-list"] {
         background-color: transparent !important;
         border-bottom: 2px solid #e2e8f0 !important;
         gap: 20px;
     }
-
     .stTabs [data-baseweb="tab"] {
         background-color: transparent !important;
         border: none !important;
-        color: #111827 !important;
-        font-weight: 600 !important;
+        color: #64748b !important;
+        font-weight: 500 !important;
+    }
+    .stTabs [aria-selected="true"] {
+        color: #0f172a !important;
+        border-bottom: 3px solid #3b82f6 !important;
     }
 
-    .stTabs [aria-selected="true"] {
-        color: #111827 !important;
-        border-bottom: 3px solid #3b82f6 !important;
+    .sf-header {
+        text-align: center;
+        padding: 50px 0 15px 0;
+        position: relative;
+    }
+
+    .sf-header-title {
+        font-size: 4.2rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin: 0;
+        line-height: 1.1;
+        letter-spacing: -1.5px;
+    }
+
+    .sf-header-subtitle {
+        font-size: 1.1rem;
+        color: #64748b;
+        margin-top: 12px;
+        font-weight: 500;
+        letter-spacing: 0.4px;
+    }
+
+    .sf-watermark {
+        font-size: 4.4rem;
+        font-weight: 900;
+        color: rgba(59, 130, 246, 0.08);
+        text-transform: uppercase;
+        letter-spacing: 12px;
+        margin-top: 12px;
+        margin-bottom: -42px;
+        position: relative;
+        top: -8px;
+        z-index: 10;
+        pointer-events: none;
+        user-select: none;
+        text-align: center;
+        width: 100%;
+        line-height: 1;
+    }
+
+    .sf-card {
+        background: rgba(255, 255, 255, 0.75);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 32px;
+        box-shadow: 0 4px 30px rgba(15, 23, 42, 0.08),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+        margin-bottom: 28px;
+        border: 1px solid rgba(59, 130, 246, 0.15);
     }
 
     .stButton > button {
@@ -124,73 +157,94 @@ st.markdown("""
         border: none !important;
         font-weight: 600 !important;
         font-size: 15px !important;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
         box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3) !important;
+        letter-spacing: 0.4px !important;
     }
-
     .stButton > button:hover {
-        opacity: 0.92 !important;
+        opacity: 0.9 !important;
         transform: translateY(-2px) !important;
+        box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4) !important;
     }
 
     .stDownloadButton > button {
         background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
         color: #ffffff !important;
-        border: none !important;
+        box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3) !important;
+    }
+    .stDownloadButton > button:hover {
+        box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4) !important;
+        transform: translateY(-2px) !important;
     }
 
-    div[data-baseweb="select"] > div,
-    input[type="text"],
-    input[type="password"],
-    textarea {
+    div[data-baseweb="select"] > div {
         border-radius: 10px !important;
         border: 1.5px solid #e2e8f0 !important;
         background: #ffffff !important;
-        color: #111827 !important;
+        color: #1e293b !important;
     }
 
-    input[type="text"]::placeholder,
-    input[type="password"]::placeholder,
-    textarea::placeholder {
-        color: #94a3b8 !important;
+    input[type="text"], input[type="password"] {
+        background: #ffffff !important;
+        color: #1e293b !important;
+        border: 1.5px solid #e2e8f0 !important;
+        border-radius: 10px !important;
     }
 
-    div.stSelectbox label,
-    div.stTextInput label,
-    div.stRadio label {
+    input[type="text"]::placeholder, input[type="password"]::placeholder {
+        color: #cbd5e1 !important;
+    }
+
+    div.stSelectbox label, div.stTextInput label, div.stRadio label {
         font-weight: 600 !important;
-        color: #111827 !important;
+        color: #1e293b !important;
         font-size: 0.9rem !important;
+        letter-spacing: 0.3px !important;
     }
 
     [data-testid="stSidebar"] {
-        background: #ffffff !important;
+        background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%) !important;
         border-right: 1px solid #e2e8f0 !important;
     }
 
     [data-testid="stSidebar"] * {
-        color: #111827 !important;
+        color: #1e293b !important;
     }
 
     .sf-output {
-        background: #ffffff;
+        background: linear-gradient(135deg,
+            rgba(59, 130, 246, 0.05) 0%,
+            rgba(37, 99, 235, 0.05) 100%);
         border-radius: 18px;
         padding: 28px;
         border-left: 5px solid #3b82f6;
-        box-shadow: 0 2px 15px rgba(59, 130, 246, 0.08);
+        box-shadow: 0 2px 15px rgba(59, 130, 246, 0.1);
         margin-top: 12px;
-        border: 1px solid #e2e8f0;
-        color: #111827 !important;
+        border: 1px solid rgba(59, 130, 246, 0.2);
+        color: #1e293b;
     }
 
     .sf-output h3, .sf-output h2 {
-        color: #111827 !important;
+        color: #3b82f6 !important;
         margin-top: 0;
         font-weight: 700;
     }
 
-    div[data-testid="stSuccessMessage"],
-    div[data-testid="stErrorMessage"],
+    div[data-testid="stSuccessMessage"] {
+        background: rgba(16, 185, 129, 0.08) !important;
+        border: 1.5px solid rgba(16, 185, 129, 0.3) !important;
+        border-radius: 10px !important;
+    }
+
+    div[data-testid="stErrorMessage"] {
+        background: rgba(239, 68, 68, 0.08) !important;
+        border: 1.5px solid rgba(239, 68, 68, 0.3) !important;
+        border-radius: 10px !important;
+    }
+
     div[data-testid="stInfoMessage"] {
+        background: rgba(59, 130, 246, 0.08) !important;
+        border: 1.5px solid rgba(59, 130, 246, 0.3) !important;
         border-radius: 10px !important;
     }
 
@@ -201,11 +255,25 @@ st.markdown("""
     }
 
     @media (max-width: 768px) {
+        .sf-header-title { font-size: 2.8rem !important; }
+        .sf-header-subtitle { font-size: 1rem !important; }
+        .sf-watermark {
+            font-size: 2.4rem !important;
+            letter-spacing: 6px !important;
+        }
+
         html, body, .stApp {
             overflow-x: hidden !important;
             overscroll-behavior: none !important;
             scroll-behavior: auto !important;
             position: relative !important;
+        }
+
+        div[data-baseweb="select"] input,
+        div[data-baseweb="select"] [role="combobox"],
+        div[data-baseweb="select"] > div {
+            font-size: 16px !important;
+            -webkit-text-size-adjust: 100% !important;
         }
 
         input, textarea, select,
@@ -214,6 +282,22 @@ st.markdown("""
             font-size: 16px !important;
             -webkit-text-size-adjust: 100% !important;
             touch-action: manipulation !important;
+        }
+
+        div[role="listbox"] {
+            max-height: 38vh !important;
+            overflow-y: auto !important;
+            -webkit-overflow-scrolling: touch !important;
+            position: fixed !important;
+            z-index: 9999 !important;
+        }
+
+        div[role="option"] {
+            min-height: 48px !important;
+            padding: 12px 16px !important;
+            font-size: 15px !important;
+            display: flex !important;
+            align-items: center !important;
         }
     }
     </style>
@@ -622,14 +706,19 @@ def main_app():
             st.error("No study data found.")
             st.stop()
         category = st.selectbox("📚 Category", list(STUDY_DATA.keys()))
-   
+    with c2:
+        st.info("📌 Select your options below")
+
     course = st.selectbox("🎓 Program / Class", get_courses(category))
     stream = st.selectbox("📖 Stream", get_streams(category, course))
     subject = st.selectbox("🧾 Subject", get_subjects(category, course, stream))
 
     if category == "K-12th":
         board = st.selectbox("🏫 Board", BOARDS)
-    
+    else:
+        board = "University / National Syllabus"
+        st.info(f"📌 Syllabus: {board}")
+
     topic = st.selectbox("🗂️ Topic", get_topics(category, course, stream, subject))
 
     chapter_key = f"{category}||{course}||{stream}||{subject}||{topic}"
@@ -642,12 +731,21 @@ def main_app():
     st.markdown('</div>', unsafe_allow_html=True)
 
     col1, col2 = st.columns(2)
-    
     with col1:
         output_style = st.radio(
             "⚙️ Output Style",
             ["📄 Detailed", "⚡ Short & Quick", "📋 Notes Format"]
         )
+    with col2:
+        st.markdown("""
+        <div style="padding:12px; background:rgba(59,130,246,0.08);
+                    border-radius:10px; border-left:4px solid #3b82f6;">
+            <strong>💡 Output Styles:</strong><br/>
+            📄 <strong>Detailed</strong> — Complete & thorough<br/>
+            ⚡ <strong>Quick</strong> — Concise & scannable<br/>
+            📋 <strong>Notes</strong> — Structured format
+        </div>
+        """, unsafe_allow_html=True)
 
     st.markdown('<div style="margin-top:24px;"></div>', unsafe_allow_html=True)
 
@@ -655,13 +753,12 @@ def main_app():
         if not chapter or chapter == "No chapters found":
             st.warning("⚠️ Please select a valid chapter before generating.")
             return
-            
-    audience = f"{board} {course} students" if category == "K-12th" else f"{course} students"
-    final_prompt = build_prompt(tool, chapter, topic, subject, audience, output_style)
 
-    with st.spinner(f"🧠 Generating {tool}... please wait ⏳"):
-        result, model_used = generate_with_fallback(final_prompt)
+        audience = f"{board} {course} students" if category == "K-12th" else f"{course} students"
+        final_prompt = build_prompt(tool, chapter, topic, subject, audience, output_style)
 
+        with st.spinner(f"🧠 Generating {tool}... please wait ⏳"):
+            result, model_used = generate_with_fallback(final_prompt)
 
         st.markdown("---")
 
