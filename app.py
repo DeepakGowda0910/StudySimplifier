@@ -726,21 +726,26 @@ def main_app():
     st.markdown('</div>', unsafe_allow_html=True)
 
     col1, col2 = st.columns(2)
-    with col1:
-     # Add custom CSS to make radio button labels black
-st.markdown("""
-<style>
-    div[data-testid="stRadio"] label {
+    
+with st.container():
+    st.markdown("""
+    <style>
+    div[data-testid="stRadio"] label p {
         color: black !important;
         font-weight: 500;
     }
-</style>
-""", unsafe_allow_html=True)
 
-output_style = st.radio(
-    "Output Style",
-    ["📄 Detailed", "⚡ Short & Quick", "📋 Notes Format"]
-)
+    div[data-testid="stRadio"] > label {
+        color: black !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+    output_style = st.radio(
+        "Output Style",
+        ["📄 Detailed", "⚡ Short & Quick", "📋 Notes Format"]
+    )
+
 
     st.markdown('<div style="margin-top:24px;"></div>', unsafe_allow_html=True)
 
