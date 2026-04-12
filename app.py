@@ -732,16 +732,6 @@ def main_app():
             "⚙️ Output Style",
             ["📄 Detailed", "⚡ Short & Quick", "📋 Notes Format"]
         )
-    with col2:
-        st.markdown("""
-        <div style="padding:12px; background:rgba(59,130,246,0.08);
-                    border-radius:10px; border-left:4px solid #3b82f6;">
-            <strong>💡 Output Styles:</strong><br/>
-            📄 <strong>Detailed</strong> — Complete & thorough<br/>
-            ⚡ <strong>Quick</strong> — Concise & scannable<br/>
-            📋 <strong>Notes</strong> — Structured format
-        </div>
-        """, unsafe_allow_html=True)
 
     st.markdown('<div style="margin-top:24px;"></div>', unsafe_allow_html=True)
 
