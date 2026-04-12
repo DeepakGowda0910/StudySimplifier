@@ -713,10 +713,7 @@ def main_app():
 
     if category == "K-12th":
         board = st.selectbox("🏫 Board", BOARDS)
-    else:
-        board = "University / National Syllabus"
-        st.info(f"📌 Syllabus: {board}")
-
+    
     topic = st.selectbox("🗂️ Topic", get_topics(category, course, stream, subject))
 
     chapter_key = f"{category}||{course}||{stream}||{subject}||{topic}"
