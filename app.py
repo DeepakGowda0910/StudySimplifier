@@ -745,20 +745,19 @@ with st.container():
         "Output Style",
         ["📄 Detailed", "⚡ Short & Quick", "📋 Notes Format"]
     )
+st.markdown('<div style="margin-top:24px;"></div>', unsafe_allow_html=True)
 
+if st.button(f"✨ Generate {tool}", use_container_width=True):
+    if not chapter or chapter == "No chapters found":
+        st.warning("⚠️ Please select a valid chapter before generating.")
+        st.stop()
 
-    st.markdown('<div style="margin-top:24px;"></div>', unsafe_allow_html=True)
+    audience = f"{board} {course} students" if category == "K-12th" else f"{course} students"
+    final_prompt = build_prompt(tool, chapter, topic, subject, audience, output_style)
 
-    if st.button(f"✨ Generate {tool}", use_container_width=True):
-        if not chapter or chapter == "No chapters found":
-            st.warning("⚠️ Please select a valid chapter before generating.")
-            return
+    with st.spinner(f"🧠 Generating {tool}... please wait ⏳"):
+        result, model_used = generate_with_fallback(final_prompt)
 
-        audience = f"{board} {course} students" if category == "K-12th" else f"{course} students"
-        final_prompt = build_prompt(tool, chapter, topic, subject, audience, output_style)
-
-        with st.spinner(f"🧠 Generating {tool}... please wait ⏳"):
-            result, model_used = generate_with_fallback(final_prompt)
 
         st.markdown("---")
 
