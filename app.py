@@ -727,31 +727,29 @@ def main_app():
 
     col1, col2 = st.columns(2)
     
-with st.container():
-    st.markdown("""
-    <style>
-    div[data-testid="stRadio"] label p {
-        color: black !important;
-        font-weight: 500;
-    }
+    with col1:
+        output_style = st.radio(
+            "⚙️ Output Style",
+            ["📄 Detailed", "⚡ Short & Quick", "📋 Notes Format"]
+        )
+    with col2:
+        st.markdown("""
+        <div style="padding:12px; background:rgba(59,130,246,0.08);
+                    border-radius:10px; border-left:4px solid #3b82f6;">
+            <strong>💡 Output Styles:</strong><br/>
+            📄 <strong>Detailed</strong> — Complete & thorough<br/>
+            ⚡ <strong>Quick</strong> — Concise & scannable<br/>
+            📋 <strong>Notes</strong> — Structured format
+        </div>
+        """, unsafe_allow_html=True)
 
-    div[data-testid="stRadio"] > label {
-        color: black !important;
-    }
-    </style>
-    """, unsafe_allow_html=True)
+    st.markdown('<div style="margin-top:24px;"></div>', unsafe_allow_html=True)
 
-    output_style = st.radio(
-        "Output Style",
-        ["📄 Detailed", "⚡ Short & Quick", "📋 Notes Format"]
-    )
-st.markdown('<div style="margin-top:24px;"></div>', unsafe_allow_html=True)
-
-if st.button(f"✨ Generate {tool}", use_container_width=True):
-    if not chapter or chapter == "No chapters found":
-        st.warning("⚠️ Please select a valid chapter before generating.")
-        st.stop()
-
+    if st.button(f"✨ Generate {tool}", use_container_width=True):
+        if not chapter or chapter == "No chapters found":
+            st.warning("⚠️ Please select a valid chapter before generating.")
+            return
+            
     audience = f"{board} {course} students" if category == "K-12th" else f"{course} students"
     final_prompt = build_prompt(tool, chapter, topic, subject, audience, output_style)
 
