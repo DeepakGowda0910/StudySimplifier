@@ -1,9 +1,12 @@
 # ═══════════════════════════════════════════════════════════════════════════════
-# STUDYSMART AI — APP v2.5
-# ✅ Academic-format question papers per board/class
-# ✅ Full Subject Question Paper generator
-# ✅ Get Answers (session_state fixed)
-# ✅ temperature=0.1 for consistent results
+# STUDYSMART AI — APP v3.0
+# Fixes included:
+# - Dynamic generate button label based on selected output
+# - Output Style "Question Paper" now truly generates question paper
+# - Board/course specific question paper patterns
+# - Get Answers now answers the exact generated paper
+# - Full Subject Question Paper retained
+# - Stable output with low temperature
 # ═══════════════════════════════════════════════════════════════════════════════
 
 import streamlit as st
@@ -19,7 +22,7 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import cm
 from reportlab.lib import colors
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, HRFlowable
-from reportlab.lib.enums import TA_LEFT, TA_CENTER
+from reportlab.lib.enums import TA_CENTER
 
 # ═════════════════════════════════════════════════════════════════════════════
 # STEP 1: LOAD STUDY DATA
@@ -53,291 +56,197 @@ st.set_page_config(
 )
 
 st.markdown("""
-    <style>
-    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap');
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
-    html, body, [class*="css"], [class*="st-"] {
-        font-family: 'Inter', 'Poppins', sans-serif !important;
-        letter-spacing: 0.3px;
-    }
-    .stApp {
-        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #e8f0f7 100%);
-        min-height: 100vh;
-    }
-    .block-container {
-        padding-top: 1.5rem !important;
-        padding-bottom: 2rem !important;
-        padding-left: 1.2rem !important;
-        padding-right: 1.2rem !important;
-        max-width: 1300px;
-    }
-    #MainMenu  { visibility: hidden; }
-    footer     { visibility: hidden; }
-    header     { visibility: hidden; }
+html, body, [class*="css"], [class*="st-"] {
+    font-family: 'Inter', sans-serif !important;
+}
 
-    .stTabs [data-baseweb="tab-list"] {
-        background-color: transparent !important;
-        border-bottom: 2px solid #e2e8f0 !important;
-        gap: 20px;
-    }
-    .stTabs [data-baseweb="tab"] {
-        background-color: transparent !important;
-        border: none !important;
-        color: #64748b !important;
-        font-weight: 500 !important;
-    }
-    .stTabs [aria-selected="true"] {
-        color: #0f172a !important;
-        border-bottom: 3px solid #3b82f6 !important;
-    }
+.stApp {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #e8f0f7 100%);
+}
 
-    .sf-header {
-        text-align: center;
-        padding: 50px 0 15px 0;
-    }
-    .sf-header-title {
-        font-size: 4.2rem;
-        font-weight: 800;
-        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        margin: 0;
-        line-height: 1.1;
-        letter-spacing: -1.5px;
-    }
-    .sf-header-subtitle {
-        font-size: 1.1rem;
-        color: #64748b;
-        margin-top: 12px;
-        font-weight: 500;
-        letter-spacing: 0.4px;
-    }
-    .sf-watermark {
-        font-size: 0.7rem;
-        color: #cbd5e1;
-        letter-spacing: 3px;
-        text-transform: uppercase;
-        margin-top: 8px;
-        text-align: center !important;
-        width: 100% !important;
-        display: block !important;
-    }
+.block-container {
+    max-width: 1250px;
+    padding-top: 1.2rem !important;
+    padding-bottom: 2rem !important;
+}
 
-    .sf-card {
-        background: rgba(255,255,255,0.85);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        border-radius: 16px;
-        padding: 28px 32px;
-        border: 1px solid rgba(59,130,246,0.15);
-        margin-bottom: 20px;
-        box-shadow: 0 4px 24px rgba(59,130,246,0.07);
-    }
+#MainMenu, footer, header {
+    visibility: hidden;
+}
 
-    /* Blue output box */
-    .sf-output {
-        background: linear-gradient(135deg,
-            rgba(59,130,246,0.05) 0%,
-            rgba(37,99,235,0.05) 100%);
-        border-radius: 18px;
-        padding: 28px;
-        border-left: 5px solid #3b82f6;
-        box-shadow: 0 2px 15px rgba(59,130,246,0.1);
-        margin-top: 12px;
-        border: 1px solid rgba(59,130,246,0.2);
-        color: #1e293b;
-    }
-    .sf-output h3, .sf-output h2 {
-        color: #3b82f6 !important;
-        margin-top: 0;
-        font-weight: 700;
-    }
+.sf-header {
+    text-align: center;
+    padding: 32px 0 10px 0;
+}
 
-    /* Green answers box */
-    .sf-answers {
-        background: linear-gradient(135deg,
-            rgba(34,197,94,0.05) 0%,
-            rgba(22,163,74,0.05) 100%);
-        border-radius: 18px;
-        padding: 28px;
-        border-left: 5px solid #22c55e;
-        box-shadow: 0 2px 15px rgba(34,197,94,0.1);
-        margin-top: 20px;
-        border: 1px solid rgba(34,197,94,0.2);
-        color: #1e293b;
-    }
-    .sf-answers h3, .sf-answers h2 {
-        color: #16a34a !important;
-        margin-top: 0;
-        font-weight: 700;
-    }
+.sf-header-title {
+    font-size: 3.8rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
 
-    /* Purple full-subject box */
-    .sf-fullpaper {
-        background: linear-gradient(135deg,
-            rgba(139,92,246,0.05) 0%,
-            rgba(109,40,217,0.05) 100%);
-        border-radius: 18px;
-        padding: 28px;
-        border-left: 5px solid #8b5cf6;
-        box-shadow: 0 2px 15px rgba(139,92,246,0.1);
-        margin-top: 20px;
-        border: 1px solid rgba(139,92,246,0.2);
-        color: #1e293b;
-    }
-    .sf-fullpaper h3, .sf-fullpaper h2 {
-        color: #7c3aed !important;
-        margin-top: 0;
-        font-weight: 700;
-    }
+.sf-header-subtitle {
+    color: #64748b;
+    font-weight: 500;
+    margin-top: 8px;
+}
 
-    .sf-history-item {
-        background: rgba(59,130,246,0.05);
-        border-radius: 10px;
-        padding: 12px 16px;
-        border-left: 4px solid #3b82f6;
-        margin-bottom: 10px;
-        font-size: 0.9rem;
-        color: #475569;
-    }
+.sf-card {
+    background: rgba(255,255,255,0.88);
+    border-radius: 16px;
+    padding: 24px 28px;
+    border: 1px solid rgba(59,130,246,0.14);
+    box-shadow: 0 4px 24px rgba(59,130,246,0.07);
+    margin-bottom: 18px;
+}
 
-    /* Primary blue button */
-    .stButton > button {
-        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
-        color: #ffffff !important;
-        border: none !important;
-        border-radius: 12px !important;
-        padding: 0.65rem 1.8rem !important;
-        font-weight: 600 !important;
-        font-size: 0.95rem !important;
-        letter-spacing: 0.4px !important;
-        transition: all 0.2s ease !important;
-        box-shadow: 0 4px 15px rgba(59,130,246,0.3) !important;
-    }
-    .stButton > button:hover {
-        box-shadow: 0 8px 25px rgba(59,130,246,0.4) !important;
-        transform: translateY(-2px) !important;
-    }
+.sf-output {
+    background: linear-gradient(135deg, rgba(59,130,246,0.05), rgba(37,99,235,0.05));
+    border-left: 5px solid #2563eb;
+    border-radius: 16px;
+    padding: 24px;
+    border: 1px solid rgba(59,130,246,0.15);
+    margin-top: 14px;
+}
 
-    /* Green download button */
-    .stDownloadButton > button {
-        background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
-        color: #ffffff !important;
-        box-shadow: 0 4px 15px rgba(16,185,129,0.3) !important;
-    }
-    .stDownloadButton > button:hover {
-        box-shadow: 0 8px 25px rgba(16,185,129,0.4) !important;
-        transform: translateY(-2px) !important;
-    }
+.sf-output h3, .sf-output h2 {
+    color: #1d4ed8 !important;
+    margin-top: 0;
+}
 
-    div[data-baseweb="select"] > div {
-        border-radius: 10px !important;
-        border: 1.5px solid #e2e8f0 !important;
-        background: #ffffff !important;
-        color: #1e293b !important;
-    }
-    input[type="text"], input[type="password"] {
-        background: #ffffff !important;
-        color: #1e293b !important;
-        border: 1.5px solid #e2e8f0 !important;
-        border-radius: 10px !important;
-    }
-    input[type="text"]::placeholder, input[type="password"]::placeholder {
-        color: #cbd5e1 !important;
-    }
-    div.stSelectbox label, div.stTextInput label, div.stRadio label {
-        font-weight: 600 !important;
-        color: #1e293b !important;
-        font-size: 0.9rem !important;
-        letter-spacing: 0.3px !important;
-    }
+.sf-answers {
+    background: linear-gradient(135deg, rgba(34,197,94,0.05), rgba(22,163,74,0.05));
+    border-left: 5px solid #16a34a;
+    border-radius: 16px;
+    padding: 24px;
+    border: 1px solid rgba(34,197,94,0.15);
+    margin-top: 18px;
+}
 
-    [data-testid="stSidebar"] {
-        background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%) !important;
-        border-right: 1px solid #e2e8f0 !important;
-    }
-    [data-testid="stSidebar"] * { color: #1e293b !important; }
+.sf-answers h3, .sf-answers h2 {
+    color: #15803d !important;
+    margin-top: 0;
+}
 
-    div[data-testid="stSuccessMessage"] {
-        background: rgba(16,185,129,0.08) !important;
-        border: 1.5px solid rgba(16,185,129,0.3) !important;
-        border-radius: 10px !important;
-    }
-    div[data-testid="stWarningMessage"] {
-        background: rgba(245,158,11,0.08) !important;
-        border: 1.5px solid rgba(245,158,11,0.3) !important;
-        border-radius: 10px !important;
-    }
-    div[data-testid="stErrorMessage"] {
-        background: rgba(239,68,68,0.08) !important;
-        border: 1.5px solid rgba(239,68,68,0.3) !important;
-        border-radius: 10px !important;
-    }
+.sf-fullpaper {
+    background: linear-gradient(135deg, rgba(139,92,246,0.05), rgba(109,40,217,0.05));
+    border-left: 5px solid #7c3aed;
+    border-radius: 16px;
+    padding: 24px;
+    border: 1px solid rgba(139,92,246,0.15);
+    margin-top: 18px;
+}
 
-    @media (max-width: 768px) {
-        .sf-header-title { font-size: 2.8rem !important; }
-        .block-container {
-            padding-left: 0.6rem !important;
-            padding-right: 0.6rem !important;
-        }
-        .sf-card    { padding: 16px 14px; }
-        .sf-output  { padding: 14px 12px; }
-        .sf-answers { padding: 14px 12px; }
-        .sf-fullpaper { padding: 14px 12px; }
+.sf-fullpaper h3, .sf-fullpaper h2 {
+    color: #6d28d9 !important;
+    margin-top: 0;
+}
 
-        .stSelectbox > div > div {
-            min-height: 48px !important;
-            font-size: 15px !important;
-        }
-        div[role="listbox"] {
-            max-height: 38vh !important;
-            overflow-y: auto !important;
-            -webkit-overflow-scrolling: touch !important;
-            position: fixed !important;
-            z-index: 9999 !important;
-        }
-        div[role="option"] {
-            min-height: 48px !important;
-            padding: 12px 16px !important;
-            font-size: 15px !important;
-            display: flex !important;
-            align-items: center !important;
-        }
-        .sf-watermark {
-            text-align: center !important;
-            width: 100% !important;
-            display: block !important;
-        }
-    }
-    </style>
+.sf-preview {
+    background: rgba(15, 23, 42, 0.03);
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    border-radius: 14px;
+    padding: 18px 20px;
+    margin-top: 14px;
+    margin-bottom: 12px;
+}
+
+.sf-history-item {
+    background: rgba(59,130,246,0.05);
+    border-left: 4px solid #3b82f6;
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-bottom: 10px;
+    font-size: 0.9rem;
+}
+
+.stButton > button {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 12px !important;
+    font-weight: 600 !important;
+    padding: 0.65rem 1.3rem !important;
+    box-shadow: 0 4px 15px rgba(59,130,246,0.25) !important;
+}
+
+.stDownloadButton > button {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 12px !important;
+    font-weight: 600 !important;
+}
+
+div[data-baseweb="select"] > div,
+input[type="text"], input[type="password"] {
+    border-radius: 10px !important;
+}
+
+@media (max-width: 768px) {
+    .sf-header-title { font-size: 2.5rem !important; }
+    .sf-card, .sf-output, .sf-answers, .sf-fullpaper { padding: 16px; }
+}
+</style>
 """, unsafe_allow_html=True)
+
 # ═════════════════════════════════════════════════════════════════════════════
-# STEP 3: HELPER FUNCTIONS
+# STEP 3: BASIC HELPERS
 # ═════════════════════════════════════════════════════════════════════════════
 
 def get_courses(category):
-    try: return list(STUDY_DATA[category].keys())
-    except KeyError: return []
+    try:
+        return list(STUDY_DATA[category].keys())
+    except KeyError:
+        return []
 
 def get_streams(category, course):
-    try: return list(STUDY_DATA[category][course].keys())
-    except KeyError: return []
+    try:
+        return list(STUDY_DATA[category][course].keys())
+    except KeyError:
+        return []
 
 def get_subjects(category, course, stream):
-    try: return list(STUDY_DATA[category][course][stream].keys())
-    except KeyError: return []
+    try:
+        return list(STUDY_DATA[category][course][stream].keys())
+    except KeyError:
+        return []
 
 def get_topics(category, course, stream, subject):
-    try: return list(STUDY_DATA[category][course][stream][subject].keys())
-    except KeyError: return []
+    try:
+        return list(STUDY_DATA[category][course][stream][subject].keys())
+    except KeyError:
+        return []
 
 def get_chapters(category, course, stream, subject, topic):
-    try: return STUDY_DATA[category][course][stream][subject][topic]
-    except KeyError: return ["No chapters found"]
+    try:
+        return STUDY_DATA[category][course][stream][subject][topic]
+    except KeyError:
+        return ["No chapters found"]
 
 def hash_p(password):
     return hashlib.sha256(password.encode()).hexdigest()
+
+def count_words(text):
+    return len(text.split()) if text else 0
+
+def add_to_history(label, chapter, subject, result_preview):
+    if "history" not in st.session_state:
+        st.session_state.history = []
+    entry = {
+        "time": time.strftime("%H:%M"),
+        "tool": label,
+        "chapter": chapter,
+        "subject": subject,
+        "preview": result_preview[:120] + "..." if len(result_preview) > 120 else result_preview
+    }
+    st.session_state.history.insert(0, entry)
+    st.session_state.history = st.session_state.history[:5]
 
 def init_db():
     conn = sqlite3.connect("users.db")
@@ -379,69 +288,73 @@ def list_working_gemini_models():
 
 def get_available_models():
     working_models, err = list_working_gemini_models()
-    if err: return [f"Error: {err}"]
-    if not working_models: return ["No Gemini models available for this API key"]
+    if err:
+        return [f"Error: {err}"]
+    if not working_models:
+        return ["No Gemini models available for this API key"]
     return working_models
 
-def count_words(text):
-    return len(text.split())
+def get_effective_output_name(tool, output_style):
+    """
+    This fixes the button text and the actual generation mode.
+    If Question Paper is selected in Output Style, it becomes Question Paper.
+    """
+    if output_style == "🧪 Question Paper":
+        return "Question Paper"
+    if tool == "📝 Summary":
+        if output_style == "📋 Notes Format":
+            return "Notes"
+        if output_style == "📄 Detailed":
+            return "Detailed Summary"
+        if output_style == "⚡ Short & Quick":
+            return "Quick Summary"
+        return "Summary"
+    if tool == "🧠 Quiz":
+        return "Quiz"
+    if tool == "📌 Revision Notes":
+        return "Revision Notes"
+    if tool == "🧪 Question Paper":
+        return "Question Paper"
+    if tool == "❓ Exam Q&A":
+        return "Exam Q&A"
+    return "Content"
 
-def add_to_history(tool, chapter, subject, result_preview):
-    if "history" not in st.session_state:
-        st.session_state.history = []
-    entry = {
-        "time": time.strftime("%H:%M"),
-        "tool": tool,
-        "chapter": chapter,
-        "subject": subject,
-        "preview": result_preview[:120] + "..." if len(result_preview) > 120 else result_preview
-    }
-    st.session_state.history.insert(0, entry)
-    st.session_state.history = st.session_state.history[:5]
-
-
+def get_generate_button_label(tool, output_style):
+    name = get_effective_output_name(tool, output_style)
+    return f"✨ Generate {name}"
 # ═════════════════════════════════════════════════════════════════════════════
-# STEP 4A: BOARD-AWARE QUESTION PAPER FORMAT BUILDER
-# Returns the exact academic format spec for any board/class/level
+# STEP 4: QUESTION PAPER FORMAT DEFINITIONS
 # ═════════════════════════════════════════════════════════════════════════════
 
 def get_qp_format_spec(board, course, subject):
-    """
-    Returns a structured dict describing the OFFICIAL question paper format
-    for the given board + course + subject combination.
-    No web fetch needed — the AI is instructed to use its own knowledge of
-    official formats, and we supply the structural skeleton it must follow.
-    """
     board_up = board.upper()
 
-    # ── K-12 CBSE ────────────────────────────────────────────────────────────
     if "CBSE" in board_up:
-        if any(c in course for c in ["10", "X", "Class 10"]):
+        if any(x in course for x in ["10", "X", "Class 10"]):
             return {
                 "board_label": "CENTRAL BOARD OF SECONDARY EDUCATION",
-                "exam_label": "SUMMATIVE ASSESSMENT / BOARD EXAMINATION",
+                "exam_label": "BOARD EXAMINATION",
                 "class_label": "CLASS X",
                 "total_marks": 80,
                 "time": "3 Hours",
                 "instructions": [
-                    "This question paper contains 5 Sections — A, B, C, D and E.",
-                    "Section A has 20 MCQs carrying 1 mark each.",
-                    "Section B has 5 Very Short Answer questions carrying 2 marks each.",
-                    "Section C has 6 Short Answer questions carrying 3 marks each.",
-                    "Section D has 4 Long Answer questions carrying 5 marks each.",
-                    "Section E has 3 Source/Case-Based questions carrying 4 marks each.",
-                    "There is no overall choice. However, internal choices are provided.",
-                    "Use of calculator is NOT allowed.",
+                    "This question paper contains Sections A, B, C, D and E.",
+                    "All questions are compulsory.",
+                    "Section A consists of objective type questions.",
+                    "Internal choices are provided in some questions.",
+                    "Use neat and clear presentation.",
+                    "Do not write anything in the question paper except where instructed."
                 ],
                 "sections": [
-                    {"name": "SECTION A", "type": "MCQ", "q_count": 20, "marks_each": 1, "total": 20},
-                    {"name": "SECTION B", "type": "Very Short Answer (VSA)", "q_count": 5, "marks_each": 2, "total": 10},
-                    {"name": "SECTION C", "type": "Short Answer (SA)", "q_count": 6, "marks_each": 3, "total": 18},
-                    {"name": "SECTION D", "type": "Long Answer (LA)", "q_count": 4, "marks_each": 5, "total": 20},
-                    {"name": "SECTION E", "type": "Case/Source-Based", "q_count": 3, "marks_each": 4, "total": 12},
-                ],
+                    {"name": "SECTION A", "type": "MCQ / Objective", "q_count": 20, "marks_each": 1, "total": 20},
+                    {"name": "SECTION B", "type": "Very Short Answer", "q_count": 5, "marks_each": 2, "total": 10},
+                    {"name": "SECTION C", "type": "Short Answer", "q_count": 6, "marks_each": 3, "total": 18},
+                    {"name": "SECTION D", "type": "Long Answer", "q_count": 4, "marks_each": 5, "total": 20},
+                    {"name": "SECTION E", "type": "Case / Source Based", "q_count": 3, "marks_each": 4, "total": 12},
+                ]
             }
-        elif any(c in course for c in ["12", "XII", "Class 12"]):
+
+        if any(x in course for x in ["12", "XII", "Class 12"]):
             return {
                 "board_label": "CENTRAL BOARD OF SECONDARY EDUCATION",
                 "exam_label": "BOARD EXAMINATION",
@@ -449,414 +362,386 @@ def get_qp_format_spec(board, course, subject):
                 "total_marks": 70,
                 "time": "3 Hours",
                 "instructions": [
-                    "This question paper contains 5 Sections — A, B, C, D and E.",
-                    "Section A has 18 MCQs carrying 1 mark each.",
-                    "Section B has 4 Very Short Answer questions carrying 2 marks each.",
-                    "Section C has 5 Short Answer questions carrying 3 marks each.",
-                    "Section D has 2 Long Answer questions carrying 5 marks each.",
-                    "Section E has 3 Case/Source-Based questions carrying 4 marks each.",
-                    "Internal choices are provided in Sections B, C and D.",
-                    "Use of calculator is NOT allowed.",
-                ],
-                "sections": [
-                    {"name": "SECTION A", "type": "MCQ", "q_count": 18, "marks_each": 1, "total": 18},
-                    {"name": "SECTION B", "type": "Very Short Answer (VSA)", "q_count": 4, "marks_each": 2, "total": 8},
-                    {"name": "SECTION C", "type": "Short Answer (SA)", "q_count": 5, "marks_each": 3, "total": 15},
-                    {"name": "SECTION D", "type": "Long Answer (LA)", "q_count": 2, "marks_each": 5, "total": 10},
-                    {"name": "SECTION E", "type": "Case/Source-Based", "q_count": 3, "marks_each": 4, "total": 12},
-                ],
-            }
-        else:
-            # CBSE generic (Classes 6-9, 11)
-            return {
-                "board_label": "CENTRAL BOARD OF SECONDARY EDUCATION",
-                "exam_label": "ANNUAL EXAMINATION",
-                "class_label": course.upper(),
-                "total_marks": 80,
-                "time": "3 Hours",
-                "instructions": [
-                    "This question paper has 4 Sections — A, B, C and D.",
-                    "Section A: 20 MCQs (1 mark each).",
-                    "Section B: 6 Short Answer questions (2 marks each).",
-                    "Section C: 6 Short Answer questions (3 marks each).",
-                    "Section D: 4 Long Answer questions (5 marks each).",
+                    "This question paper contains Sections A, B, C, D and E.",
                     "All questions are compulsory.",
+                    "Section A consists of objective type questions.",
+                    "Internal choices are provided in some questions.",
+                    "Use neat and clear presentation."
                 ],
                 "sections": [
-                    {"name": "SECTION A", "type": "MCQ", "q_count": 20, "marks_each": 1, "total": 20},
-                    {"name": "SECTION B", "type": "Short Answer I (SA-I)", "q_count": 6, "marks_each": 2, "total": 12},
-                    {"name": "SECTION C", "type": "Short Answer II (SA-II)", "q_count": 6, "marks_each": 3, "total": 18},
-                    {"name": "SECTION D", "type": "Long Answer (LA)", "q_count": 4, "marks_each": 5, "total": 20},
-                ],
+                    {"name": "SECTION A", "type": "MCQ / Objective", "q_count": 18, "marks_each": 1, "total": 18},
+                    {"name": "SECTION B", "type": "Very Short Answer", "q_count": 4, "marks_each": 2, "total": 8},
+                    {"name": "SECTION C", "type": "Short Answer", "q_count": 5, "marks_each": 3, "total": 15},
+                    {"name": "SECTION D", "type": "Long Answer", "q_count": 2, "marks_each": 5, "total": 10},
+                    {"name": "SECTION E", "type": "Case / Source Based", "q_count": 3, "marks_each": 4, "total": 12},
+                ]
             }
 
-    # ── K-12 ICSE / ISC ──────────────────────────────────────────────────────
-    elif "ICSE" in board_up or "ISC" in board_up:
-        if any(c in course for c in ["12", "XII"]) or "ISC" in board_up:
-            return {
-                "board_label": "COUNCIL FOR THE INDIAN SCHOOL CERTIFICATE EXAMINATIONS",
-                "exam_label": "INDIAN SCHOOL CERTIFICATE EXAMINATION (ISC)",
-                "class_label": "CLASS XII",
-                "total_marks": 70,
-                "time": "3 Hours",
-                "instructions": [
-                    "Attempt ALL questions in Section A and any FOUR from Section B.",
-                    "Section A is compulsory and contains MCQs and short answers.",
-                    "Section B contains structured/essay-type questions.",
-                    "The intended marks for questions are given in brackets [ ].",
-                    "Neat diagrams must be drawn wherever necessary.",
-                ],
-                "sections": [
-                    {"name": "SECTION A", "type": "MCQ + Assertion-Reason + Short Answer", "q_count": 15, "marks_each": "varies", "total": 30},
-                    {"name": "SECTION B", "type": "Structured / Essay-Type (Attempt any 4 of 6)", "q_count": 6, "marks_each": 10, "total": 40},
-                ],
-            }
-        else:
-            return {
-                "board_label": "COUNCIL FOR THE INDIAN SCHOOL CERTIFICATE EXAMINATIONS",
-                "exam_label": "INDIAN CERTIFICATE OF SECONDARY EDUCATION (ICSE)",
-                "class_label": "CLASS X",
-                "total_marks": 80,
-                "time": "2 Hours",
-                "instructions": [
-                    "Attempt ALL questions from Section A and any FOUR from Section B.",
-                    "All working, including rough work, must be shown clearly.",
-                    "The intended marks for questions are given in brackets [ ].",
-                    "Mathematical tables are provided.",
-                ],
-                "sections": [
-                    {"name": "SECTION A", "type": "MCQ + Short Answer (Compulsory)", "q_count": 10, "marks_each": "varies", "total": 40},
-                    {"name": "SECTION B", "type": "Long Answer (Attempt any 4 of 6)", "q_count": 6, "marks_each": 10, "total": 40},
-                ],
-            }
-
-    # ── IB ────────────────────────────────────────────────────────────────────
-    elif "IB" in board_up:
         return {
-            "board_label": "INTERNATIONAL BACCALAUREATE ORGANIZATION",
-            "exam_label": "IB DIPLOMA PROGRAMME — FINAL EXAMINATION",
+            "board_label": "CENTRAL BOARD OF SECONDARY EDUCATION",
+            "exam_label": "ANNUAL EXAMINATION",
             "class_label": course.upper(),
-            "total_marks": 100,
-            "time": "2 Hours 30 Minutes",
+            "total_marks": 80,
+            "time": "3 Hours",
             "instructions": [
-                "Do NOT open this examination paper until instructed.",
-                "Answer ALL questions in Paper 1 (Section A).",
-                "Answer TWO questions from Paper 2 (Section B).",
-                "Show all working. Where not asked, a correct answer alone will not earn marks.",
-                "Diagrams and graphs must be drawn in pencil.",
+                "All questions are compulsory.",
+                "Read all questions carefully before answering.",
+                "Use proper numbering and show all workings where necessary."
             ],
             "sections": [
-                {"name": "PAPER 1 / SECTION A", "type": "Structured (Data-based / MCQ)", "q_count": 30, "marks_each": 1, "total": 30},
-                {"name": "PAPER 2 / SECTION B", "type": "Extended Response (Choose 2 of 4)", "q_count": 4, "marks_each": 25, "total": 50},
-                {"name": "PAPER 3 / SECTION C", "type": "Option / Case Study", "q_count": 2, "marks_each": 10, "total": 20},
-            ],
+                {"name": "SECTION A", "type": "Objective", "q_count": 20, "marks_each": 1, "total": 20},
+                {"name": "SECTION B", "type": "Short Answer I", "q_count": 6, "marks_each": 2, "total": 12},
+                {"name": "SECTION C", "type": "Short Answer II", "q_count": 6, "marks_each": 3, "total": 18},
+                {"name": "SECTION D", "type": "Long Answer", "q_count": 4, "marks_each": 5, "total": 20},
+            ]
         }
 
-    # ── Cambridge IGCSE / A-Level ─────────────────────────────────────────────
-    elif "CAMBRIDGE" in board_up:
+    if "ICSE" in board_up:
         return {
-            "board_label": "CAMBRIDGE ASSESSMENT INTERNATIONAL EDUCATION",
-            "exam_label": "CAMBRIDGE IGCSE / A LEVEL EXAMINATION",
+            "board_label": "COUNCIL FOR THE INDIAN SCHOOL CERTIFICATE EXAMINATIONS",
+            "exam_label": "ICSE EXAMINATION",
             "class_label": course.upper(),
             "total_marks": 80,
             "time": "2 Hours",
             "instructions": [
-                "Write your name, centre number and candidate number on your answer booklet.",
-                "Answer ALL questions in Section A.",
-                "Answer any THREE questions from Section B.",
-                "Write in dark blue or black pen.",
-                "Do not use staples, paper clips, glue or correction fluid.",
+                "Attempt all questions from Section A.",
+                "Attempt any four questions from Section B unless otherwise specified.",
+                "The intended marks for questions are given in brackets [ ].",
+                "Neatness and proper presentation will be rewarded."
             ],
             "sections": [
-                {"name": "SECTION A", "type": "Structured Questions (Compulsory)", "q_count": 10, "marks_each": 4, "total": 40},
-                {"name": "SECTION B", "type": "Essay / Extended Response (Choose 3 of 5)", "q_count": 5, "marks_each": 12, "total": 36},
-            ],
+                {"name": "SECTION A", "type": "Compulsory Objective / Short Answer", "q_count": 10, "marks_each": "varied", "total": 40},
+                {"name": "SECTION B", "type": "Descriptive", "q_count": 6, "marks_each": 10, "total": 40},
+            ]
         }
 
-    # ── University / Medical / Engineering / UG-PG ────────────────────────────
-    else:
-        if any(k in course.upper() for k in ["MBBS", "BDS", "MD", "MEDICAL"]):
-            return {
-                "board_label": "UNIVERSITY EXAMINATIONS",
-                "exam_label": f"{course.upper()} PROFESSIONAL EXAMINATION",
-                "class_label": course.upper(),
-                "total_marks": 100,
-                "time": "3 Hours",
-                "instructions": [
-                    "Answer ALL questions in Part A.",
-                    "Answer any FIVE questions from Part B.",
-                    "Diagrams must be neat, labelled and relevant.",
-                    "Clinical relevance and applied aspects will be given due credit.",
-                    "Write legibly; illegible answers will not be evaluated.",
-                ],
-                "sections": [
-                    {"name": "PART A — SHORT NOTES", "type": "Short Notes (2–3 paragraphs each)", "q_count": 10, "marks_each": 5, "total": 50},
-                    {"name": "PART B — LONG ESSAYS", "type": "Long Essays (Attempt any 5 of 8)", "q_count": 8, "marks_each": 10, "total": 50},
-                ],
-            }
-        elif any(k in course.upper() for k in ["B.TECH", "B.E", "ENGINEERING"]):
-            return {
-                "board_label": "UNIVERSITY EXAMINATIONS",
-                "exam_label": f"{course.upper()} END SEMESTER EXAMINATION",
-                "class_label": course.upper(),
-                "total_marks": 100,
-                "time": "3 Hours",
-                "instructions": [
-                    "Answer any FIVE full questions, choosing one from each module.",
-                    "Missing data if any may be suitably assumed.",
-                    "Use of scientific calculator is permitted.",
-                    "Draw neat circuit/block diagrams wherever required.",
-                ],
-                "sections": [
-                    {"name": "MODULE 1", "type": "Q1 OR Q2 (10 marks each)", "q_count": 2, "marks_each": 10, "total": 10},
-                    {"name": "MODULE 2", "type": "Q3 OR Q4 (10 marks each)", "q_count": 2, "marks_each": 10, "total": 10},
-                    {"name": "MODULE 3", "type": "Q5 OR Q6 (10 marks each)", "q_count": 2, "marks_each": 10, "total": 10},
-                    {"name": "MODULE 4", "type": "Q7 OR Q8 (10 marks each)", "q_count": 2, "marks_each": 10, "total": 10},
-                    {"name": "MODULE 5", "type": "Q9 OR Q10 (10 marks each)", "q_count": 2, "marks_each": 10, "total": 10},
-                ],
-            }
-        else:
-            # Generic university
-            return {
-                "board_label": "UNIVERSITY EXAMINATIONS",
-                "exam_label": f"{course.upper()} SEMESTER EXAMINATION",
-                "class_label": course.upper(),
-                "total_marks": 100,
-                "time": "3 Hours",
-                "instructions": [
-                    "Answer ALL questions in Section A.",
-                    "Answer any FIVE questions from Section B.",
-                    "Answer any TWO questions from Section C.",
-                    "Figures in brackets indicate marks.",
-                ],
-                "sections": [
-                    {"name": "SECTION A", "type": "Short Answer (Compulsory)", "q_count": 10, "marks_each": 2, "total": 20},
-                    {"name": "SECTION B", "type": "Medium Answer (Attempt 5 of 8)", "q_count": 8, "marks_each": 5, "total": 40},
-                    {"name": "SECTION C", "type": "Long Essay (Attempt 2 of 4)", "q_count": 4, "marks_each": 10, "total": 40},
-                ],
-            }
+    if "ISC" in board_up:
+        return {
+            "board_label": "COUNCIL FOR THE INDIAN SCHOOL CERTIFICATE EXAMINATIONS",
+            "exam_label": "ISC EXAMINATION",
+            "class_label": course.upper(),
+            "total_marks": 70,
+            "time": "3 Hours",
+            "instructions": [
+                "Attempt all questions from Section A.",
+                "Attempt any four questions from Section B unless otherwise specified.",
+                "The intended marks for questions are given in brackets [ ].",
+                "Neat diagrams should be drawn wherever necessary."
+            ],
+            "sections": [
+                {"name": "SECTION A", "type": "Compulsory", "q_count": 10, "marks_each": "varied", "total": 30},
+                {"name": "SECTION B", "type": "Descriptive", "q_count": 6, "marks_each": 10, "total": 40},
+            ]
+        }
+
+    if "IB" in board_up:
+        return {
+            "board_label": "INTERNATIONAL BACCALAUREATE",
+            "exam_label": "FINAL EXAMINATION",
+            "class_label": course.upper(),
+            "total_marks": 100,
+            "time": "2 Hours 30 Minutes",
+            "instructions": [
+                "Answer all required questions.",
+                "Use precise terminology and structured responses.",
+                "Show reasoning wherever required."
+            ],
+            "sections": [
+                {"name": "SECTION A", "type": "Structured / Objective", "q_count": 20, "marks_each": "varied", "total": 40},
+                {"name": "SECTION B", "type": "Extended Response", "q_count": 4, "marks_each": 15, "total": 60},
+            ]
+        }
+
+    if "CAMBRIDGE" in board_up:
+        return {
+            "board_label": "CAMBRIDGE ASSESSMENT INTERNATIONAL EDUCATION",
+            "exam_label": "INTERNATIONAL EXAMINATION",
+            "class_label": course.upper(),
+            "total_marks": 80,
+            "time": "2 Hours",
+            "instructions": [
+                "Answer all questions as instructed.",
+                "Write clearly and use correct numbering.",
+                "Show all working where required."
+            ],
+            "sections": [
+                {"name": "SECTION A", "type": "Structured Questions", "q_count": 10, "marks_each": 4, "total": 40},
+                {"name": "SECTION B", "type": "Extended Response", "q_count": 4, "marks_each": 10, "total": 40},
+            ]
+        }
+
+    # University / professional fallback
+    if any(k in course.upper() for k in ["MBBS", "BDS", "MD", "MEDICAL"]):
+        return {
+            "board_label": "UNIVERSITY EXAMINATIONS",
+            "exam_label": f"{course.upper()} PROFESSIONAL EXAMINATION",
+            "class_label": course.upper(),
+            "total_marks": 100,
+            "time": "3 Hours",
+            "instructions": [
+                "Answer all questions in Part A.",
+                "Answer any five questions from Part B unless otherwise specified.",
+                "Draw neat labelled diagrams wherever necessary.",
+                "Clinical relevance will be given due credit."
+            ],
+            "sections": [
+                {"name": "PART A", "type": "Short Notes", "q_count": 10, "marks_each": 5, "total": 50},
+                {"name": "PART B", "type": "Long Essays", "q_count": 8, "marks_each": 10, "total": 50},
+            ]
+        }
+
+    return {
+        "board_label": "UNIVERSITY EXAMINATIONS",
+        "exam_label": f"{course.upper()} SEMESTER EXAMINATION",
+        "class_label": course.upper(),
+        "total_marks": 100,
+        "time": "3 Hours",
+        "instructions": [
+            "Answer all questions in Section A.",
+            "Answer any five questions from Section B unless otherwise specified.",
+            "Figures in brackets indicate marks."
+        ],
+        "sections": [
+            {"name": "SECTION A", "type": "Short Answer", "q_count": 10, "marks_each": 2, "total": 20},
+            {"name": "SECTION B", "type": "Medium Answer", "q_count": 8, "marks_each": 5, "total": 40},
+            {"name": "SECTION C", "type": "Long Answer", "q_count": 4, "marks_each": 10, "total": 40},
+        ]
+    }
 
 
-# ═════════════════════════════════════════════════════════════════════════════
-# STEP 4B: PROMPT BUILDER
-# ═════════════════════════════════════════════════════════════════════════════
-
-def build_prompt(tool, chapter, topic, subject, audience, output_style, board="", course=""):
-    base_context = f"""
-You are an expert educator creating study material for {audience}.
-Subject: {subject} | Topic: {topic} | Chapter: {chapter}
-Requirements: Accurate, Exam-focused, Well-structured, With examples, Error-free.
-"""
-
-    if tool == "📝 Summary":
-        if output_style == "📄 Detailed":
-            return base_context + """
-Create a comprehensive summary with:
-- Chapter Overview (150-200 words)
-- Key Concepts (300-400 words)
-- Formulas and Definitions
-- 2-3 Worked Examples
-- Real-world Applications
-- Common Mistakes to Avoid
-- Quick Revision Points (100 words)
-- Exam Important Points
-"""
-        elif output_style == "⚡ Short & Quick":
-            return base_context + """
-Create a quick reference guide (500 words max) with:
-- One-line Definition
-- 5-7 Key Points
-- 3 Important Formulas
-- 2 Quick Examples
-- Exam Tips
-"""
-        else:
-            return base_context + """
-Create notebook-style notes with:
-- Title and Date
-- Main Ideas
-- Sub-topics with bullet points
-- Formulas boxed separately
-- Examples
-- Quick Facts
-"""
-
-    elif tool == "🧠 Quiz":
-        return base_context + """
-Create a complete quiz with:
-- Section A: 5 MCQs with 4 options each (mark correct answer)
-- Section B: 5 Short Answer Questions (50-100 words each)
-- Section C: 3 Long Answer Questions (200+ words each)
-- Full Answer Key with detailed explanations
-"""
-
-    elif tool == "📌 Revision Notes":
-        return base_context + """
-Create revision notes with:
-- Top 10 Must-Know Points
-- Mind Map in text format
-- Formula Sheet
-- Diagram Descriptions
-- Important Definitions
-- Comparison Tables
-- Exam Pattern Focus Areas
-- Memory Tricks and Mnemonics
-"""
-
-    elif tool == "🧪 Question Paper":
-        # ── Academic-format chapter-level question paper ──────────────────────
-        fmt = get_qp_format_spec(board, course, subject)
-        instructions_text = "\n".join([f"  {i+1}. {ins}" for i, ins in enumerate(fmt["instructions"])])
-        sections_text = "\n".join([
-            f"  • {s['name']} — {s['type']} | {s['q_count']} questions × {s['marks_each']} marks = {s['total']} marks"
-            for s in fmt["sections"]
-        ])
-
-        return f"""
-You are a {fmt['board_label']} official question paper setter.
-Create a CHAPTER-LEVEL question paper STRICTLY following the format below.
-
-═══════════════════════════════════════════════════════
-{fmt['board_label']}
-{fmt['exam_label']}
-CLASS / COURSE: {fmt['class_label']}
-Subject: {subject}   Chapter: {chapter}
-Maximum Marks: {fmt['total_marks']}     Time Allowed: {fmt['time']}
-═══════════════════════════════════════════════════════
-
-GENERAL INSTRUCTIONS (print these at the top):
-{instructions_text}
-
-PAPER STRUCTURE YOU MUST FOLLOW EXACTLY:
-{sections_text}
-Total: {fmt['total_marks']} marks
-
-RULES FOR QUESTION GENERATION:
-1. Number every question clearly (Q1, Q2 … within each section).
-2. For MCQs: provide exactly 4 options labelled (a) (b) (c) (d). Do NOT mark the answer.
-3. For Short/Long Answer: write the question and show marks in brackets e.g. [3 marks].
-4. Include internal choices where appropriate (e.g., "OR") as per the board pattern.
-5. Cover all major sub-topics of Chapter: {chapter}.
-6. Difficulty split: 30% easy, 50% medium, 20% hard.
-7. DO NOT provide answers or hints anywhere in this paper.
-8. Maintain the official tone — no casual language.
-
-Now generate the complete question paper.
-"""
-
-    elif tool == "❓ Exam Q&A":
-        return base_context + """
-Create a complete Q&A bank with:
-- 8-10 Frequently Asked Questions
-- 5 Conceptual Questions with answers
-- 5 Application-Based Questions with answers
-- 3 Comparison Questions with answers
-- 5 'Why/How' Questions with answers
-- 3-5 Solved Numerical/Practical Problems
-Each answer: 150-300 words minimum with examples
-"""
-
-    elif output_style == "🧪 Question Paper":
-        fmt = get_qp_format_spec(board, course, subject)
-        instructions_text = "\n".join([f"  {i+1}. {ins}" for i, ins in enumerate(fmt["instructions"])])
-        sections_text = "\n".join([
-            f"  • {s['name']} — {s['type']} | {s['q_count']} questions × {s['marks_each']} marks = {s['total']} marks"
-            for s in fmt["sections"]
-        ])
-        return f"""
-You are a {fmt['board_label']} official question paper setter.
-Create a question paper for Chapter: {chapter} strictly following the official format below.
-
-{fmt['board_label']}
-{fmt['exam_label']} | {fmt['class_label']}
-Subject: {subject} | Maximum Marks: {fmt['total_marks']} | Time: {fmt['time']}
-
-INSTRUCTIONS:
-{instructions_text}
-
-STRUCTURE:
-{sections_text}
-
-Rules: Number all questions. MCQs must have (a)(b)(c)(d). Show marks in brackets.
-DO NOT include answers. Maintain official board tone.
-"""
-
-    return base_context + "Create comprehensive and exam-ready study material."
-
-
-def build_answers_prompt(chapter, topic, subject, audience, question_paper_text):
-    """Generate answers strictly matching the provided question paper."""
-    return f"""
-You are an expert educator. Below is a question paper given to students.
-Provide COMPLETE and DETAILED answers for EVERY question in this paper.
-
-Subject: {subject} | Topic: {topic} | Chapter: {chapter} | Audience: {audience}
-
-===== QUESTION PAPER =====
-{question_paper_text}
-===== END OF PAPER =====
-
-Write the ANSWER KEY:
-- MCQs: State the correct option letter AND a brief explanation (2-3 lines).
-- Very Short Answer: 2-4 concise lines.
-- Short Answer: 4-6 lines with examples.
-- Long Answer: Detailed 200-300 words with diagrams described in text, examples, key points.
-- Case/Source-Based: Full analysis and all sub-question answers.
-
-Label each answer clearly matching the question number and section.
-Be accurate, educational, and thorough. Maintain academic tone.
-"""
-
-
-def build_full_subject_qp_prompt(board, course, stream, subject, category):
-    """
-    Build a prompt for a FULL SUBJECT question paper covering the complete syllabus.
-    """
+def render_qp_preview(board, course, subject):
     fmt = get_qp_format_spec(board, course, subject)
-    instructions_text = "\n".join([f"  {i+1}. {ins}" for i, ins in enumerate(fmt["instructions"])])
+    lines = [
+        f"**Board / Pattern:** {fmt['board_label']}",
+        f"**Exam:** {fmt['exam_label']}",
+        f"**Class / Course:** {fmt['class_label']}",
+        f"**Time Allowed:** {fmt['time']}",
+        f"**Maximum Marks:** {fmt['total_marks']}",
+        "",
+        "**Sections:**"
+    ]
+    for sec in fmt["sections"]:
+        lines.append(
+            f"- **{sec['name']}** — {sec['type']} | {sec['q_count']} questions | {sec['marks_each']} marks each | Total {sec['total']}"
+        )
+    lines.append("")
+    lines.append("**Instructions Preview:**")
+    for ins in fmt["instructions"]:
+        lines.append(f"- {ins}")
+    return "\n".join(lines)
+
+# ═════════════════════════════════════════════════════════════════════════════
+# STEP 5: PROMPTS
+# ═════════════════════════════════════════════════════════════════════════════
+
+def build_question_paper_prompt(board, course, subject, chapter, topic, audience):
+    fmt = get_qp_format_spec(board, course, subject)
+    instructions_text = "\n".join([f"{i+1}. {x}" for i, x in enumerate(fmt["instructions"])])
     sections_text = "\n".join([
-        f"  • {s['name']} — {s['type']} | {s['q_count']} questions × {s['marks_each']} marks = {s['total']} marks"
+        f"- {s['name']} | {s['type']} | {s['q_count']} questions | {s['marks_each']} marks each | Total {s['total']}"
         for s in fmt["sections"]
     ])
 
     return f"""
-You are an official question paper setter for {fmt['board_label']}.
-Generate a COMPLETE FULL-SYLLABUS question paper for the subject below.
+You are an official academic paper setter.
 
-═══════════════════════════════════════════════════════════════════
-{fmt['board_label']}
-{fmt['exam_label']}
+Generate a CHAPTER-LEVEL question paper using the EXACT academic pattern below.
+
+BOARD: {fmt['board_label']}
+EXAM: {fmt['exam_label']}
 CLASS / COURSE: {fmt['class_label']}
-Subject: {subject}   Stream/Branch: {stream}
-Maximum Marks: {fmt['total_marks']}     Time Allowed: {fmt['time']}
-═══════════════════════════════════════════════════════════════════
+SUBJECT: {subject}
+TOPIC: {topic}
+CHAPTER: {chapter}
+TIME ALLOWED: {fmt['time']}
+MAXIMUM MARKS: {fmt['total_marks']}
+AUDIENCE: {audience}
 
-GENERAL INSTRUCTIONS (print verbatim at the top of the paper):
+GENERAL INSTRUCTIONS TO PRINT IN THE PAPER:
 {instructions_text}
 
-OFFICIAL PAPER STRUCTURE (follow this EXACTLY):
+REQUIRED SECTION STRUCTURE:
 {sections_text}
-Total: {fmt['total_marks']} marks
 
-SYLLABUS COVERAGE RULES:
-1. This is a FULL SUBJECT paper — cover ALL major chapters/units of {subject} for {course}.
-2. Questions must be spread across the entire syllabus proportionally.
-3. Do NOT focus on one chapter — distribute questions across all units.
-4. Number questions continuously within each section (Q1, Q2, Q3 ...).
-5. MCQs must have exactly 4 options labelled (a) (b) (c) (d). Do NOT mark correct answers.
-6. Show marks in square brackets [X marks] after every question.
-7. Provide internal choices (OR) where the board format requires it.
-8. Difficulty: 30% easy (recall), 50% medium (application), 20% hard (analysis/evaluation).
-9. Maintain STRICT official academic language — no casual phrasing.
-10. DO NOT include answers or hints anywhere in this paper.
-11. Include diagrams as "Draw a neat labelled diagram of X" type instructions.
+VERY IMPORTANT RULES:
+1. Follow this format strictly.
+2. Use a proper academic header.
+3. Show sections clearly, such as SECTION A, SECTION B, PART A, PART B, depending on the pattern.
+4. Number questions properly.
+5. For MCQs, give exactly 4 options: (a), (b), (c), (d).
+6. Show marks in square brackets like [3 marks].
+7. Cover the selected chapter only, but do it comprehensively.
+8. Difficulty split must be 30% easy, 50% medium, 20% hard.
+9. DO NOT include answers.
+10. DO NOT include hints.
+11. DO NOT produce a summary or notes.
+12. Output must look like a real examination paper.
 
-Generate the full question paper now — complete, exam-ready, and properly formatted.
+Generate only the final question paper.
 """
 
+def build_full_subject_qp_prompt(board, course, stream, subject, audience):
+    fmt = get_qp_format_spec(board, course, subject)
+    instructions_text = "\n".join([f"{i+1}. {x}" for i, x in enumerate(fmt["instructions"])])
+    sections_text = "\n".join([
+        f"- {s['name']} | {s['type']} | {s['q_count']} questions | {s['marks_each']} marks each | Total {s['total']}"
+        for s in fmt["sections"]
+    ])
+
+    return f"""
+You are an official academic paper setter.
+
+Generate a FULL SUBJECT question paper covering the complete syllabus.
+
+BOARD: {fmt['board_label']}
+EXAM: {fmt['exam_label']}
+CLASS / COURSE: {fmt['class_label']}
+STREAM: {stream}
+SUBJECT: {subject}
+TIME ALLOWED: {fmt['time']}
+MAXIMUM MARKS: {fmt['total_marks']}
+AUDIENCE: {audience}
+
+GENERAL INSTRUCTIONS TO PRINT IN THE PAPER:
+{instructions_text}
+
+REQUIRED SECTION STRUCTURE:
+{sections_text}
+
+STRICT RULES:
+1. This must cover the FULL subject syllabus, not just one chapter.
+2. Distribute questions across the syllabus.
+3. Follow the academic format exactly.
+4. Number questions properly.
+5. MCQs must have 4 options: (a), (b), (c), (d).
+6. Show marks like [5 marks].
+7. Add internal choices if appropriate for the pattern.
+8. DO NOT include answers.
+9. DO NOT include hints.
+10. Output must look like a proper standard exam paper.
+
+Generate only the final full subject question paper.
+"""
+
+def build_answers_prompt(question_paper_text, board, course, subject, chapter):
+    """
+    This is the main mismatch fix:
+    the model is forced to answer the EXACT generated paper text.
+    """
+    return f"""
+You are preparing the OFFICIAL ANSWER KEY for the exact question paper below.
+
+BOARD / COURSE: {board} | {course}
+SUBJECT: {subject}
+CHAPTER: {chapter}
+
+IMPORTANT INSTRUCTIONS:
+1. Answer ONLY the questions present in the paper below.
+2. DO NOT invent new questions.
+3. DO NOT change question numbering.
+4. DO NOT create a new paper.
+5. Preserve the same section names and question numbers.
+6. For each question, write:
+   - the exact question number
+   - a short restatement of the question
+   - the answer
+7. For MCQs:
+   - give the correct option
+   - briefly explain why
+8. For descriptive questions:
+   - provide accurate academic answers
+   - keep them aligned to the asked marks
+9. If the paper contains internal choice OR questions, answer both alternatives clearly.
+10. The answer key must match the given paper exactly.
+
+===== EXACT QUESTION PAPER START =====
+{question_paper_text}
+===== EXACT QUESTION PAPER END =====
+
+Now generate the answer key for the EXACT SAME paper above.
+"""
+
+def build_prompt(tool, chapter, topic, subject, audience, output_style, board="", course=""):
+    """
+    IMPORTANT:
+    Output Style Question Paper gets priority over tool.
+    This fixes the issue where Summary was still being generated.
+    """
+    base_context = f"""
+You are an expert educator creating study material for {audience}.
+Subject: {subject} | Topic: {topic} | Chapter: {chapter}
+Requirements: Accurate, exam-focused, well-structured, with examples, and error-free.
+"""
+
+    # Highest priority
+    if output_style == "🧪 Question Paper":
+        return build_question_paper_prompt(board, course, subject, chapter, topic, audience)
+
+    if tool == "🧪 Question Paper":
+        return build_question_paper_prompt(board, course, subject, chapter, topic, audience)
+
+    if tool == "📝 Summary":
+        if output_style == "📄 Detailed":
+            return base_context + """
+Create a detailed summary with:
+- Chapter overview
+- Key concepts
+- Important definitions
+- Worked examples
+- Exam tips
+- Common mistakes
+"""
+        elif output_style == "⚡ Short & Quick":
+            return base_context + """
+Create a quick summary with:
+- One-line definition
+- 5-7 key points
+- Important formulas / facts
+- Quick revision tips
+"""
+        elif output_style == "📋 Notes Format":
+            return base_context + """
+Create structured study notes with:
+- Headings and subheadings
+- Bullet points
+- Definitions
+- Important facts
+- Examples
+- Revision points
+"""
+
+    if tool == "🧠 Quiz":
+        return base_context + """
+Create a quiz with:
+- 5 MCQs
+- 5 short questions
+- 3 long questions
+- Answer key
+"""
+
+    if tool == "📌 Revision Notes":
+        return base_context + """
+Create revision notes with:
+- Top 10 must-know points
+- Formula sheet / facts list
+- Mnemonics
+- Key comparisons
+- Exam focus areas
+"""
+
+    if tool == "❓ Exam Q&A":
+        return base_context + """
+Create an exam Q&A bank with:
+- Frequently asked questions
+- Conceptual questions with answers
+- Application questions with answers
+- Why/how questions with answers
+"""
+
+    return base_context + "Create comprehensive study material."
 
 # ═════════════════════════════════════════════════════════════════════════════
-# STEP 5: AI GENERATION ENGINE  (temperature=0.1 for consistency)
+# STEP 6: AI GENERATION
 # ═════════════════════════════════════════════════════════════════════════════
 
 def generate_with_fallback(prompt):
@@ -864,11 +749,10 @@ def generate_with_fallback(prompt):
     if not api_key:
         return (
             "⚠️ API key missing!\n\n"
-            "1. Create `.streamlit/secrets.toml`\n"
-            "2. Add: `GEMINI_API_KEY = \"your_key_here\"`\n"
-            "3. Get your free key at https://aistudio.google.com/app/apikey",
+            "Add GEMINI_API_KEY to `.streamlit/secrets.toml`",
             "None"
         )
+
     try:
         genai.configure(api_key=api_key)
     except Exception as e:
@@ -895,9 +779,9 @@ def generate_with_fallback(prompt):
             response = model.generate_content(
                 prompt,
                 generation_config=genai.types.GenerationConfig(
-                    temperature=0.1,        # ✅ Consistent results
-                    max_output_tokens=8192, # ✅ Full-subject papers need more tokens
-                    top_p=0.95,
+                    temperature=0.0,
+                    max_output_tokens=8192,
+                    top_p=0.9,
                 ),
             )
             if response and getattr(response, "text", None):
@@ -906,106 +790,143 @@ def generate_with_fallback(prompt):
             last_error = f"{model_name}: {str(e)}"
             continue
 
-    return (
-        f"❌ All AI models failed.\n\n**Last error:** {last_error}\n\n"
-        "- Check your API key is active\n"
-        "- Check internet connection\n"
-        "- Try again after a few minutes",
-        "None"
-    )
-
+    return (f"❌ All AI models failed.\n\nLast error: {last_error}", "None")
 
 # ═════════════════════════════════════════════════════════════════════════════
-# STEP 6: PDF GENERATION
+# STEP 7: PDF GENERATION
 # ═════════════════════════════════════════════════════════════════════════════
 
-def generate_pdf(title, subtitle, content, header_color="#1d4ed8"):
+def generate_pdf(title, subtitle, content, color_hex="#1d4ed8"):
     buffer = io.BytesIO()
     doc = SimpleDocTemplate(
-        buffer, pagesize=A4,
-        topMargin=2*cm, bottomMargin=2*cm,
-        leftMargin=1.5*cm, rightMargin=1.5*cm
+        buffer,
+        pagesize=A4,
+        topMargin=2 * cm,
+        bottomMargin=2 * cm,
+        leftMargin=1.5 * cm,
+        rightMargin=1.5 * cm
     )
-    styles = getSampleStyleSheet()
-    story  = []
 
-    story.append(Paragraph(title, ParagraphStyle(
-        "T", parent=styles["Heading1"], fontSize=22,
-        textColor=colors.HexColor(header_color),
-        spaceAfter=6, alignment=TA_CENTER, fontName="Helvetica-Bold"
-    )))
-    story.append(Paragraph(subtitle, ParagraphStyle(
-        "S", parent=styles["Normal"], fontSize=11,
-        textColor=colors.HexColor("#64748b"),
-        spaceAfter=10, alignment=TA_CENTER, fontName="Helvetica"
-    )))
+    styles = getSampleStyleSheet()
+    story = []
+
+    story.append(Paragraph(
+        title,
+        ParagraphStyle(
+            "CustomTitle",
+            parent=styles["Heading1"],
+            fontSize=21,
+            textColor=colors.HexColor(color_hex),
+            spaceAfter=6,
+            alignment=TA_CENTER,
+            fontName="Helvetica-Bold"
+        )
+    ))
+
+    story.append(Paragraph(
+        subtitle,
+        ParagraphStyle(
+            "CustomSubtitle",
+            parent=styles["Normal"],
+            fontSize=10.5,
+            textColor=colors.HexColor("#64748b"),
+            spaceAfter=10,
+            alignment=TA_CENTER,
+            fontName="Helvetica"
+        )
+    ))
+
     story.append(HRFlowable(
-        width="100%", thickness=2,
-        color=colors.HexColor(header_color), spaceAfter=16
+        width="100%",
+        thickness=2,
+        color=colors.HexColor(color_hex),
+        spaceAfter=14
     ))
 
     body_style = ParagraphStyle(
-        "B", parent=styles["Normal"], fontSize=10.5,
+        "Body",
+        parent=styles["Normal"],
+        fontSize=10.5,
+        leading=15,
         textColor=colors.HexColor("#1e293b"),
-        leading=16, spaceAfter=6, fontName="Helvetica"
+        spaceAfter=5,
+        fontName="Helvetica"
     )
+
     heading_style = ParagraphStyle(
-        "H", parent=styles["Heading2"], fontSize=13,
-        textColor=colors.HexColor(header_color),
-        spaceBefore=12, spaceAfter=6, fontName="Helvetica-Bold"
+        "Head",
+        parent=styles["Heading2"],
+        fontSize=12.5,
+        textColor=colors.HexColor(color_hex),
+        spaceBefore=10,
+        spaceAfter=6,
+        fontName="Helvetica-Bold"
     )
+
     bullet_style = ParagraphStyle(
-        "BL", parent=styles["Normal"], fontSize=10.5,
+        "Bullet",
+        parent=styles["Normal"],
+        fontSize=10.5,
+        leading=15,
+        leftIndent=16,
+        bulletIndent=6,
         textColor=colors.HexColor("#334155"),
-        leading=15, leftIndent=16, spaceAfter=4,
-        bulletIndent=6, fontName="Helvetica"
+        spaceAfter=4,
+        fontName="Helvetica"
     )
 
     for line in content.split("\n"):
         line = line.strip()
         if not line:
-            story.append(Spacer(1, 0.2*cm)); continue
-        if line.startswith("####"):
-            story.append(Paragraph(line.lstrip("#").strip(), body_style))
-        elif line.startswith(("###", "##", "#")):
+            story.append(Spacer(1, 0.18 * cm))
+            continue
+
+        safe = line.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+
+        if line.startswith(("###", "##", "#")):
             story.append(Paragraph(line.lstrip("#").strip(), heading_style))
-        elif line.startswith("**") and line.endswith("**"):
-            story.append(Paragraph(f"<b>{line.replace('**','')}</b>", body_style))
         elif line.startswith(("- ", "• ", "* ")):
-            safe = line[2:].replace("&","&amp;").replace("<","&lt;").replace(">","&gt;")
-            story.append(Paragraph(f"• {safe}", bullet_style))
-        elif line and line[0].isdigit() and ". " in line[:5]:
-            safe = line.replace("&","&amp;").replace("<","&lt;").replace(">","&gt;")
-            story.append(Paragraph(safe, bullet_style))
+            story.append(Paragraph(f"• {safe[2:]}", bullet_style))
         else:
-            safe = line.replace("&","&amp;").replace("<","&lt;").replace(">","&gt;")
             story.append(Paragraph(safe, body_style))
 
-    story.append(Spacer(1, 0.4*cm))
-    story.append(HRFlowable(width="100%", thickness=1,
-        color=colors.HexColor("#e2e8f0"), spaceAfter=6))
+    story.append(Spacer(1, 0.3 * cm))
+    story.append(HRFlowable(
+        width="100%",
+        thickness=1,
+        color=colors.HexColor("#e2e8f0"),
+        spaceAfter=5
+    ))
+
     story.append(Paragraph(
         f"<i>Generated by StudySmart AI | {time.strftime('%Y-%m-%d %H:%M')}</i>",
-        ParagraphStyle("F", parent=styles["Normal"], fontSize=8,
-            textColor=colors.HexColor("#94a3b8"), alignment=TA_CENTER)
+        ParagraphStyle(
+            "Footer",
+            parent=styles["Normal"],
+            fontSize=8,
+            textColor=colors.HexColor("#94a3b8"),
+            alignment=TA_CENTER
+        )
     ))
+
     doc.build(story)
     buffer.seek(0)
     return buffer
 # ═════════════════════════════════════════════════════════════════════════════
-# STEP 7: SESSION STATE INIT
+# STEP 8: SESSION STATE
 # ═════════════════════════════════════════════════════════════════════════════
 
 def init_session_state():
     defaults = {
         "logged_in": False,
         "username": "",
-        "current_chapters": [],
         "history": [],
+        "current_chapters": [],
         "last_chapter_key": "",
-        # Generated content
+
         "generated_result": None,
         "generated_model": None,
+        "generated_label": None,
         "generated_tool": None,
         "generated_chapter": None,
         "generated_subject": None,
@@ -1015,90 +936,104 @@ def init_session_state():
         "generated_board": None,
         "generated_audience": None,
         "generated_output_style": None,
-        # Answers
+
         "answers_result": None,
         "answers_model": None,
         "show_answers": False,
-        # Full subject paper
+
         "fullpaper_result": None,
         "fullpaper_model": None,
         "show_fullpaper": False,
     }
-    for key, val in defaults.items():
-        if key not in st.session_state:
-            st.session_state[key] = val
+    for k, v in defaults.items():
+        if k not in st.session_state:
+            st.session_state[k] = v
 
+def reset_generation_state():
+    st.session_state.generated_result = None
+    st.session_state.generated_model = None
+    st.session_state.generated_label = None
+    st.session_state.generated_tool = None
+    st.session_state.generated_chapter = None
+    st.session_state.generated_subject = None
+    st.session_state.generated_topic = None
+    st.session_state.generated_course = None
+    st.session_state.generated_stream = None
+    st.session_state.generated_board = None
+    st.session_state.generated_audience = None
+    st.session_state.generated_output_style = None
+    st.session_state.answers_result = None
+    st.session_state.answers_model = None
+    st.session_state.show_answers = False
+    st.session_state.fullpaper_result = None
+    st.session_state.fullpaper_model = None
+    st.session_state.show_fullpaper = False
 
 # ═════════════════════════════════════════════════════════════════════════════
-# STEP 8: MAIN APP UI
+# STEP 9: MAIN APP
 # ═════════════════════════════════════════════════════════════════════════════
 
 def main_app():
-
-    # ── Sidebar ───────────────────────────────────────────────────────────────
     with st.sidebar:
         st.markdown(f"""
-            <div style="text-align:center; padding:20px 0 15px 0;">
-                <div style="font-size:3rem; margin-bottom:8px;">🎓</div>
-                <div style="font-size:1.4rem; font-weight:800;
-                     background:linear-gradient(135deg,#3b82f6 0%,#2563eb 100%);
-                     -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-                     background-clip:text;">StudySmart</div>
-                <div style="font-size:0.9rem;color:#64748b;margin-top:6px;">
+            <div style="text-align:center; padding:18px 0 12px 0;">
+                <div style="font-size:2.8rem;">🎓</div>
+                <div style="font-size:1.3rem; font-weight:800; color:#2563eb;">StudySmart</div>
+                <div style="font-size:0.9rem; color:#64748b; margin-top:4px;">
                     Welcome, {st.session_state.username} 👋
                 </div>
             </div>
         """, unsafe_allow_html=True)
+
         st.divider()
 
-        tool = st.radio("SELECT TOOL", [
-            "📝 Summary", "🧠 Quiz", "📌 Revision Notes",
-            "🧪 Question Paper", "❓ Exam Q&A"
-        ])
+        tool = st.radio(
+            "SELECT TOOL",
+            ["📝 Summary", "🧠 Quiz", "📌 Revision Notes", "🧪 Question Paper", "❓ Exam Q&A"]
+        )
+
         st.divider()
 
         with st.expander("📜 Recent History"):
-            history = st.session_state.get("history", [])
-            if not history:
-                st.caption("No history yet. Generate something first!")
+            if not st.session_state.history:
+                st.caption("No history yet.")
             else:
-                for h in history:
+                for h in st.session_state.history:
                     st.markdown(f"""
                         <div class="sf-history-item">
                             🕐 {h['time']} &nbsp;|&nbsp; <b>{h['tool']}</b><br/>
                             📖 {h['chapter']} — {h['subject']}<br/>
-                            <small style="opacity:0.7">{h['preview']}</small>
+                            <small>{h['preview']}</small>
                         </div>
                     """, unsafe_allow_html=True)
 
         st.divider()
+
         with st.expander("🤖 AI Model Status"):
             if st.button("Check Models", use_container_width=True):
                 with st.spinner("Checking..."):
                     models = get_available_models()
                 for m in models:
                     st.write(f"✅ {m}")
+
         st.divider()
 
         if st.button("🚪 Logout", use_container_width=True):
-            for k in ["logged_in","username","history","generated_result",
-                      "answers_result","show_answers","fullpaper_result","show_fullpaper"]:
-                st.session_state[k] = False if k == "logged_in" else (
-                    "" if k == "username" else ([] if k == "history" else None))
-            st.session_state.show_answers   = False
-            st.session_state.show_fullpaper = False
+            st.session_state.logged_in = False
+            st.session_state.username = ""
+            st.session_state.history = []
+            reset_generation_state()
             st.rerun()
 
-    # ── Header ─────────────────────────────────────────────────────────────────
+    # Header
     st.markdown("""
         <div class="sf-header">
             <div class="sf-header-title">StudySmart</div>
             <div class="sf-header-subtitle">Your Smart Exam Preparation Platform</div>
         </div>
-        <div class="sf-watermark">POWERED BY AI</div>
     """, unsafe_allow_html=True)
 
-    # ── Selection Card ──────────────────────────────────────────────────────────
+    # Selection card
     st.markdown('<div class="sf-card">', unsafe_allow_html=True)
 
     if not STUDY_DATA:
@@ -1106,9 +1041,9 @@ def main_app():
         st.stop()
 
     category = st.selectbox("📚 Category", list(STUDY_DATA.keys()))
-    course   = st.selectbox("🎓 Program / Class", get_courses(category))
-    stream   = st.selectbox("📖 Stream", get_streams(category, course))
-    subject  = st.selectbox("🧾 Subject", get_subjects(category, course, stream))
+    course = st.selectbox("🎓 Program / Class", get_courses(category))
+    stream = st.selectbox("📖 Stream", get_streams(category, course))
+    subject = st.selectbox("🧾 Subject", get_subjects(category, course, stream))
 
     if category == "K-12th":
         board = st.selectbox("🏫 Board", BOARDS)
@@ -1118,318 +1053,340 @@ def main_app():
     topic = st.selectbox("🗂️ Topic", get_topics(category, course, stream, subject))
 
     chapter_key = f"{category}||{course}||{stream}||{subject}||{topic}"
-    if st.session_state.get("last_chapter_key") != chapter_key:
-        st.session_state.current_chapters   = get_chapters(category, course, stream, subject, topic)
-        st.session_state.last_chapter_key   = chapter_key
-        st.session_state.generated_result   = None
-        st.session_state.answers_result     = None
-        st.session_state.show_answers       = False
-        st.session_state.fullpaper_result   = None
-        st.session_state.show_fullpaper     = False
+    if st.session_state.last_chapter_key != chapter_key:
+        st.session_state.current_chapters = get_chapters(category, course, stream, subject, topic)
+        st.session_state.last_chapter_key = chapter_key
+        reset_generation_state()
 
-    chapter = st.selectbox("📝 Chapter", st.session_state.get("current_chapters", ["No chapters found"]))
+    chapter = st.selectbox("📝 Chapter", st.session_state.current_chapters)
+
     st.markdown('</div>', unsafe_allow_html=True)
 
-    # ── Output Style ────────────────────────────────────────────────────────────
     output_style = st.radio(
         "⚙️ Output Style",
         ["📄 Detailed", "⚡ Short & Quick", "📋 Notes Format", "🧪 Question Paper"],
         horizontal=True
     )
-    st.markdown('<div style="margin-top:20px;"></div>', unsafe_allow_html=True)
 
-    # ── Generate Button ─────────────────────────────────────────────────────────
-    if st.button(f"✨ Generate {tool}", use_container_width=True):
+    effective_label = get_effective_output_name(tool, output_style)
+    generate_button_label = get_generate_button_label(tool, output_style)
+
+    # Show format preview whenever question paper mode is selected
+    if effective_label == "Question Paper":
+        st.markdown('<div class="sf-preview">', unsafe_allow_html=True)
+        st.markdown("### 📄 Question Paper Pattern Preview")
+        st.markdown(render_qp_preview(board, course, subject))
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    if st.button(generate_button_label, use_container_width=True):
         if not chapter or chapter == "No chapters found":
             st.warning("⚠️ Please select a valid chapter before generating.")
             return
 
-        audience     = f"{board} {course} students" if category == "K-12th" else f"{course} students"
-        final_prompt = build_prompt(tool, chapter, topic, subject, audience,
-                                    output_style, board=board, course=course)
+        audience = f"{board} {course} students" if category == "K-12th" else f"{course} students"
 
-        with st.spinner(f"🧠 Generating {tool}... please wait ⏳"):
-            result, model_used = generate_with_fallback(final_prompt)
+        prompt = build_prompt(
+            tool=tool,
+            chapter=chapter,
+            topic=topic,
+            subject=subject,
+            audience=audience,
+            output_style=output_style,
+            board=board,
+            course=course
+        )
 
-        st.session_state.generated_result       = result
-        st.session_state.generated_model        = model_used
-        st.session_state.generated_tool         = tool
-        st.session_state.generated_chapter      = chapter
-        st.session_state.generated_subject      = subject
-        st.session_state.generated_topic        = topic
-        st.session_state.generated_course       = course
-        st.session_state.generated_stream       = stream
-        st.session_state.generated_board        = board
-        st.session_state.generated_audience     = audience
+        with st.spinner(f"Generating {effective_label}... please wait ⏳"):
+            result, model_used = generate_with_fallback(prompt)
+
+        st.session_state.generated_result = result
+        st.session_state.generated_model = model_used
+        st.session_state.generated_label = effective_label
+        st.session_state.generated_tool = tool
+        st.session_state.generated_chapter = chapter
+        st.session_state.generated_subject = subject
+        st.session_state.generated_topic = topic
+        st.session_state.generated_course = course
+        st.session_state.generated_stream = stream
+        st.session_state.generated_board = board
+        st.session_state.generated_audience = audience
         st.session_state.generated_output_style = output_style
-        st.session_state.answers_result         = None
-        st.session_state.show_answers           = False
-        st.session_state.fullpaper_result       = None
-        st.session_state.show_fullpaper         = False
+
+        st.session_state.answers_result = None
+        st.session_state.answers_model = None
+        st.session_state.show_answers = False
+
+        st.session_state.fullpaper_result = None
+        st.session_state.fullpaper_model = None
+        st.session_state.show_fullpaper = False
 
         if model_used != "None":
-            add_to_history(tool, chapter, subject, result)
+            add_to_history(effective_label, chapter, subject, result)
 
-    # ── Display Generated Content ───────────────────────────────────────────────
+    # Display generated content
     if st.session_state.generated_result and st.session_state.generated_model != "None":
-
-        result     = st.session_state.generated_result
+        result = st.session_state.generated_result
         model_used = st.session_state.generated_model
-        g_tool     = st.session_state.generated_tool
-        g_chapter  = st.session_state.generated_chapter
-        g_subject  = st.session_state.generated_subject
-        g_topic    = st.session_state.generated_topic
-        g_course   = st.session_state.generated_course
-        g_stream   = st.session_state.generated_stream
-        g_board    = st.session_state.generated_board
+        g_label = st.session_state.generated_label
+        g_chapter = st.session_state.generated_chapter
+        g_subject = st.session_state.generated_subject
+        g_topic = st.session_state.generated_topic
+        g_course = st.session_state.generated_course
+        g_stream = st.session_state.generated_stream
+        g_board = st.session_state.generated_board
         g_audience = st.session_state.generated_audience
-        g_style    = st.session_state.generated_output_style
 
         st.markdown("---")
-        col_a, col_b = st.columns(2)
-        col_a.metric("🤖 Model Used",
-            model_used.split("/")[-1] if "/" in model_used else model_used)
-        col_b.metric("📝 Word Count", f"{count_words(result):,}")
+
+        c1, c2 = st.columns(2)
+        c1.metric("🤖 Model Used", model_used.split("/")[-1] if "/" in model_used else model_used)
+        c2.metric("📝 Word Count", f"{count_words(result):,}")
 
         st.markdown('<div class="sf-output">', unsafe_allow_html=True)
-        st.markdown(f"### {g_tool} — {g_chapter}")
+        st.markdown(f"### {g_label} — {g_chapter}")
         st.markdown(result)
         st.markdown('</div>', unsafe_allow_html=True)
 
-        is_question_paper = (
-            g_tool  == "🧪 Question Paper" or
-            g_style == "🧪 Question Paper"
-        )
+        is_question_paper = g_label == "Question Paper"
 
-        # ── Question Paper specific buttons ──────────────────────────────────
         if is_question_paper:
-            st.markdown('<div style="margin-top:16px;"></div>', unsafe_allow_html=True)
+            st.markdown("---")
 
-            # Download chapter question paper
             try:
                 qp_pdf = generate_pdf(
                     f"Question Paper — {g_chapter}",
                     f"{g_subject} | {g_board} | {g_course}",
-                    result, header_color="#1d4ed8"
+                    result,
+                    color_hex="#1d4ed8"
                 )
-                safe_qp = g_chapter.replace(" ","_").replace(":","").replace("/","-") + "_QP.pdf"
+                safe_qp = g_chapter.replace(" ", "_").replace(":", "").replace("/", "-") + "_QuestionPaper.pdf"
                 st.download_button(
                     "⬇️ Download Question Paper as PDF",
-                    data=qp_pdf, file_name=safe_qp,
+                    data=qp_pdf,
+                    file_name=safe_qp,
                     mime="application/pdf",
-                    use_container_width=True, key="dl_qp"
+                    use_container_width=True,
+                    key="dl_qp"
                 )
             except Exception as e:
-                st.warning(f"⚠️ PDF failed: {e}")
+                st.warning(f"⚠️ Question paper PDF generation failed: {str(e)}")
 
-            st.markdown('<div style="margin-top:10px;"></div>', unsafe_allow_html=True)
-
-            # ── GET ANSWERS button ────────────────────────────────────────────
+            # Get answers button
             if st.button("📋 Get Answers", use_container_width=True, key="get_answers_btn"):
-                with st.spinner("📚 Generating detailed answer key... please wait ⏳"):
-                    ans_prompt = build_answers_prompt(
-                        g_chapter, g_topic, g_subject, g_audience, result
-                    )
-                    ans_result, ans_model = generate_with_fallback(ans_prompt)
-                st.session_state.answers_result = ans_result
-                st.session_state.answers_model  = ans_model
-                st.session_state.show_answers   = True
+                exact_question_paper = st.session_state.generated_result
 
-            # Display answers
+                with st.spinner("Generating answers for the exact question paper... ⏳"):
+                    answers_prompt = build_answers_prompt(
+                        question_paper_text=exact_question_paper,
+                        board=g_board,
+                        course=g_course,
+                        subject=g_subject,
+                        chapter=g_chapter
+                    )
+                    answers_result, answers_model = generate_with_fallback(answers_prompt)
+
+                st.session_state.answers_result = answers_result
+                st.session_state.answers_model = answers_model
+                st.session_state.show_answers = True
+
             if st.session_state.show_answers and st.session_state.answers_result:
                 ans_result = st.session_state.answers_result
-                ans_model  = st.session_state.answers_model
+                ans_model = st.session_state.answers_model
+
                 if ans_model != "None":
                     st.markdown('<div class="sf-answers">', unsafe_allow_html=True)
                     st.markdown(f"### 📚 Answer Key — {g_chapter}")
                     st.markdown(ans_result)
                     st.markdown('</div>', unsafe_allow_html=True)
+
                     try:
                         ans_pdf = generate_pdf(
                             f"Answer Key — {g_chapter}",
                             f"{g_subject} | {g_board} | {g_course}",
-                            ans_result, header_color="#16a34a"
+                            ans_result,
+                            color_hex="#15803d"
                         )
-                        safe_ans = g_chapter.replace(" ","_").replace(":","").replace("/","-") + "_Answers.pdf"
+                        safe_ans = g_chapter.replace(" ", "_").replace(":", "").replace("/", "-") + "_Answers.pdf"
                         st.download_button(
                             "⬇️ Download Answer Key as PDF",
-                            data=ans_pdf, file_name=safe_ans,
+                            data=ans_pdf,
+                            file_name=safe_ans,
                             mime="application/pdf",
-                            use_container_width=True, key="dl_ans"
+                            use_container_width=True,
+                            key="dl_answers"
                         )
-                        st.info("✅ Answer Key PDF ready — click above to download.")
                     except Exception as e:
-                        st.warning(f"⚠️ Answer PDF failed: {e}")
+                        st.warning(f"⚠️ Answer key PDF generation failed: {str(e)}")
                 else:
-                    st.error("❌ Failed to generate answers. Please try again.")
+                    st.error("❌ Failed to generate answer key.")
                     st.markdown(ans_result)
 
-            # ─────────────────────────────────────────────────────────────────
-            # ✅ NEW: GENERATE FULL SUBJECT QUESTION PAPER
-            # ─────────────────────────────────────────────────────────────────
+            # Full subject paper
             st.markdown("---")
-            st.markdown("""
-                <div style="background:linear-gradient(135deg,rgba(139,92,246,0.08),rgba(109,40,217,0.08));
-                     border-radius:14px;padding:20px 24px;border:1px solid rgba(139,92,246,0.2);
-                     margin-bottom:12px;">
-                    <div style="font-size:1.1rem;font-weight:700;color:#7c3aed;margin-bottom:6px;">
-                        📋 Generate Full Subject Question Paper
-                    </div>
-                    <div style="font-size:0.88rem;color:#64748b;">
-                        Generate a <strong>complete exam paper covering the entire syllabus</strong>
-                        of <strong>{subject}</strong> — strictly following the official
-                        <strong>{board}</strong> format for <strong>{course}</strong>.
-                    </div>
+            st.markdown(f"""
+                <div class="sf-preview">
+                    <strong>🗂️ Full Subject Question Paper</strong><br/>
+                    Generate a complete <strong>{g_subject}</strong> paper for <strong>{g_board}</strong> / <strong>{g_course}</strong> following the standard academic structure.
                 </div>
-            """.format(
-                subject=g_subject, board=g_board, course=g_course
-            ), unsafe_allow_html=True)
+            """, unsafe_allow_html=True)
 
             if st.button(
-                f"🗂️ Generate Full {g_subject} Question Paper ({g_board})",
-                use_container_width=True, key="full_qp_btn"
+                f"🗂️ Generate Full {g_subject} Question Paper",
+                use_container_width=True,
+                key="full_subject_qp_btn"
             ):
-                with st.spinner(
-                    f"📄 Generating full {g_subject} question paper for {g_board} {g_course}... ⏳"
-                ):
+                with st.spinner(f"Generating full subject question paper for {g_subject}... ⏳"):
                     full_prompt = build_full_subject_qp_prompt(
-                        g_board, g_course, g_stream, g_subject, g_subject
+                        board=g_board,
+                        course=g_course,
+                        stream=g_stream,
+                        subject=g_subject,
+                        audience=g_audience
                     )
                     full_result, full_model = generate_with_fallback(full_prompt)
-                st.session_state.fullpaper_result = full_result
-                st.session_state.fullpaper_model  = full_model
-                st.session_state.show_fullpaper   = True
 
-            # Display full subject paper
+                st.session_state.fullpaper_result = full_result
+                st.session_state.fullpaper_model = full_model
+                st.session_state.show_fullpaper = True
+
             if st.session_state.show_fullpaper and st.session_state.fullpaper_result:
                 full_result = st.session_state.fullpaper_result
-                full_model  = st.session_state.fullpaper_model
+                full_model = st.session_state.fullpaper_model
+
                 if full_model != "None":
                     st.markdown('<div class="sf-fullpaper">', unsafe_allow_html=True)
-                    st.markdown(f"### 🗂️ Full Subject Question Paper — {g_subject} ({g_board} {g_course})")
+                    st.markdown(f"### 🗂️ Full Subject Question Paper — {g_subject}")
                     st.markdown(full_result)
                     st.markdown('</div>', unsafe_allow_html=True)
+
                     try:
                         full_pdf = generate_pdf(
-                            f"Full Question Paper — {g_subject}",
+                            f"Full Subject Question Paper — {g_subject}",
                             f"{g_board} | {g_course} | {g_stream}",
-                            full_result, header_color="#7c3aed"
+                            full_result,
+                            color_hex="#6d28d9"
                         )
-                        safe_full = f"{g_subject}_{g_board}_{g_course}_FullPaper.pdf".replace(" ","_")
+                        safe_full = f"{g_subject}_{g_board}_{g_course}_FullPaper.pdf".replace(" ", "_")
                         st.download_button(
                             "⬇️ Download Full Subject Question Paper as PDF",
-                            data=full_pdf, file_name=safe_full,
+                            data=full_pdf,
+                            file_name=safe_full,
                             mime="application/pdf",
-                            use_container_width=True, key="dl_full"
+                            use_container_width=True,
+                            key="dl_fullpaper"
                         )
-                        st.info("✅ Full Subject Question Paper PDF ready — click above to download.")
                     except Exception as e:
-                        st.warning(f"⚠️ PDF generation failed: {e}")
+                        st.warning(f"⚠️ Full paper PDF generation failed: {str(e)}")
                 else:
                     st.error("❌ Failed to generate full subject question paper.")
                     st.markdown(full_result)
 
-        # ── Non-question-paper PDF download ────────────────────────────────────
         else:
             st.markdown("---")
             try:
                 pdf_buffer = generate_pdf(
-                    f"{g_tool} — {g_chapter}",
+                    f"{g_label} — {g_chapter}",
                     f"{g_subject} | {g_topic} | {g_course}",
                     result
                 )
-                safe_name = g_chapter.replace(" ","_").replace(":","").replace("/","-") + ".pdf"
+                safe_name = g_chapter.replace(" ", "_").replace(":", "").replace("/", "-") + ".pdf"
                 st.download_button(
                     "⬇️ Download as PDF",
-                    data=pdf_buffer, file_name=safe_name,
+                    data=pdf_buffer,
+                    file_name=safe_name,
                     mime="application/pdf",
-                    use_container_width=True, key="dl_main"
+                    use_container_width=True,
+                    key="dl_main"
                 )
-                st.info("✅ PDF ready — click above to download.")
             except Exception as e:
-                st.warning(f"⚠️ PDF generation failed: {e}")
+                st.warning(f"⚠️ PDF generation failed: {str(e)}")
 
     elif st.session_state.generated_result and st.session_state.generated_model == "None":
         st.markdown("---")
-        st.error("❌ AI Generation Failed")
+        st.error("❌ AI generation failed")
         st.markdown(st.session_state.generated_result)
 
-
 # ═════════════════════════════════════════════════════════════════════════════
-# STEP 9: AUTH UI
+# STEP 10: AUTH UI
 # ═════════════════════════════════════════════════════════════════════════════
 
 def auth_ui():
-    _, col_c, _ = st.columns([1, 2, 1])
-    with col_c:
+    _, col, _ = st.columns([1, 2, 1])
+
+    with col:
         st.markdown("""
             <div class="sf-header">
                 <div class="sf-header-title">StudySmart</div>
                 <div class="sf-header-subtitle">Your Smart Exam Preparation Platform</div>
             </div>
-            <div class="sf-watermark">POWERED BY AI</div>
         """, unsafe_allow_html=True)
 
         st.markdown('<div class="sf-card">', unsafe_allow_html=True)
         tab1, tab2 = st.tabs(["🔐 Login", "📝 Register"])
 
         with tab1:
-            u = st.text_input("👤 Username", key="login_u", placeholder="Enter your username")
-            p = st.text_input("🔑 Password", type="password", key="login_p", placeholder="Enter your password")
+            u = st.text_input("👤 Username", key="login_u", placeholder="Enter username")
+            p = st.text_input("🔑 Password", type="password", key="login_p", placeholder="Enter password")
+
             if st.button("Sign In 🚀", use_container_width=True):
                 if u.strip() and p.strip():
                     conn = sqlite3.connect("users.db")
                     c = conn.cursor()
-                    c.execute("SELECT * FROM users WHERE username=? AND password=?",
-                              (u.strip(), hash_p(p)))
+                    c.execute(
+                        "SELECT * FROM users WHERE username=? AND password=?",
+                        (u.strip(), hash_p(p))
+                    )
                     user = c.fetchone()
                     conn.close()
+
                     if user:
                         st.session_state.logged_in = True
-                        st.session_state.username  = u.strip()
-                        st.success("✅ Login successful! Loading app...")
+                        st.session_state.username = u.strip()
+                        st.success("✅ Login successful!")
                         time.sleep(1)
                         st.rerun()
                     else:
                         st.error("❌ Invalid username or password.")
                 else:
-                    st.warning("⚠️ Please fill in both fields")
+                    st.warning("⚠️ Please fill in both fields.")
 
         with tab2:
-            nu = st.text_input("👤 New Username", key="reg_u", placeholder="Min 3 characters")
-            np = st.text_input("🔑 New Password", type="password", key="reg_p", placeholder="Min 6 characters")
+            nu = st.text_input("👤 New Username", key="reg_u", placeholder="Minimum 3 characters")
+            np = st.text_input("🔑 New Password", type="password", key="reg_p", placeholder="Minimum 6 characters")
             cp = st.text_input("🔑 Confirm Password", type="password", key="reg_cp", placeholder="Re-enter password")
+
             if st.button("Create Account ✨", use_container_width=True):
                 if not nu.strip():
                     st.error("❌ Username cannot be empty")
                 elif len(nu.strip()) < 3:
                     st.error("❌ Username must be at least 3 characters")
-                elif not np.strip():
-                    st.error("❌ Password cannot be empty")
                 elif len(np.strip()) < 6:
                     st.error("❌ Password must be at least 6 characters")
                 elif np != cp:
-                    st.error("❌ Passwords do not match.")
+                    st.error("❌ Passwords do not match")
                 else:
                     try:
                         conn = sqlite3.connect("users.db")
                         c = conn.cursor()
-                        c.execute("INSERT INTO users (username, password) VALUES (?, ?)",
-                                  (nu.strip(), hash_p(np)))
+                        c.execute(
+                            "INSERT INTO users (username, password) VALUES (?, ?)",
+                            (nu.strip(), hash_p(np))
+                        )
                         conn.commit()
                         conn.close()
+
                         st.success("✅ Account created! Logging you in...")
                         time.sleep(1)
                         st.session_state.logged_in = True
-                        st.session_state.username  = nu.strip()
+                        st.session_state.username = nu.strip()
                         st.rerun()
                     except sqlite3.IntegrityError:
-                        st.error("❌ Username already taken.")
+                        st.error("❌ Username already exists")
+
         st.markdown('</div>', unsafe_allow_html=True)
 
-
 # ═════════════════════════════════════════════════════════════════════════════
-# STEP 10: ENTRY POINT
+# STEP 11: ENTRY POINT
 # ═════════════════════════════════════════════════════════════════════════════
 
 init_db()
