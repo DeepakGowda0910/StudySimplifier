@@ -540,1507 +540,851 @@ def init_db():
     c.execute("""CREATE TABLE IF NOT EXISTS users (
         username TEXT PRIMARY KEY, password TEXT NOT NULL)""")
     conn.commit(); conn.close()
-# ─────────────────────────────────────────────────────────────────────────────
-# DATABASE
-# ─────────────────────────────────────────────────────────────────────────────
-def init_db():
-    conn = sqlite3.connect("users.db")
-    c = conn.cursor()
-    c.execute("""
-        CREATE TABLE IF NOT EXISTS users (
-            username TEXT PRIMARY KEY,
-            password TEXT NOT NULL
-        )
-    """)
-    conn.commit()
-    conn.close()
 
 # ─────────────────────────────────────────────────────────────────────────────
 # SESSION STATE
 # ─────────────────────────────────────────────────────────────────────────────
 def init_session_state():
     defaults = {
-        "logged_in": False,
-        "username": "",
-        "history": [],
-        "active_page": "dashboard",
-
-        "current_chapters": [],
-        "last_chapter_key": "",
-
-        "generated_result": None,
-        "generated_model": None,
-        "generated_label": None,
-        "generated_tool": None,
-        "generated_chapter": None,
-        "generated_subject": None,
-        "generated_topic": None,
-        "generated_course": None,
-        "generated_stream": None,
-        "generated_board": None,
-        "generated_audience": None,
-        "generated_output_style": None,
-
-        "answers_result": None,
-        "answers_model": None,
-        "show_answers": False,
-
-        "fullpaper_result": None,
-        "fullpaper_model": None,
-        "show_fullpaper": False,
-
+        "logged_in": False, "username": "", "active_page": "dashboard",
+        "history": [], "current_chapters": [], "last_chapter_key": "",
+        "generated_result": None, "generated_model": None,
+        "generated_label": None,  "generated_tool": None,
+        "generated_chapter": None,"generated_subject": None,
+        "generated_topic": None,  "generated_course": None,
+        "generated_stream": None, "generated_board": None,
+        "generated_audience": None,"generated_output_style": None,
+        "answers_result": None, "answers_model": None, "show_answers": False,
+        "fullpaper_result": None,"fullpaper_model": None,"show_fullpaper": False,
         "daily_checkin_done": False,
-        "study_timer_active": False,
-        "study_timer_start": None,
+        "study_timer_active": False,"study_timer_start": None,
         "current_subject_for_timer": "General",
-
-        "review_idx": 0,
-        "review_show_ans": False,
+        "review_idx": 0,"review_show_ans": False,
     }
-
     for k, v in defaults.items():
         if k not in st.session_state:
             st.session_state[k] = v
 
-def reset_generation_state():
-    keys = [
-        "generated_result", "generated_model", "generated_label", "generated_tool",
-        "generated_chapter", "generated_subject", "generated_topic",
-        "generated_course", "generated_stream", "generated_board",
-        "generated_audience", "generated_output_style",
-        "answers_result", "answers_model",
-        "fullpaper_result", "fullpaper_model"
-    ]
-    for k in keys:
-        st.session_state[k] = None
+# ─────────────────────────────────────────────────────────────────────────────
+# NAVIGATION
+# ─────────────────────────────────────────────────────────────────────────────
+def go_to(page: str):
+    st.session_state.active_page = page
+    st.rerun()
 
+def reset_generation_state():
+    for k in ["generated_result","generated_model","generated_label","generated_tool",
+              "generated_chapter","generated_subject","generated_topic","generated_course",
+              "generated_stream","generated_board","generated_audience","generated_output_style",
+              "answers_result","answers_model","fullpaper_result","fullpaper_model"]:
+        st.session_state[k] = None
     st.session_state.show_answers = False
     st.session_state.show_fullpaper = False
 
 # ─────────────────────────────────────────────────────────────────────────────
-# BASIC HELPERS
+# STUDY DATA HELPERS
 # ─────────────────────────────────────────────────────────────────────────────
-def get_courses(category):
-    try:
-        return list(STUDY_DATA[category].keys())
-    except KeyError:
-        return []
+def get_courses(cat):
+    try: return list(STUDY_DATA[cat].keys())
+    except: return []
+def get_streams(cat, course):
+    try: return list(STUDY_DATA[cat][course].keys())
+    except: return []
+def get_subjects(cat, course, stream):
+    try: return list(STUDY_DATA[cat][course][stream].keys())
+    except: return []
+def get_topics(cat, course, stream, subject):
+    try: return list(STUDY_DATA[cat][course][stream][subject].keys())
+    except: return []
+def get_chapters(cat, course, stream, subject, topic):
+    try: return STUDY_DATA[cat][course][stream][subject][topic]
+    except: return ["No chapters found"]
 
-def get_streams(category, course):
-    try:
-        return list(STUDY_DATA[category][course].keys())
-    except KeyError:
-        return []
-
-def get_subjects(category, course, stream):
-    try:
-        return list(STUDY_DATA[category][course][stream].keys())
-    except KeyError:
-        return []
-
-def get_topics(category, course, stream, subject):
-    try:
-        return list(STUDY_DATA[category][course][stream][subject].keys())
-    except KeyError:
-        return []
-
-def get_chapters(category, course, stream, subject, topic):
-    try:
-        return STUDY_DATA[category][course][stream][subject][topic]
-    except KeyError:
-        return ["No chapters found"]
-
-def hash_p(password):
-    return hashlib.sha256(password.encode()).hexdigest()
+# ─────────────────────────────────────────────────────────────────────────────
+# AUTH
+# ─────────────────────────────────────────────────────────────────────────────
+def hash_p(pw): return hashlib.sha256(pw.encode()).hexdigest()
 
 def do_login(username, password):
-    username = username.strip()
-    password = password.strip()
+    u = username.strip()
+    if not u or not password.strip(): return False, "⚠️ Please fill in both fields."
+    conn = sqlite3.connect("users.db"); c = conn.cursor()
+    c.execute("SELECT * FROM users WHERE username=? AND password=?", (u, hash_p(password)))
+    user = c.fetchone(); conn.close()
+    return (True, u) if user else (False, "❌ Invalid username or password.")
 
-    if not username or not password:
-        return False, "⚠️ Please fill in both fields."
-
-    conn = sqlite3.connect("users.db")
-    c = conn.cursor()
-    c.execute(
-        "SELECT * FROM users WHERE username=? AND password=?",
-        (username, hash_p(password))
-    )
-    user = c.fetchone()
-    conn.close()
-
-    if user:
-        return True, username
-    return False, "❌ Invalid username or password."
-
-def add_to_history(label, chapter, subject, result_preview):
-    if "history" not in st.session_state:
-        st.session_state.history = []
-
-    entry = {
-        "time": time.strftime("%H:%M"),
-        "tool": label,
-        "chapter": chapter,
-        "subject": subject,
-        "preview": result_preview[:120] + "..." if len(result_preview) > 120 else result_preview
-    }
+# ─────────────────────────────────────────────────────────────────────────────
+# HISTORY
+# ─────────────────────────────────────────────────────────────────────────────
+def add_to_history(label, chapter, subject, preview):
+    entry = {"time": time.strftime("%H:%M"), "tool": label, "chapter": chapter,
+             "subject": subject, "preview": preview[:110]+"..." if len(preview)>110 else preview}
     st.session_state.history.insert(0, entry)
     st.session_state.history = st.session_state.history[:6]
 
-def get_available_models():
-    api_key = st.secrets.get("GEMINI_API_KEY", "")
-    if not api_key:
-        return ["Error: GEMINI_API_KEY not found"]
-
-    try:
-        genai.configure(api_key=api_key)
-        working = []
-        for m in genai.list_models():
-            name = getattr(m, "name", "")
-            methods = getattr(m, "supported_generation_methods", [])
-            if "gemini" in name.lower() and "generateContent" in methods:
-                working.append(name)
-        return working if working else ["No models available"]
-    except Exception as e:
-        return [f"Error: {str(e)}"]
-
-def get_effective_output_name(tool, output_style):
-    if output_style == "🧪 Question Paper" or tool == "🧪 Question Paper":
-        return "Question Paper"
-
+# ─────────────────────────────────────────────────────────────────────────────
+# LABEL HELPERS
+# ─────────────────────────────────────────────────────────────────────────────
+def get_effective_output_name(tool, style):
+    if style == "🧪 Question Paper" or tool == "🧪 Question Paper": return "Question Paper"
     if tool == "📝 Summary":
-        if output_style == "📋 Notes Format":
-            return "Notes"
-        if output_style == "📄 Detailed":
-            return "Detailed Summary"
-        if output_style == "⚡ Short & Quick":
-            return "Quick Summary"
+        if style == "📋 Notes Format":  return "Notes"
+        if style == "📄 Detailed":      return "Detailed Summary"
+        if style == "⚡ Short & Quick": return "Quick Summary"
         return "Summary"
-
-    if tool == "🧠 Quiz":
-        return "Quiz"
-    if tool == "📌 Revision Notes":
-        return "Revision Notes"
-    if tool == "❓ Exam Q&A":
-        return "Exam Q&A"
-
+    if tool == "🧠 Quiz":           return "Quiz"
+    if tool == "📌 Revision Notes": return "Revision Notes"
+    if tool == "❓ Exam Q&A":       return "Exam Q&A"
     return "Content"
 
-def get_button_label(tool, output_style):
-    name = get_effective_output_name(tool, output_style)
-    icons = {
-        "Question Paper": "🧪",
-        "Notes": "📋",
-        "Detailed Summary": "📄",
-        "Quick Summary": "⚡",
-        "Summary": "📝",
-        "Quiz": "🧠",
-        "Revision Notes": "📌",
-        "Exam Q&A": "❓",
-    }
-    return f"{icons.get(name, '✨')} Generate {name}"
+def get_button_label(tool, style):
+    name = get_effective_output_name(tool, style)
+    icons = {"Question Paper":"🧪","Notes":"📋","Detailed Summary":"📄",
+             "Quick Summary":"⚡","Summary":"📝","Quiz":"🧠","Revision Notes":"📌","Exam Q&A":"❓"}
+    return f"{icons.get(name,'✨')} Generate {name}"
 
 # ─────────────────────────────────────────────────────────────────────────────
-# FLASHCARD HELPERS
+# FLASHCARD DB
 # ─────────────────────────────────────────────────────────────────────────────
 def save_flashcard(username, front, back, subject, chapter):
-    conn = sqlite3.connect("users.db")
-    c = conn.cursor()
+    conn = sqlite3.connect("users.db"); c = conn.cursor()
     today = datetime.date.today().isoformat()
-    c.execute("""
-        INSERT INTO flashcards
-        (username, front_text, back_text, subject, chapter, next_review_date)
-        VALUES (?, ?, ?, ?, ?, ?)
-    """, (username, front, back, subject, chapter, today))
-    conn.commit()
-    conn.close()
+    c.execute("INSERT INTO flashcards (username,front_text,back_text,subject,chapter,next_review_date) VALUES (?,?,?,?,?,?)",
+              (username, front, back, subject, chapter, today))
+    conn.commit(); conn.close()
 
 def get_due_flashcards(username):
-    conn = sqlite3.connect("users.db")
-    c = conn.cursor()
+    conn = sqlite3.connect("users.db"); c = conn.cursor()
     today = datetime.date.today().isoformat()
-    c.execute("""
-        SELECT id, front_text, back_text, subject, chapter, ease_factor, interval_days, review_count
-        FROM flashcards
-        WHERE username=? AND next_review_date <= ?
-        ORDER BY next_review_date ASC
-    """, (username, today))
-    rows = c.fetchall()
-    conn.close()
-    return rows
+    c.execute("SELECT id,front_text,back_text,subject,chapter,ease_factor,interval_days,review_count FROM flashcards WHERE username=? AND next_review_date<=? ORDER BY next_review_date ASC", (username, today))
+    rows = c.fetchall(); conn.close(); return rows
 
 def get_all_flashcards(username):
-    conn = sqlite3.connect("users.db")
-    c = conn.cursor()
-    c.execute("""
-        SELECT id, front_text, back_text, subject, chapter, next_review_date, review_count
-        FROM flashcards
-        WHERE username=?
-        ORDER BY created_date DESC
-    """, (username,))
-    rows = c.fetchall()
-    conn.close()
-    return rows
+    conn = sqlite3.connect("users.db"); c = conn.cursor()
+    c.execute("SELECT id,front_text,back_text,subject,chapter,next_review_date,review_count FROM flashcards WHERE username=? ORDER BY created_date DESC", (username,))
+    rows = c.fetchall(); conn.close(); return rows
 
 def update_flashcard_review(card_id, performance):
-    conn = sqlite3.connect("users.db")
-    c = conn.cursor()
-    c.execute("""
-        SELECT ease_factor, interval_days, review_count
-        FROM flashcards
-        WHERE id=?
-    """, (card_id,))
+    conn = sqlite3.connect("users.db"); c = conn.cursor()
+    c.execute("SELECT ease_factor,interval_days FROM flashcards WHERE id=?", (card_id,))
     row = c.fetchone()
-
-    if not row:
-        conn.close()
-        return
-
-    ef, interval, review_count = row
-
-    if performance == 1:
-        interval = 1
-        ef = max(1.3, ef - 0.2)
-    elif performance == 2:
-        interval = max(1, int(interval * 1.2))
-        ef = max(1.3, ef - 0.1)
-    elif performance == 3:
-        interval = max(1, int(interval * ef))
-    elif performance == 4:
-        interval = max(1, int(interval * ef * 1.3))
-        ef = ef + 0.1
-
-    next_review = (datetime.date.today() + datetime.timedelta(days=interval)).isoformat()
-
-    c.execute("""
-        UPDATE flashcards
-        SET ease_factor=?, interval_days=?, next_review_date=?, review_count=review_count+1
-        WHERE id=?
-    """, (round(ef, 2), interval, next_review, card_id))
-    conn.commit()
-    conn.close()
+    if not row: conn.close(); return
+    ef, interval = row
+    if   performance == 1: interval=1;                        ef=max(1.3,ef-0.2)
+    elif performance == 2: interval=max(1,int(interval*1.2)); ef=max(1.3,ef-0.1)
+    elif performance == 3: interval=max(1,int(interval*ef))
+    elif performance == 4: interval=max(1,int(interval*ef*1.3)); ef+=0.1
+    nrd=(datetime.date.today()+datetime.timedelta(days=interval)).isoformat()
+    c.execute("UPDATE flashcards SET ease_factor=?,interval_days=?,next_review_date=?,review_count=review_count+1 WHERE id=?", (round(ef,2),interval,nrd,card_id))
+    conn.commit(); conn.close()
 
 def delete_flashcard(card_id):
-    conn = sqlite3.connect("users.db")
-    c = conn.cursor()
-    c.execute("DELETE FROM flashcards WHERE id=?", (card_id,))
-    conn.commit()
-    conn.close()
+    conn=sqlite3.connect("users.db"); c=conn.cursor()
+    c.execute("DELETE FROM flashcards WHERE id=?",(card_id,))
+    conn.commit(); conn.close()
 
 def get_earned_badges(username):
-    conn = sqlite3.connect("users.db")
-    c = conn.cursor()
-    c.execute("SELECT badge_id FROM achievements WHERE username=?", (username,))
-    rows = {r[0] for r in c.fetchall()}
-    conn.close()
-    return rows
-# ─────────────────────────────────────────────────────────────────────────────
-# BADGES
-# ─────────────────────────────────────────────────────────────────────────────
+    conn=sqlite3.connect("users.db"); c=conn.cursor()
+    c.execute("SELECT badge_id FROM achievements WHERE username=?",(username,))
+    ids={r[0] for r in c.fetchall()}; conn.close(); return ids
+
 ALL_BADGES = [
-    {"id": "first_login", "name": "First Step", "icon": "👣", "desc": "Logged in for the first time"},
-    {"id": "streak_3", "name": "Heatwave", "icon": "🔥", "desc": "Reached a 3-day streak"},
-    {"id": "streak_7", "name": "Weekly Warrior", "icon": "🎖️", "desc": "Reached a 7-day streak"},
-    {"id": "streak_14", "name": "Fortnight Champ", "icon": "🏆", "desc": "Reached a 14-day streak"},
-    {"id": "streak_30", "name": "Monthly Master", "icon": "👑", "desc": "Reached a 30-day streak"},
-    {"id": "first_gen", "name": "Starter Spark", "icon": "✨", "desc": "Generated first AI content"},
-    {"id": "qp_generated", "name": "Paper Setter", "icon": "📝", "desc": "Generated a question paper"},
-    {"id": "quiz_done", "name": "Quiz Taker", "icon": "🧠", "desc": "Generated a quiz"},
+    {"id":"first_login",  "name":"First Step",     "icon":"👣","desc":"Logged in for the first time"},
+    {"id":"streak_3",     "name":"Heatwave",        "icon":"🔥","desc":"3-day study streak"},
+    {"id":"streak_7",     "name":"Weekly Warrior",  "icon":"🎖️","desc":"7-day study streak"},
+    {"id":"streak_14",    "name":"Fortnight Champ", "icon":"🏆","desc":"14-day study streak"},
+    {"id":"streak_30",    "name":"Monthly Master",  "icon":"👑","desc":"30-day study streak"},
+    {"id":"first_gen",    "name":"Starter Spark",   "icon":"✨","desc":"Generated first AI content"},
+    {"id":"qp_generated", "name":"Paper Setter",    "icon":"📝","desc":"Generated a question paper"},
+    {"id":"quiz_done",    "name":"Quiz Taker",       "icon":"🧠","desc":"Generated a quiz"},
 ]
 
+def get_available_models():
+    api_key = st.secrets.get("GEMINI_API_KEY","")
+    if not api_key: return ["Error: GEMINI_API_KEY not found"]
+    try:
+        genai.configure(api_key=api_key)
+        return [m.name for m in genai.list_models()
+                if "gemini" in m.name.lower()
+                and "generateContent" in getattr(m,"supported_generation_methods",[])]
+    except Exception as e: return [f"Error: {e}"]
+
 # ─────────────────────────────────────────────────────────────────────────────
-# QUESTION PAPER FORMAT
+# QP FORMAT
 # ─────────────────────────────────────────────────────────────────────────────
 def get_qp_format_spec(board, course, subject):
     b = board.upper()
-
     if "CBSE" in b:
-        if any(x in course for x in ["10", "X", "Class 10"]):
-            return {
-                "board_label": "CENTRAL BOARD OF SECONDARY EDUCATION",
-                "exam_label": "BOARD EXAMINATION",
-                "class_label": "CLASS X",
-                "total_marks": 80,
-                "time": "3 Hours",
-                "instructions": [
-                    "This paper contains Sections A, B, C, D and E.",
-                    "All questions are compulsory.",
-                    "Section A — MCQ (1 mark each).",
-                    "Section B — Very Short Answer (2 marks each).",
-                    "Section C — Short Answer (3 marks each).",
-                    "Section D — Long Answer (5 marks each).",
-                    "Section E — Case / Source Based (4 marks each)."
-                ],
-                "sections": [
-                    {"name": "SECTION A", "type": "MCQ / Objective", "q_count": 20, "marks_each": 1, "total": 20},
-                    {"name": "SECTION B", "type": "Very Short Answer", "q_count": 5, "marks_each": 2, "total": 10},
-                    {"name": "SECTION C", "type": "Short Answer", "q_count": 6, "marks_each": 3, "total": 18},
-                    {"name": "SECTION D", "type": "Long Answer", "q_count": 4, "marks_each": 5, "total": 20},
-                    {"name": "SECTION E", "type": "Case Based", "q_count": 3, "marks_each": 4, "total": 12},
-                ]
-            }
-
-        if any(x in course for x in ["12", "XII", "Class 12"]):
-            return {
-                "board_label": "CENTRAL BOARD OF SECONDARY EDUCATION",
-                "exam_label": "BOARD EXAMINATION",
-                "class_label": "CLASS XII",
-                "total_marks": 70,
-                "time": "3 Hours",
-                "instructions": [
-                    "This paper contains Sections A, B, C, D and E.",
-                    "All questions are compulsory.",
-                    "Section A — MCQ (1 mark each).",
-                    "Section B — Very Short Answer (2 marks each).",
-                    "Section C — Short Answer (3 marks each).",
-                    "Section D — Long Answer (5 marks each).",
-                    "Section E — Case / Source Based (4 marks each)."
-                ],
-                "sections": [
-                    {"name": "SECTION A", "type": "MCQ / Objective", "q_count": 18, "marks_each": 1, "total": 18},
-                    {"name": "SECTION B", "type": "Very Short Answer", "q_count": 4, "marks_each": 2, "total": 8},
-                    {"name": "SECTION C", "type": "Short Answer", "q_count": 5, "marks_each": 3, "total": 15},
-                    {"name": "SECTION D", "type": "Long Answer", "q_count": 2, "marks_each": 5, "total": 10},
-                    {"name": "SECTION E", "type": "Case Based", "q_count": 3, "marks_each": 4, "total": 12},
-                ]
-            }
-
+        if any(x in course for x in ["10","X","Class 10"]):
+            return {"board_label":"CENTRAL BOARD OF SECONDARY EDUCATION","exam_label":"BOARD EXAMINATION","class_label":"CLASS X","total_marks":80,"time":"3 Hours",
+                "instructions":["This paper contains Sections A, B, C, D and E.","All questions are compulsory.","Section A — MCQ (1 mark each).","Section B — Very Short Answer (2 marks each).","Section C — Short Answer (3 marks each).","Section D — Long Answer (5 marks each).","Section E — Case / Source Based (4 marks each)."],
+                "sections":[{"name":"SECTION A","type":"MCQ","q_count":20,"marks_each":1,"total":20},{"name":"SECTION B","type":"Very Short Answer","q_count":5,"marks_each":2,"total":10},{"name":"SECTION C","type":"Short Answer","q_count":6,"marks_each":3,"total":18},{"name":"SECTION D","type":"Long Answer","q_count":4,"marks_each":5,"total":20},{"name":"SECTION E","type":"Case Based","q_count":3,"marks_each":4,"total":12}]}
+        if any(x in course for x in ["12","XII","Class 12"]):
+            return {"board_label":"CENTRAL BOARD OF SECONDARY EDUCATION","exam_label":"BOARD EXAMINATION","class_label":"CLASS XII","total_marks":70,"time":"3 Hours",
+                "instructions":["This paper contains Sections A, B, C, D and E.","All questions are compulsory.","Section A — MCQ (1 mark each).","Section B — Very Short Answer (2 marks each).","Section C — Short Answer (3 marks each).","Section D — Long Answer (5 marks each).","Section E — Case / Source Based (4 marks each)."],
+                "sections":[{"name":"SECTION A","type":"MCQ","q_count":18,"marks_each":1,"total":18},{"name":"SECTION B","type":"Very Short Answer","q_count":4,"marks_each":2,"total":8},{"name":"SECTION C","type":"Short Answer","q_count":5,"marks_each":3,"total":15},{"name":"SECTION D","type":"Long Answer","q_count":2,"marks_each":5,"total":10},{"name":"SECTION E","type":"Case Based","q_count":3,"marks_each":4,"total":12}]}
     if "ICSE" in b:
-        return {
-            "board_label": "COUNCIL FOR THE INDIAN SCHOOL CERTIFICATE EXAMINATIONS",
-            "exam_label": "ICSE EXAMINATION",
-            "class_label": course.upper(),
-            "total_marks": 80,
-            "time": "2 Hours",
-            "instructions": [
-                "Attempt all from Section A.",
-                "Attempt any four from Section B.",
-                "Marks in brackets indicate marks."
-            ],
-            "sections": [
-                {"name": "SECTION A", "type": "Compulsory", "q_count": 10, "marks_each": "varied", "total": 40},
-                {"name": "SECTION B", "type": "Descriptive", "q_count": 6, "marks_each": 10, "total": 40},
-            ]
-        }
-
-    return {
-        "board_label": "UNIVERSITY EXAMINATIONS",
-        "exam_label": f"{course.upper()} EXAMINATION",
-        "class_label": course.upper(),
-        "total_marks": 100,
-        "time": "3 Hours",
-        "instructions": [
-            "Answer all in Section A.",
-            "Answer any five from Section B.",
-            "Figures in brackets indicate marks."
-        ],
-        "sections": [
-            {"name": "SECTION A", "type": "Short Answer", "q_count": 10, "marks_each": 2, "total": 20},
-            {"name": "SECTION B", "type": "Medium Answer", "q_count": 8, "marks_each": 5, "total": 40},
-            {"name": "SECTION C", "type": "Long Answer", "q_count": 4, "marks_each": 10, "total": 40},
-        ]
-    }
+        return {"board_label":"COUNCIL FOR THE INDIAN SCHOOL CERTIFICATE EXAMINATIONS","exam_label":"ICSE EXAMINATION","class_label":course.upper(),"total_marks":80,"time":"2 Hours",
+            "instructions":["Attempt all from Section A.","Attempt any four from Section B.","Marks in brackets."],
+            "sections":[{"name":"SECTION A","type":"Compulsory","q_count":10,"marks_each":"varied","total":40},{"name":"SECTION B","type":"Descriptive","q_count":6,"marks_each":10,"total":40}]}
+    return {"board_label":"UNIVERSITY EXAMINATIONS","exam_label":f"{course.upper()} EXAMINATION","class_label":course.upper(),"total_marks":100,"time":"3 Hours",
+        "instructions":["Answer all in Section A.","Answer any five from Section B.","Marks in brackets."],
+        "sections":[{"name":"SECTION A","type":"Short Answer","q_count":10,"marks_each":2,"total":20},{"name":"SECTION B","type":"Medium Answer","q_count":8,"marks_each":5,"total":40},{"name":"SECTION C","type":"Long Answer","q_count":4,"marks_each":10,"total":40}]}
 
 # ─────────────────────────────────────────────────────────────────────────────
 # PROMPTS
 # ─────────────────────────────────────────────────────────────────────────────
-def build_question_paper_prompt(board, course, subject, chapter, topic, audience):
-    fmt = get_qp_format_spec(board, course, subject)
-    instr = "\n".join([f"{i+1}. {x}" for i, x in enumerate(fmt["instructions"])])
-    secs = "\n".join([
-        f"- {s['name']} | {s['type']} | {s['q_count']} questions | {s['marks_each']} marks each | Total {s['total']}"
-        for s in fmt["sections"]
-    ])
+def build_qp_prompt(board, course, subject, chapter, topic, audience):
+    fmt=get_qp_format_spec(board,course,subject)
+    instr="\n".join([f"{i+1}. {x}" for i,x in enumerate(fmt["instructions"])])
+    secs="\n".join([f"- {s['name']} | {s['type']} | {s['q_count']} Qs | {s['marks_each']} marks each | Total {s['total']}" for s in fmt["sections"]])
+    return f"""You are an official academic question paper setter.
+BOARD: {fmt['board_label']} | EXAM: {fmt['exam_label']} | CLASS: {fmt['class_label']}
+SUBJECT: {subject} | TOPIC: {topic} | CHAPTER: {chapter}
+TIME: {fmt['time']} | MARKS: {fmt['total_marks']}
+INSTRUCTIONS:\n{instr}\nSTRUCTURE:\n{secs}
+RULES: Follow structure exactly. Number all questions. MCQs: 4 options (a)(b)(c)(d). Show marks [X]. No answers.
+Generate the complete paper now."""
 
-    return f"""
-You are an official academic question paper setter.
+def build_full_qp_prompt(board, course, stream, subject, audience):
+    fmt=get_qp_format_spec(board,course,subject)
+    instr="\n".join([f"{i+1}. {x}" for i,x in enumerate(fmt["instructions"])])
+    secs="\n".join([f"- {s['name']} | {s['type']} | {s['q_count']} Qs | {s['marks_each']} marks each | Total {s['total']}" for s in fmt["sections"]])
+    return f"""You are an official academic question paper setter.
+Generate a FULL SUBJECT paper (entire syllabus).
+BOARD: {fmt['board_label']} | STREAM: {stream} | SUBJECT: {subject}
+TIME: {fmt['time']} | MARKS: {fmt['total_marks']}
+INSTRUCTIONS:\n{instr}\nSTRUCTURE:\n{secs}
+RULES: Cover full syllabus. No answers. Official academic format.
+Generate the complete paper now."""
 
-Generate a CHAPTER-LEVEL question paper.
+def build_answers_prompt(qp_text, board, course, subject, chapter):
+    return f"""Prepare the official answer key.
+BOARD: {board} | COURSE: {course} | SUBJECT: {subject} | CHAPTER: {chapter}
+Keep same section names and numbering. MCQs: answer + brief explanation.
+PAPER:\n{qp_text}\nGenerate answer key now."""
 
-BOARD: {fmt['board_label']}
-EXAM: {fmt['exam_label']}
-CLASS / COURSE: {fmt['class_label']}
-SUBJECT: {subject}
-TOPIC: {topic}
-CHAPTER: {chapter}
-TIME: {fmt['time']}
-MAXIMUM MARKS: {fmt['total_marks']}
-
-INSTRUCTIONS:
-{instr}
-
-STRUCTURE:
-{secs}
-
-RULES:
-1. Follow the structure exactly.
-2. Number all questions clearly.
-3. MCQs must have (a), (b), (c), (d).
-4. Show marks in square brackets.
-5. Do not include answers.
-6. Cover the chapter comprehensively.
-
-Generate the complete paper now.
-"""
-
-def build_full_subject_qp_prompt(board, course, stream, subject, audience):
-    fmt = get_qp_format_spec(board, course, subject)
-    instr = "\n".join([f"{i+1}. {x}" for i, x in enumerate(fmt["instructions"])])
-    secs = "\n".join([
-        f"- {s['name']} | {s['type']} | {s['q_count']} questions | {s['marks_each']} marks each | Total {s['total']}"
-        for s in fmt["sections"]
-    ])
-
-    return f"""
-You are an official academic question paper setter.
-
-Generate a FULL SUBJECT question paper for the complete syllabus.
-
-BOARD: {fmt['board_label']}
-EXAM: {fmt['exam_label']}
-CLASS / COURSE: {fmt['class_label']}
-STREAM: {stream}
-SUBJECT: {subject}
-TIME: {fmt['time']}
-MAXIMUM MARKS: {fmt['total_marks']}
-
-INSTRUCTIONS:
-{instr}
-
-STRUCTURE:
-{secs}
-
-RULES:
-1. Cover the full syllabus.
-2. Follow official academic format.
-3. MCQs must have four options.
-4. Do not include answers or hints.
-
-Generate the complete full subject paper now.
-"""
-
-def build_answers_prompt(question_paper_text, board, course, subject, chapter):
-    return f"""
-You are preparing the official answer key for the exact paper below.
-
-BOARD: {board}
-COURSE: {course}
-SUBJECT: {subject}
-CHAPTER: {chapter}
-
-RULES:
-1. Answer only the questions from this paper.
-2. Keep exact section names and question numbering.
-3. MCQs: correct answer plus short explanation.
-4. Short answers: concise and correct.
-5. Long answers: clear, complete and exam-oriented.
-
-QUESTION PAPER:
-{question_paper_text}
-
-Generate the answer key now.
-"""
-
-def build_prompt(tool, chapter, topic, subject, audience, output_style, board="", course=""):
-    if output_style == "🧪 Question Paper" or tool == "🧪 Question Paper":
-        return build_question_paper_prompt(board, course, subject, chapter, topic, audience)
-
-    base = f"""
-You are an expert educator creating study material for {audience}.
-Subject: {subject}
-Topic: {topic}
-Chapter: {chapter}
-
-Make it accurate, exam-oriented, structured and easy to revise.
-"""
-
+def build_prompt(tool, chapter, topic, subject, audience, style, board="", course=""):
+    if style == "🧪 Question Paper" or tool == "🧪 Question Paper":
+        return build_qp_prompt(board,course,subject,chapter,topic,audience)
+    base=(f"You are an expert educator for {audience}.\n"
+          f"Subject: {subject} | Topic: {topic} | Chapter: {chapter}\n"
+          f"Make it accurate, exam-oriented and well-structured.\n\n")
     if tool == "📝 Summary":
-        if output_style == "📄 Detailed":
-            return base + """
-Create a detailed summary with:
-- chapter overview
-- key concepts
-- definitions
-- formulas
-- 2 examples
-- common mistakes
-- exam tips
-"""
-        elif output_style == "⚡ Short & Quick":
-            return base + """
-Create a quick revision summary with:
-- one-line definition
-- 5 to 7 key points
-- important formulas or facts
-- quick exam revision tips
-"""
-        elif output_style == "📋 Notes Format":
-            return base + """
-Create structured notes with clear headings, bullets, definitions, examples, and revision points.
-"""
-
-    if tool == "🧠 Quiz":
-        return base + """
-Create:
-- 5 MCQs with 4 options and answers
-- 5 short-answer questions with answers
-- 3 long-answer questions with answers
-"""
-
-    if tool == "📌 Revision Notes":
-        return base + """
-Create revision notes with:
-- top 10 must-know points
-- formula / fact sheet
-- memory tricks
-- important comparisons
-- exam focus areas
-"""
-
-    if tool == "❓ Exam Q&A":
-        return base + """
-Create an exam Q&A bank with:
-- 8 to 10 frequently asked questions with answers
-- conceptual questions
-- application questions
-- why/how questions
-"""
-
-    return base + "Create complete study material."
+        if style == "📄 Detailed":      return base+"Create a detailed summary: overview, key concepts, definitions, formulas, 2 examples, common mistakes, exam tips."
+        if style == "⚡ Short & Quick": return base+"Create a quick-reference summary: one-line definition, 5-7 key points, formulas, quick tips. Max 500 words."
+        if style == "📋 Notes Format":  return base+"Create structured notes: clear headings, bullets, definitions, examples, revision points."
+    if tool == "🧠 Quiz":           return base+"Create: 5 MCQs (4 options each, mark answer), 5 short-answer Q&As, 3 long-answer Q&As."
+    if tool == "📌 Revision Notes": return base+"Create revision notes: top 10 must-know points, formula sheet, mnemonics, comparisons, exam focus areas."
+    if tool == "❓ Exam Q&A":       return base+"Create exam Q&A bank: 8-10 frequently asked Qs with answers, conceptual Qs, application Qs."
+    return base+"Create complete exam-ready study material."
 
 def build_flashcard_prompt(subject, chapter, topic):
-    return f"""
-You are an expert educator.
-
-Create exactly 10 flashcards for:
-Subject: {subject}
-Chapter: {chapter}
-Topic: {topic}
-
-Strict format:
-
-CARD 1
-FRONT: ...
-BACK: ...
-
-CARD 2
-FRONT: ...
-BACK: ...
-
-Continue exactly for 10 cards.
-No extra commentary.
-"""
+    return f"""Create exactly 10 study flashcards.
+Subject: {subject} | Chapter: {chapter} | Topic: {topic}
+Use EXACTLY this format:
+CARD 1\nFRONT: [question or term]\nBACK: [answer or definition]
+CARD 2\nFRONT: ...\nBACK: ...
+(Continue for all 10. No extra text.)"""
 
 # ─────────────────────────────────────────────────────────────────────────────
-# AI GENERATION
+# AI ENGINE
 # ─────────────────────────────────────────────────────────────────────────────
 def generate_with_fallback(prompt):
-    api_key = st.secrets.get("GEMINI_API_KEY", "")
-    if not api_key:
-        return ("⚠️ API key missing! Add GEMINI_API_KEY in secrets.", "None")
-
+    api_key=st.secrets.get("GEMINI_API_KEY","")
+    if not api_key: return ("⚠️ API key missing.","None")
+    try: genai.configure(api_key=api_key)
+    except Exception as e: return (f"❌ Config failed: {e}","None")
     try:
-        genai.configure(api_key=api_key)
-    except Exception as e:
-        return (f"❌ Gemini configuration failed: {str(e)}", "None")
-
-    available = []
-    try:
-        for m in genai.list_models():
-            name = getattr(m, "name", "")
-            methods = getattr(m, "supported_generation_methods", [])
-            if "gemini" in name.lower() and "generateContent" in methods:
-                available.append(name)
-    except Exception as e:
-        return (f"❌ Could not list models: {str(e)}", "None")
-
-    if not available:
-        return ("❌ No Gemini models available.", "None")
-
-    last_error = ""
+        available=[m.name for m in genai.list_models()
+                   if "gemini" in m.name.lower()
+                   and "generateContent" in getattr(m,"supported_generation_methods",[])]
+    except Exception as e: return (f"❌ Could not list models: {e}","None")
+    if not available: return ("❌ No Gemini models available.","None")
     for model_name in available:
         try:
-            model = genai.GenerativeModel(model_name)
-            response = model.generate_content(
-                prompt,
-                generation_config=genai.types.GenerationConfig(
-                    temperature=0.0,
-                    max_output_tokens=8192,
-                    top_p=0.9
-                )
-            )
-            if response and getattr(response, "text", None):
+            model=genai.GenerativeModel(model_name)
+            response=model.generate_content(prompt,
+                generation_config=genai.types.GenerationConfig(temperature=0.0,max_output_tokens=8192,top_p=0.9))
+            if response and getattr(response,"text",None):
                 return response.text, model_name
-        except Exception as e:
-            last_error = str(e)
-            continue
-
-    return (f"❌ All models failed. Last error: {last_error}", "None")
+        except Exception: continue
+    return ("❌ All models failed.","None")
 
 def parse_flashcards(raw_text):
-    cards = []
-    blocks = raw_text.split("CARD ")
+    cards=[]; blocks=raw_text.strip().split("CARD ")
     for block in blocks:
-        block = block.strip()
-        if not block:
-            continue
-
-        front = ""
-        back = ""
-
+        if not block.strip(): continue
+        front=back=""
         for line in block.splitlines():
-            line = line.strip()
-            if line.upper().startswith("FRONT:"):
-                front = line[6:].strip()
-            elif line.upper().startswith("BACK:"):
-                back = line[5:].strip()
-
-        if front and back:
-            cards.append({"front": front, "back": back})
-
+            l=line.strip()
+            if l.upper().startswith("FRONT:"): front=l[6:].strip()
+            elif l.upper().startswith("BACK:"): back=l[5:].strip()
+        if front and back: cards.append({"front":front,"back":back})
     return cards
 
 # ─────────────────────────────────────────────────────────────────────────────
-# PDF
+# PDF GENERATOR
 # ─────────────────────────────────────────────────────────────────────────────
 def generate_pdf(title, subtitle, content, color_hex="#1d4ed8"):
-    buffer = io.BytesIO()
-    doc = SimpleDocTemplate(
-        buffer,
-        pagesize=A4,
-        topMargin=2*cm,
-        bottomMargin=2*cm,
-        leftMargin=1.5*cm,
-        rightMargin=1.5*cm
-    )
-
-    styles = getSampleStyleSheet()
-    story = []
-
-    story.append(Paragraph(
-        title,
-        ParagraphStyle(
-            "T",
-            parent=styles["Heading1"],
-            fontSize=20,
-            textColor=colors.HexColor(color_hex),
-            alignment=TA_CENTER,
-            spaceAfter=6,
-            fontName="Helvetica-Bold"
-        )
-    ))
-    story.append(Paragraph(
-        subtitle,
-        ParagraphStyle(
-            "S",
-            parent=styles["Normal"],
-            fontSize=10,
-            textColor=colors.HexColor("#64748b"),
-            alignment=TA_CENTER,
-            spaceAfter=10
-        )
-    ))
-    story.append(HRFlowable(width="100%", thickness=2, color=colors.HexColor(color_hex), spaceAfter=14))
-
-    body = ParagraphStyle(
-        "B",
-        parent=styles["Normal"],
-        fontSize=10.5,
-        leading=15,
-        textColor=colors.HexColor("#1e293b"),
-        spaceAfter=5
-    )
-    heading = ParagraphStyle(
-        "H",
-        parent=styles["Heading2"],
-        fontSize=12.5,
-        textColor=colors.HexColor(color_hex),
-        spaceBefore=10,
-        spaceAfter=6,
-        fontName="Helvetica-Bold"
-    )
-
+    buffer=io.BytesIO()
+    doc=SimpleDocTemplate(buffer,pagesize=A4,topMargin=2*cm,bottomMargin=2*cm,leftMargin=1.5*cm,rightMargin=1.5*cm)
+    styles=getSampleStyleSheet(); story=[]
+    story.append(Paragraph(title,ParagraphStyle("T",parent=styles["Heading1"],fontSize=20,textColor=colors.HexColor(color_hex),alignment=TA_CENTER,spaceAfter=6,fontName="Helvetica-Bold")))
+    story.append(Paragraph(subtitle,ParagraphStyle("S",parent=styles["Normal"],fontSize=10,textColor=colors.HexColor("#64748b"),alignment=TA_CENTER,spaceAfter=10)))
+    story.append(HRFlowable(width="100%",thickness=2,color=colors.HexColor(color_hex),spaceAfter=14))
+    body=ParagraphStyle("B",parent=styles["Normal"],fontSize=10.5,leading=15,textColor=colors.HexColor("#1e293b"),spaceAfter=5)
+    head=ParagraphStyle("H",parent=styles["Heading2"],fontSize=12.5,textColor=colors.HexColor(color_hex),spaceBefore=10,spaceAfter=6,fontName="Helvetica-Bold")
     for line in content.split("\n"):
-        line = line.strip()
-        if not line:
-            story.append(Spacer(1, 0.15*cm))
-            continue
-
-        safe = line.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
-        if line.startswith(("###", "##", "#")):
-            story.append(Paragraph(line.lstrip("#").strip(), heading))
-        else:
-            story.append(Paragraph(safe, body))
-
-    story.append(Spacer(1, 0.3*cm))
-    story.append(HRFlowable(width="100%", thickness=1, color=colors.HexColor("#e2e8f0"), spaceAfter=5))
-    story.append(Paragraph(
-        f"<i>Generated by StudySmart AI | {time.strftime('%Y-%m-%d %H:%M')}</i>",
-        ParagraphStyle(
-            "F",
-            parent=styles["Normal"],
-            fontSize=8,
-            textColor=colors.HexColor("#94a3b8"),
-            alignment=TA_CENTER
-        )
-    ))
-
-    doc.build(story)
-    buffer.seek(0)
-    return buffer
+        line=line.strip()
+        if not line: story.append(Spacer(1,0.15*cm)); continue
+        safe=line.replace("&","&amp;").replace("<","&lt;").replace(">","&gt;")
+        if line.startswith(("#","##","###")): story.append(Paragraph(line.lstrip("#").strip(),head))
+        else: story.append(Paragraph(safe,body))
+    story.append(Spacer(1,0.3*cm))
+    story.append(HRFlowable(width="100%",thickness=1,color=colors.HexColor("#e2e8f0"),spaceAfter=5))
+    story.append(Paragraph(f"<i>Generated by StudySmart AI | {time.strftime('%Y-%m-%d %H:%M')}</i>",
+        ParagraphStyle("F",parent=styles["Normal"],fontSize=8,textColor=colors.HexColor("#94a3b8"),alignment=TA_CENTER)))
+    doc.build(story); buffer.seek(0); return buffer
 
 # ─────────────────────────────────────────────────────────────────────────────
-# UI UTILITIES
+# HEADER
 # ─────────────────────────────────────────────────────────────────────────────
-def render_top_header(title="StudySmart", subtitle="Your Smart Exam Preparation Platform", show_powered=True):
-    watermark_html = '<div class="sf-watermark">POWERED BY AI</div>' if show_powered else ''
+def render_header(title, subtitle):
     st.markdown(f"""
         <div class="sf-hero">
             <div class="sf-hero-title">{title}</div>
-            <div class="sf-hero-subtitle">{subtitle}</div>
-            {watermark_html}
+            <div class="sf-hero-sub">{subtitle}</div>
+            <div class="sf-powered">✦ POWERED BY AI ✦</div>
         </div>
     """, unsafe_allow_html=True)
-def show_dashboard(username):
+    st.markdown("<div style='height:8px'></div>", unsafe_allow_html=True)
+
+# ─────────────────────────────────────────────────────────────────────────────
+# BACK BUTTON
+# ─────────────────────────────────────────────────────────────────────────────
+def render_back_button():
+    col_btn, _ = st.columns([1, 3])
+    with col_btn:
+        if st.button("← Back to Dashboard", key="back_to_dash", use_container_width=True):
+            go_to("dashboard")
+    st.markdown("<div style='height:4px'></div>", unsafe_allow_html=True)
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SIDEBAR
+# ─────────────────────────────────────────────────────────────────────────────
+def render_sidebar(username):
     stats = get_user_stats(username) or {}
-
-    render_top_header(
-        title="StudySmart",
-        subtitle="Your Daily Learning Companion"
-    )
-
-    st.markdown("""
-        <div class="sf-chip-row">
-            <div class="sf-chip">🔥 Daily streak motivation</div>
-            <div class="sf-chip">📚 Revision made smarter</div>
-            <div class="sf-chip">🧠 AI-powered study flow</div>
-            <div class="sf-chip">📱 Mobile friendly experience</div>
-        </div>
-    """, unsafe_allow_html=True)
-
-    st.markdown("<div style='height:16px;'></div>", unsafe_allow_html=True)
-
-    c1, c2, c3, c4 = st.columns(4)
-    cards = [
-        (c1, "metric-blue", "🔥", stats.get("streak_days", 0), "Current Streak"),
-        (c2, "metric-green", "⭐", f"Level {stats.get('level', 1)}", "Progress Level"),
-        (c3, "metric-purple", "📚", stats.get("flashcards_due", 0), "Cards Due Today"),
-        (c4, "metric-amber", "⏱️", f"{stats.get('weekly_study_minutes', 0)} min", "Weekly Study"),
-    ]
-
-    for col, klass, icon, value, label in cards:
-        with col:
-            st.markdown(f"""
-                <div class="metric-card {klass}">
-                    <div class="metric-icon">{icon}</div>
-                    <div class="metric-value">{value}</div>
-                    <div class="metric-label">{label}</div>
-                </div>
-            """, unsafe_allow_html=True)
-
-    st.markdown("<div style='height:14px;'></div>", unsafe_allow_html=True)
-
-    st.markdown('<div class="sf-card">', unsafe_allow_html=True)
-    st.markdown('<div class="sf-section-title">⭐ XP Progress</div>', unsafe_allow_html=True)
-
-    total_xp = stats.get("total_xp", 0)
-    level = stats.get("level", 1)
-    level_progress = stats.get("level_progress", 0)
-    next_level_xp = stats.get("next_level_xp", 1000)
-
-    progress_pct = 0 if next_level_xp == 0 else min(100, int((level_progress / 1000) * 100))
-
-    st.markdown(f"""
-        <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:0.88rem;font-weight:600;">
-            <span>Level {level}</span>
-            <span>{total_xp} XP</span>
-        </div>
-        <div class="sf-progress-wrap">
-            <div class="sf-progress-fill" style="width:{progress_pct}%;"></div>
-        </div>
-        <div style="margin-top:6px;color:#64748b;font-size:0.82rem;">
-            Keep studying daily to unlock more levels and badges.
-        </div>
-    """, unsafe_allow_html=True)
-    st.markdown('</div>', unsafe_allow_html=True)
-
-    left, right = st.columns([1.15, 1])
-
-    with left:
-        st.markdown('<div class="sf-card">', unsafe_allow_html=True)
-        st.markdown('<div class="sf-section-title">🌱 Study Momentum</div>', unsafe_allow_html=True)
-
-        total_minutes = stats.get("total_study_minutes", 0)
-        growth = min(100, total_minutes // 10)
-
-        if growth < 20:
-            plant = "🌱 Seedling"
-        elif growth < 40:
-            plant = "🌿 Sprout"
-        elif growth < 70:
-            plant = "🪴 Growing Plant"
-        elif growth < 90:
-            plant = "🌳 Strong Tree"
-        else:
-            plant = "🌲 Master Tree"
-
+    with st.sidebar:
         st.markdown(f"""
-            <div class="sf-soft-card" style="text-align:center;">
-                <div style="font-size:3.5rem;">{plant.split()[0]}</div>
-                <div style="font-size:1rem;font-weight:800;color:#0f172a;">{plant}</div>
-                <div style="margin-top:6px;color:#64748b;font-size:0.86rem;">
-                    Your plant grows with every productive study session.
-                </div>
-                <div style="margin-top:10px;color:#1e293b;font-weight:700;">
-                    Total Study Time: {total_minutes} minutes
-                </div>
+            <div style="text-align:center;padding:12px 0 10px 0;">
+                <div style="font-size:2rem;">🎓</div>
+                <div style="font-size:1.02rem;font-weight:800;color:#2563eb;">StudySmart AI</div>
+                <div style="font-size:.77rem;margin-top:3px;">Hi, {username} 👋</div>
             </div>
         """, unsafe_allow_html=True)
+
+        c1,c2=st.columns(2)
+        with c1:
+            st.markdown(f"""<div style="text-align:center;padding:7px 3px;
+                background:linear-gradient(135deg,#ff6b6b,#feca57);
+                border-radius:10px;color:white;font-weight:800;font-size:.85rem;">
+                🔥 {stats.get('streak_days',0)}<br>
+                <span style="font-size:.62rem;font-weight:500;color:white;">day streak</span>
+            </div>""", unsafe_allow_html=True)
+        with c2:
+            st.markdown(f"""<div style="text-align:center;padding:7px 3px;
+                background:linear-gradient(135deg,#8b5cf6,#7c3aed);
+                border-radius:10px;color:white;font-weight:800;font-size:.85rem;">
+                ⭐ Lv {stats.get('level',1)}<br>
+                <span style="font-size:.62rem;font-weight:500;color:white;">{stats.get('total_xp',0)} XP</span>
+            </div>""", unsafe_allow_html=True)
+
+        st.markdown("<div style='height:8px'></div>", unsafe_allow_html=True)
+        if not st.session_state.daily_checkin_done:
+            if st.button("✅ Daily Check-in (+20 XP)", use_container_width=True, key="sb_checkin"):
+                result=check_daily_login(username)
+                st.session_state.daily_checkin_done=True
+                st.success(result.get("message","Checked in!"))
+        else:
+            st.success(f"✅ Checked in · 🔥 {stats.get('streak_days',0)} days")
+
+        st.divider()
+        st.markdown("**⏱️ Study Timer**")
+        if st.session_state.study_timer_active and st.session_state.study_timer_start:
+            elapsed=int((datetime.datetime.now()-st.session_state.study_timer_start).total_seconds()//60)
+            st.info(f"🟢 Running: {elapsed} min")
+            if st.button("⏹️ Stop & Save", use_container_width=True, key="sb_stop"):
+                st.session_state.study_timer_active=False
+                dur=max(1,elapsed)
+                subj=st.session_state.get("current_subject_for_timer","General")
+                record_study_session(username,subj,"study",dur)
+                award_xp(username,max(5,(dur//10)*10))
+                st.session_state.study_timer_start=None
+                st.success(f"✅ {dur} min saved!")
+        else:
+            if st.button("▶️ Start Timer", use_container_width=True, key="sb_start"):
+                st.session_state.study_timer_active=True
+                st.session_state.study_timer_start=datetime.datetime.now()
+                st.info("Timer started...")
+
+        st.divider()
+        st.markdown("**🧭 Navigate**")
+        cur=st.session_state.active_page
+        for key,label in [("dashboard","📊 Dashboard"),("study","📚 Study Tools"),
+                           ("flashcards","🗂️ Flashcards"),("achievements","🏅 Achievements")]:
+            btn_type="primary" if cur==key else "secondary"
+            if st.button(label, use_container_width=True, key=f"nav_{key}", type=btn_type):
+                if cur!=key: go_to(key)
+
+        fc_due=stats.get("flashcards_due",0)
+        if fc_due>0:
+            st.markdown("<div style='height:4px'></div>", unsafe_allow_html=True)
+            st.warning(f"📚 {fc_due} card{'s' if fc_due>1 else ''} due!")
+        st.divider()
+
+        with st.expander("📜 Recent History"):
+            if not st.session_state.history: st.caption("No activity yet.")
+            else:
+                for h in st.session_state.history:
+                    st.markdown(f"""<div class="sf-hist">
+                        🕐 {h['time']} | <b>{h['tool']}</b><br>
+                        📖 {h['chapter']} — {h['subject']}<br>
+                        <small>{h['preview']}</small>
+                    </div>""", unsafe_allow_html=True)
+
+        with st.expander("🤖 AI Status"):
+            if st.button("Check Models", use_container_width=True, key="sb_models"):
+                with st.spinner("Checking..."):
+                    mdls=get_available_models()
+                for m in mdls: st.write(f"✅ {m}")
+
+        st.divider()
+        if st.button("🚪 Logout", use_container_width=True, key="sb_logout"):
+            for k in list(st.session_state.keys()): del st.session_state[k]
+            st.rerun()
+
+# ─────────────────────────────────────────────────────────────────────────────
+# DASHBOARD
+# ─────────────────────────────────────────────────────────────────────────────
+def show_dashboard(username):
+    render_header("StudySmart", "Your Daily Learning Companion")
+    stats=get_user_stats(username) or {}
+
+    c1,c2,c3,c4=st.columns(4)
+    for col,cls,icon,val,lbl in [
+        (c1,"mc-blue",  "🔥",stats.get("streak_days",0),"Day Streak"),
+        (c2,"mc-green", "⭐",f"Level {stats.get('level',1)}","Your Level"),
+        (c3,"mc-purple","📚",stats.get("flashcards_due",0),"Cards Due"),
+        (c4,"mc-amber", "⏱️",f"{stats.get('weekly_study_minutes',0)} min","This Week"),
+    ]:
+        with col:
+            st.markdown(f'<div class="mc {cls}"><div class="icon">{icon}</div><div class="val">{val}</div><div class="lbl">{lbl}</div></div>', unsafe_allow_html=True)
+
+    st.markdown("<div style='height:6px'></div>", unsafe_allow_html=True)
+    st.markdown('<div class="sf-card">', unsafe_allow_html=True)
+    total_xp=stats.get("total_xp",0); lvl=stats.get("level",1)
+    lp=stats.get("level_progress",total_xp%500); pct=min(100,int((lp/500)*100))
+    st.markdown(f"""<div style="display:flex;justify-content:space-between;font-size:.85rem;font-weight:700;margin-bottom:5px;">
+        <span>⭐ Level {lvl}</span><span>{total_xp} XP &nbsp;·&nbsp; {500-lp} to next level</span>
+    </div><div class="xp-wrap"><div class="xp-fill" style="width:{pct}%;"></div></div>""", unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
+
+    left, right = st.columns([1.1,1])
+    with left:
+        st.markdown('<div class="sf-card">', unsafe_allow_html=True)
+        st.markdown("**🌱 Study Momentum**")
+        mins=stats.get("total_study_minutes",0); growth=min(100,mins//10)
+        plant=(("🌱","Seedling") if growth<20 else ("🌿","Sprout") if growth<40 else
+               ("🪴","Growing Plant") if growth<70 else ("🌳","Strong Tree") if growth<90 else ("🌲","Master Tree"))
+        st.markdown(f"""<div class="sf-soft-card" style="text-align:center;margin-bottom:10px;">
+            <div style="font-size:2.6rem;">{plant[0]}</div>
+            <div style="font-weight:800;font-size:.93rem;">{plant[1]}</div>
+            <div style="font-size:.8rem;margin-top:3px;">{mins} min studied</div>
+        </div>""", unsafe_allow_html=True)
         st.markdown('</div>', unsafe_allow_html=True)
 
+        # ── QUICK ACTIONS — buttons are always clickable due to z-index fix in CSS ──
         st.markdown('<div class="sf-card">', unsafe_allow_html=True)
-        st.markdown('<div class="sf-section-title">⚡ Quick Actions</div>', unsafe_allow_html=True)
-
-        if st.button("📚 Open Study Tools", use_container_width=True, key="dash_study"):
-            st.session_state.active_page = "study"
-            st.rerun()
-
-        if st.button("🗂️ Review Flashcards", use_container_width=True, key="dash_fc"):
-            st.session_state.active_page = "flashcards"
-            st.rerun()
-
-        if st.button("🏅 View Achievements", use_container_width=True, key="dash_badges"):
-            st.session_state.active_page = "achievements"
-            st.rerun()
-
+        st.markdown("**⚡ Quick Actions**")
+        if st.button("📚 Open Study Tools",  use_container_width=True, key="d_study"):  go_to("study")
+        if st.button("🗂️ Review Flashcards", use_container_width=True, key="d_fc"):     go_to("flashcards")
+        if st.button("🏅 View Achievements", use_container_width=True, key="d_ach"):    go_to("achievements")
         st.markdown('</div>', unsafe_allow_html=True)
 
     with right:
         st.markdown('<div class="sf-card">', unsafe_allow_html=True)
-        st.markdown('<div class="sf-section-title">📜 Recent Activity</div>', unsafe_allow_html=True)
-
+        st.markdown("**📜 Recent Activity**")
         if not st.session_state.history:
-            st.info("No recent study activity yet. Start generating content to populate your timeline.")
+            st.info("No activity yet. Generate your first study content!")
         else:
-            for item in st.session_state.history:
-                st.markdown(f"""
-                    <div class="sf-history-item">
-                        🕐 {item['time']} &nbsp;|&nbsp; <b>{item['tool']}</b><br/>
-                        📖 {item['chapter']} — {item['subject']}<br/>
-                        <small>{item['preview']}</small>
-                    </div>
-                """, unsafe_allow_html=True)
-
+            for h in st.session_state.history:
+                st.markdown(f"""<div class="sf-hist">
+                    🕐 {h['time']} | <b>{h['tool']}</b><br>
+                    📖 {h['chapter']} — {h['subject']}<br>
+                    <small>{h['preview']}</small>
+                </div>""", unsafe_allow_html=True)
         st.markdown('</div>', unsafe_allow_html=True)
 
-        earned = get_earned_badges(username)
         st.markdown('<div class="sf-card">', unsafe_allow_html=True)
-        st.markdown('<div class="sf-section-title">🏅 Badge Snapshot</div>', unsafe_allow_html=True)
-
-        earned_badges = [b for b in ALL_BADGES if b["id"] in earned][:4]
-        if earned_badges:
-            cols = st.columns(2)
-            for i, badge in enumerate(earned_badges):
-                with cols[i % 2]:
-                    st.markdown(f"""
-                        <div class="badge-card earned">
-                            <div class="badge-icon">{badge['icon']}</div>
-                            <div class="badge-name">{badge['name']}</div>
-                            <div class="badge-status">✅ Earned</div>
-                        </div>
-                    """, unsafe_allow_html=True)
-        else:
-            st.info("Your first badges will appear here as you use the app consistently.")
-
+        st.markdown("**🏅 Badge Snapshot**")
+        earned=get_earned_badges(username)
+        earned_list=[b for b in ALL_BADGES if b["id"] in earned][:4]
+        if earned_list:
+            bc=st.columns(2)
+            for i,badge in enumerate(earned_list):
+                with bc[i%2]:
+                    st.markdown(f"""<div class="bdg earned">
+                        <div class="bi">{badge['icon']}</div>
+                        <div class="bn">{badge['name']}</div>
+                        <div class="bs">✅ Earned</div>
+                    </div>""", unsafe_allow_html=True)
+        else: st.info("Complete daily tasks to earn badges!")
         st.markdown('</div>', unsafe_allow_html=True)
 
+# ─────────────────────────────────────────────────────────────────────────────
+# FLASHCARDS
+# ─────────────────────────────────────────────────────────────────────────────
 def show_flashcards(username):
-    render_top_header(
-        title="Flashcards",
-        subtitle="Daily review with spaced repetition"
-    )
-
-    tab1, tab2, tab3 = st.tabs(["📖 Review Due", "➕ Create", "📋 My Library"])
+    render_back_button()
+    render_header("Flashcards","Spaced repetition for lasting memory")
+    tab1,tab2,tab3=st.tabs(["📖 Review Due","➕ Create","📋 My Library"])
 
     with tab1:
-        due_cards = get_due_flashcards(username)
-
-        if not due_cards:
-            st.success("🎉 No flashcards due today. You're fully caught up!")
+        due=get_due_flashcards(username)
+        if not due:
+            st.success("🎉 No flashcards due today!")
+            st.info(f"You have {len(get_all_flashcards(username))} total cards.")
         else:
-            st.markdown('<div class="sf-card">', unsafe_allow_html=True)
-            st.write(f"**{len(due_cards)} card(s)** are due today.")
-
-            idx = st.session_state.review_idx
-            if idx >= len(due_cards):
-                st.success("✅ Review complete for today!")
-                if st.button("🔄 Restart Review", use_container_width=True):
-                    st.session_state.review_idx = 0
-                    st.session_state.review_show_ans = False
-                    st.rerun()
+            idx=st.session_state.review_idx
+            if idx>=len(due):
+                st.success(f"✅ All {len(due)} cards reviewed!")
+                if st.button("🔄 Review Again",use_container_width=True,key="fc_restart"):
+                    st.session_state.review_idx=0; st.session_state.review_show_ans=False; st.rerun()
             else:
-                card = due_cards[idx]
-                card_id, front, back, subject, chapter = card[0], card[1], card[2], card[3], card[4]
-
-                st.progress((idx + 1) / len(due_cards))
-                st.caption(f"Card {idx + 1} of {len(due_cards)} | {subject} | {chapter}")
-
+                card=due[idx]; card_id,front,back,subj,chap=card[0],card[1],card[2],card[3],card[4]
+                st.progress((idx+1)/len(due))
+                st.caption(f"Card {idx+1} of {len(due)} · {subj} · {chap}")
                 if not st.session_state.review_show_ans:
-                    st.markdown(f"""
-                        <div class="flashcard-front">
-                            <div style="font-size:0.82rem;opacity:0.85;margin-bottom:10px;">QUESTION</div>
-                            <div style="font-size:1.15rem;font-weight:700;line-height:1.5;">{front}</div>
-                        </div>
-                    """, unsafe_allow_html=True)
-
-                    if st.button("👁️ Reveal Answer", use_container_width=True):
-                        st.session_state.review_show_ans = True
-                        st.rerun()
+                    st.markdown(f"""<div class="fc-front">
+                        <div style="font-size:.73rem;opacity:.8;margin-bottom:8px;">QUESTION</div>
+                        <div style="font-size:1.02rem;font-weight:700;line-height:1.5;">{front}</div>
+                        <div style="font-size:.68rem;opacity:.65;margin-top:10px;">Tap to reveal ↓</div>
+                    </div>""", unsafe_allow_html=True)
+                    st.markdown("<div style='height:6px'></div>", unsafe_allow_html=True)
+                    if st.button("👁️ Reveal Answer",use_container_width=True,key="fc_reveal"):
+                        st.session_state.review_show_ans=True; st.rerun()
                 else:
-                    st.markdown(f"""
-                        <div class="flashcard-back">
-                            <div style="font-size:0.82rem;opacity:0.85;margin-bottom:10px;">ANSWER</div>
-                            <div style="font-size:1.08rem;font-weight:700;line-height:1.5;">{back}</div>
-                        </div>
-                    """, unsafe_allow_html=True)
-
-                    st.markdown("**How well did you remember this?**")
-                    r1, r2, r3, r4 = st.columns(4)
-
-                    with r1:
-                        if st.button("😓 Again", use_container_width=True, key=f"again_{card_id}"):
-                            update_flashcard_review(card_id, 1)
-                            st.session_state.review_idx += 1
-                            st.session_state.review_show_ans = False
-                            st.rerun()
-
-                    with r2:
-                        if st.button("😐 Hard", use_container_width=True, key=f"hard_{card_id}"):
-                            update_flashcard_review(card_id, 2)
-                            st.session_state.review_idx += 1
-                            st.session_state.review_show_ans = False
-                            st.rerun()
-
-                    with r3:
-                        if st.button("🙂 Good", use_container_width=True, key=f"good_{card_id}"):
-                            update_flashcard_review(card_id, 3)
-                            st.session_state.review_idx += 1
-                            st.session_state.review_show_ans = False
-                            st.rerun()
-
-                    with r4:
-                        if st.button("😄 Easy", use_container_width=True, key=f"easy_{card_id}"):
-                            update_flashcard_review(card_id, 4)
-                            st.session_state.review_idx += 1
-                            st.session_state.review_show_ans = False
-                            st.rerun()
-
-            st.markdown('</div>', unsafe_allow_html=True)
+                    st.markdown(f"""<div class="fc-back">
+                        <div style="font-size:.73rem;opacity:.8;margin-bottom:8px;">ANSWER</div>
+                        <div style="font-size:.98rem;font-weight:700;line-height:1.5;">{back}</div>
+                    </div>""", unsafe_allow_html=True)
+                    st.markdown("<div style='height:6px'></div>", unsafe_allow_html=True)
+                    st.markdown("**How well did you remember?**")
+                    b1,b2,b3,b4=st.columns(4)
+                    for col,lbl,perf,ks in [(b1,"😓 Again",1,"again"),(b2,"😐 Hard",2,"hard"),(b3,"🙂 Good",3,"good"),(b4,"😄 Easy",4,"easy")]:
+                        with col:
+                            if st.button(lbl,use_container_width=True,key=f"fc_{ks}_{card_id}"):
+                                update_flashcard_review(card_id,perf)
+                                st.session_state.review_idx+=1; st.session_state.review_show_ans=False; st.rerun()
 
     with tab2:
-        left, right = st.columns(2)
-
-        with left:
+        cl,cr=st.columns(2)
+        with cl:
             st.markdown('<div class="sf-card">', unsafe_allow_html=True)
-            st.markdown("### ✍️ Create Manually")
-            with st.form("manual_flashcard_form"):
-                front = st.text_input("Front")
-                back = st.text_area("Back", height=90)
-                subject = st.text_input("Subject")
-                chapter = st.text_input("Chapter")
-                manual_submit = st.form_submit_button("➕ Save Flashcard", use_container_width=True)
-
-            if manual_submit:
-                if front.strip() and back.strip():
-                    save_flashcard(username, front.strip(), back.strip(), subject.strip(), chapter.strip())
-                    award_xp(username, 5)
-                    st.success("✅ Flashcard saved.")
-                else:
-                    st.warning("⚠️ Front and Back are required.")
+            st.markdown("### ✍️ Manual")
+            with st.form("manual_fc"):
+                f_front=st.text_input("Front"); f_back=st.text_area("Back",height=75)
+                f_subj=st.text_input("Subject"); f_chap=st.text_input("Chapter")
+                if st.form_submit_button("➕ Save",use_container_width=True):
+                    if f_front.strip() and f_back.strip():
+                        save_flashcard(username,f_front.strip(),f_back.strip(),f_subj.strip(),f_chap.strip())
+                        award_xp(username,5); st.success("✅ Saved! +5 XP")
+                    else: st.warning("⚠️ Front and Back required.")
             st.markdown('</div>', unsafe_allow_html=True)
-
-        with right:
+        with cr:
             st.markdown('<div class="sf-card">', unsafe_allow_html=True)
             st.markdown("### 🤖 Generate with AI")
-            with st.form("ai_flashcard_form"):
-                ai_subject = st.text_input("Subject", placeholder="e.g. Physics")
-                ai_chapter = st.text_input("Chapter", placeholder="e.g. Laws of Motion")
-                ai_topic = st.text_input("Topic", placeholder="e.g. Force and inertia")
-                ai_submit = st.form_submit_button("⚡ Generate 10 Flashcards", use_container_width=True)
-
-            if ai_submit:
-                if ai_subject.strip() and ai_chapter.strip():
-                    with st.spinner("Generating flashcards..."):
-                        raw, model = generate_with_fallback(
-                            build_flashcard_prompt(ai_subject.strip(), ai_chapter.strip(), ai_topic.strip())
-                        )
-                    if model != "None":
-                        cards = parse_flashcards(raw)
-                        if cards:
-                            for card in cards:
-                                save_flashcard(
-                                    username,
-                                    card["front"],
-                                    card["back"],
-                                    ai_subject.strip(),
-                                    ai_chapter.strip()
-                                )
-                            award_xp(username, len(cards) * 5)
-                            st.success(f"✅ {len(cards)} flashcards created successfully.")
-                        else:
-                            st.warning("⚠️ AI response could not be parsed into flashcards.")
-                    else:
-                        st.error("❌ Flashcard generation failed.")
-                else:
-                    st.warning("⚠️ Subject and Chapter are required.")
+            with st.form("ai_fc"):
+                ai_subj=st.text_input("Subject",placeholder="e.g. Physics")
+                ai_chap=st.text_input("Chapter",placeholder="e.g. Laws of Motion")
+                ai_topic=st.text_input("Topic",  placeholder="e.g. Newton's 3rd Law")
+                if st.form_submit_button("⚡ Generate 10 Cards",use_container_width=True):
+                    if ai_subj.strip() and ai_chap.strip():
+                        with st.spinner("Generating..."):
+                            raw,mdl=generate_with_fallback(build_flashcard_prompt(ai_subj.strip(),ai_chap.strip(),ai_topic.strip()))
+                        if mdl!="None":
+                            cards=parse_flashcards(raw)
+                            for card in cards: save_flashcard(username,card["front"],card["back"],ai_subj.strip(),ai_chap.strip())
+                            award_xp(username,len(cards)*5); st.success(f"✅ {len(cards)} cards saved! +{len(cards)*5} XP")
+                        else: st.error("❌ Generation failed.")
+                    else: st.warning("⚠️ Subject and Chapter required.")
             st.markdown('</div>', unsafe_allow_html=True)
 
     with tab3:
-        cards = get_all_flashcards(username)
-
+        all_cards=get_all_flashcards(username)
         st.markdown('<div class="sf-card">', unsafe_allow_html=True)
-        if not cards:
-            st.info("No flashcards saved yet.")
+        if not all_cards: st.info("No flashcards yet.")
         else:
-            st.caption(f"Total flashcards: {len(cards)}")
-            for row in cards:
-                c_id, front, back, subject, chapter, next_review, review_count = row
-                with st.expander(f"📌 {front[:70]}{'...' if len(front) > 70 else ''}"):
-                    st.markdown(f"**Front:** {front}")
-                    st.markdown(f"**Back:** {back}")
-                    st.caption(f"Subject: {subject} | Chapter: {chapter} | Next review: {next_review} | Reviews: {review_count}")
-                    if st.button("🗑️ Delete Flashcard", key=f"delete_fc_{c_id}"):
-                        delete_flashcard(c_id)
-                        st.rerun()
+            st.caption(f"📚 Total: {len(all_cards)} flashcards")
+            for row in all_cards:
+                c_id,front,back,subj,chap,nrd,rc=row
+                with st.expander(f"📌 {front[:58]}{'...' if len(front)>58 else ''}"):
+                    st.markdown(f"**Q:** {front}"); st.markdown(f"**A:** {back}")
+                    st.caption(f"Subject: {subj} | Chapter: {chap} | Next review: {nrd} | Reviews: {rc}")
+                    if st.button("🗑️ Delete",key=f"del_fc_{c_id}",use_container_width=True):
+                        delete_flashcard(c_id); st.rerun()
         st.markdown('</div>', unsafe_allow_html=True)
 
+# ─────────────────────────────────────────────────────────────────────────────
+# ACHIEVEMENTS
+# ─────────────────────────────────────────────────────────────────────────────
 def show_achievements(username):
-    render_top_header(
-        title="Achievements",
-        subtitle="Track your progress and earn badges"
-    )
-
-    earned = get_earned_badges(username)
+    render_back_button()
+    render_header("Achievements","Collect badges by learning every day")
+    earned=get_earned_badges(username)
+    earned_list=[b for b in ALL_BADGES if b["id"] in earned]
+    locked_list=[b for b in ALL_BADGES if b["id"] not in earned]
 
     st.markdown('<div class="sf-card">', unsafe_allow_html=True)
-    st.write(f"**{len(earned)} / {len(ALL_BADGES)} badges earned**")
-    st.progress(len(earned) / len(ALL_BADGES))
+    st.markdown(f"**{len(earned_list)} / {len(ALL_BADGES)} badges earned**")
+    st.progress(len(earned_list)/len(ALL_BADGES) if ALL_BADGES else 0)
     st.markdown('</div>', unsafe_allow_html=True)
 
-    cols = st.columns(4)
-    for i, badge in enumerate(ALL_BADGES):
-        with cols[i % 4]:
-            is_earned = badge["id"] in earned
-            st.markdown(f"""
-                <div class="badge-card {'earned' if is_earned else ''}">
-                    <div class="badge-icon">{badge['icon'] if is_earned else '🔒'}</div>
-                    <div class="badge-name">{badge['name']}</div>
-                    <div class="badge-status">{'✅ Earned' if is_earned else badge['desc']}</div>
-                </div>
-            """, unsafe_allow_html=True)
+    if earned_list:
+        st.markdown("### ✅ Earned")
+        cols=st.columns(4)
+        for i,b in enumerate(earned_list):
+            with cols[i%4]:
+                st.markdown(f"""<div class="bdg earned">
+                    <div class="bi">{b['icon']}</div><div class="bn">{b['name']}</div>
+                    <div class="bs">✅ {b['desc']}</div>
+                </div>""", unsafe_allow_html=True)
+    if locked_list:
+        st.markdown("### 🔒 Locked")
+        cols=st.columns(4)
+        for i,b in enumerate(locked_list):
+            with cols[i%4]:
+                st.markdown(f"""<div class="bdg">
+                    <div class="bi" style="opacity:.28;">🔒</div><div class="bn">{b['name']}</div>
+                    <div class="bs">{b['desc']}</div>
+                </div>""", unsafe_allow_html=True)
 
-def render_sidebar(username):
-    stats = get_user_stats(username) or {}
-
-    with st.sidebar:
-        st.markdown(f"""
-            <div style="text-align:center;padding:10px 0 14px 0;">
-                <div style="font-size:2.35rem;">🎓</div>
-                <div style="font-size:1.15rem;font-weight:800;color:#2563eb;">StudySmart AI</div>
-                <div style="font-size:0.82rem;color:#64748b;margin-top:4px;">Welcome, {username} 👋</div>
-            </div>
-        """, unsafe_allow_html=True)
-
-        c1, c2 = st.columns(2)
-        with c1:
-            st.metric("🔥 Streak", f"{stats.get('streak_days', 0)} days")
-        with c2:
-            st.metric("⭐ Level", stats.get("level", 1))
-
-        if not st.session_state.daily_checkin_done:
-            if st.button("✅ Daily Check-in", use_container_width=True):
-                result = check_daily_login(username)
-                st.session_state.daily_checkin_done = True
-                st.success(result.get("message", "Checked in successfully!"))
-                st.rerun()
-        else:
-            st.success("✅ Daily check-in complete")
-
-        st.divider()
-
-        st.markdown("**⏱️ Study Timer**")
-        if st.session_state.study_timer_active and st.session_state.study_timer_start:
-            elapsed = int((datetime.datetime.now() - st.session_state.study_timer_start).total_seconds() // 60)
-            st.info(f"Running: {elapsed} min")
-            if st.button("⏹️ Stop Timer", use_container_width=True):
-                st.session_state.study_timer_active = False
-                duration = max(1, elapsed)
-                record_study_session(
-                    username,
-                    st.session_state.get("current_subject_for_timer", "General"),
-                    "study",
-                    duration
-                )
-                award_xp(username, (duration // 10) * 10 if duration >= 10 else 5)
-                st.session_state.study_timer_start = None
-                st.success(f"✅ Recorded {duration} minutes.")
-                st.rerun()
-        else:
-            if st.button("▶️ Start Timer", use_container_width=True):
-                st.session_state.study_timer_active = True
-                st.session_state.study_timer_start = datetime.datetime.now()
-                st.rerun()
-
-        st.divider()
-
-        nav = st.radio(
-            "Navigate",
-            ["📊 Dashboard", "📚 Study Tools", "🗂️ Flashcards", "🏅 Achievements"]
-        )
-
-        page_map = {
-            "📊 Dashboard": "dashboard",
-            "📚 Study Tools": "study",
-            "🗂️ Flashcards": "flashcards",
-            "🏅 Achievements": "achievements",
-        }
-
-        if st.session_state.active_page != page_map[nav]:
-            st.session_state.active_page = page_map[nav]
-            st.rerun()
-
-        st.divider()
-
-        with st.expander("📜 Recent History"):
-            if not st.session_state.history:
-                st.caption("No history yet.")
-            else:
-                for h in st.session_state.history:
-                    st.markdown(f"""
-                        <div class="sf-history-item">
-                            🕐 {h['time']} &nbsp;|&nbsp; <b>{h['tool']}</b><br/>
-                            📖 {h['chapter']} — {h['subject']}<br/>
-                            <small>{h['preview']}</small>
-                        </div>
-                    """, unsafe_allow_html=True)
-
-        with st.expander("🤖 AI Model Status"):
-            if st.button("Check Models", use_container_width=True):
-                with st.spinner("Checking..."):
-                    models = get_available_models()
-                for m in models:
-                    st.write(f"✅ {m}")
-
-        st.divider()
-
-        if st.button("🚪 Logout", use_container_width=True):
-            for key in list(st.session_state.keys()):
-                del st.session_state[key]
-            st.rerun()
+# ─────────────────────────────────────────────────────────────────────────────
+# STUDY TOOLS
+# ─────────────────────────────────────────────────────────────────────────────
 def show_study_tools(username):
-    render_top_header(
-        title="Study Tools",
-        subtitle="Professional AI support for smarter exam preparation"
-    )
+    render_back_button()
+    render_header("Study Tools","AI-powered exam preparation")
 
-    st.markdown('<div class="sf-card">', unsafe_allow_html=True)
-
-    tool = st.radio(
-        "Select Tool",
-        ["📝 Summary", "🧠 Quiz", "📌 Revision Notes", "🧪 Question Paper", "❓ Exam Q&A"],
-        horizontal=True
-    )
+    tool=st.radio("🛠️ Select Tool",
+        ["📝 Summary","🧠 Quiz","📌 Revision Notes","🧪 Question Paper","❓ Exam Q&A"],
+        horizontal=True, key="study_tool_radio")
 
     if not STUDY_DATA:
-        st.error("No study data found.")
-        st.stop()
+        st.error("❌ No study data. Check data/study_data.json"); return
 
-    c1, c2 = st.columns([1.4, 1])
-    with c1:
-        category = st.selectbox("📚 Category", list(STUDY_DATA.keys()))
-    with c2:
-        st.markdown("""
-            <div class="sf-soft-card" style="height:100%;">
-                <div style="font-weight:800;color:#0f172a;margin-bottom:6px;">Study Setup</div>
-                <div style="font-size:0.86rem;color:#64748b;">
-                    Choose your academic path below and generate precise learning material instantly.
-                </div>
-            </div>
-        """, unsafe_allow_html=True)
+    st.markdown('<div class="sf-card">', unsafe_allow_html=True)
+    ca,cb=st.columns([1.5,1])
+    with ca:
+        category=st.selectbox("📚 Category",list(STUDY_DATA.keys()),key="sel_cat")
+    with cb:
+        st.markdown("""<div class="sf-soft-card" style="height:100%;display:flex;
+            align-items:center;justify-content:center;flex-direction:column;">
+            <div style="font-weight:700;font-size:.87rem;">Quick Setup</div>
+            <div style="font-size:.79rem;margin-top:3px;text-align:center;">Select below and generate instantly.</div>
+        </div>""", unsafe_allow_html=True)
 
-    course = st.selectbox("🎓 Program / Class", get_courses(category))
-    stream = st.selectbox("📖 Stream", get_streams(category, course))
-    subject = st.selectbox("🧾 Subject", get_subjects(category, course, stream))
+    course =st.selectbox("🎓 Program / Class",get_courses(category),           key="sel_course")
+    stream =st.selectbox("📖 Stream",          get_streams(category,course),    key="sel_stream")
+    subject=st.selectbox("🧾 Subject",         get_subjects(category,course,stream), key="sel_subject")
 
-    if category == "K-12th":
-        board = st.selectbox("🏫 Board", BOARDS)
+    # ── Board: K-12 = selectbox; others = silent (NO BANNER) ──
+    if category=="K-12th":
+        board=st.selectbox("🏫 Board",BOARDS,key="sel_board")
     else:
-        board = "University / National Syllabus"
-        st.info(f"📌 Syllabus: {board}")
+        board="University / National Syllabus"   # silent, no st.info()
 
-    topic = st.selectbox("🗂️ Topic", get_topics(category, course, stream, subject))
+    topic=st.selectbox("🗂️ Topic",get_topics(category,course,stream,subject),key="sel_topic")
 
-    chapter_key = f"{category}||{course}||{stream}||{subject}||{topic}"
-    if st.session_state.last_chapter_key != chapter_key:
-        st.session_state.current_chapters = get_chapters(category, course, stream, subject, topic)
-        st.session_state.last_chapter_key = chapter_key
+    chapter_key=f"{category}||{course}||{stream}||{subject}||{topic}"
+    if st.session_state.last_chapter_key!=chapter_key:
+        st.session_state.current_chapters=get_chapters(category,course,stream,subject,topic)
+        st.session_state.last_chapter_key=chapter_key
         reset_generation_state()
 
-    chapter = st.selectbox("📝 Chapter", st.session_state.current_chapters)
-    st.session_state.current_subject_for_timer = subject
-
+    chapter=st.selectbox("📝 Chapter",st.session_state.current_chapters,key="sel_chapter")
+    st.session_state.current_subject_for_timer=subject
     st.markdown('</div>', unsafe_allow_html=True)
 
-    output_style = st.radio(
-        "⚙️ Output Style",
-        ["📄 Detailed", "⚡ Short & Quick", "📋 Notes Format", "🧪 Question Paper"],
-        horizontal=True
-    )
+    style=st.radio("⚙️ Output Style",
+        ["📄 Detailed","⚡ Short & Quick","📋 Notes Format","🧪 Question Paper"],
+        horizontal=True, key="study_style_radio")
 
-    effective_label = get_effective_output_name(tool, output_style)
-    btn_label = get_button_label(tool, output_style)
+    eff_label=get_effective_output_name(tool,style)
+    btn_label=get_button_label(tool,style)
+    st.markdown("<div style='height:4px'></div>", unsafe_allow_html=True)
 
-    if st.button(btn_label, use_container_width=True):
-        if not chapter or chapter == "No chapters found":
-            st.warning("⚠️ Please select a valid chapter first.")
-            return
-
-        audience = f"{board} {course} students" if category == "K-12th" else f"{course} students"
-
-        prompt = build_prompt(
-            tool, chapter, topic, subject, audience,
-            output_style, board=board, course=course
-        )
-
-        with st.spinner(f"Generating {effective_label}..."):
-            result, model_used = generate_with_fallback(prompt)
-
+    if st.button(btn_label, use_container_width=True, key="gen_btn"):
+        if not chapter or chapter=="No chapters found":
+            st.warning("⚠️ Please select a valid chapter."); return
+        audience=(f"{board} {course} students" if category=="K-12th" else f"{course} students")
+        prompt=build_prompt(tool,chapter,topic,subject,audience,style,board=board,course=course)
+        with st.spinner(f"Generating {eff_label}..."):
+            result,model_used=generate_with_fallback(prompt)
         st.session_state.update({
-            "generated_result": result,
-            "generated_model": model_used,
-            "generated_label": effective_label,
-            "generated_tool": tool,
-            "generated_chapter": chapter,
-            "generated_subject": subject,
-            "generated_topic": topic,
-            "generated_course": course,
-            "generated_stream": stream,
-            "generated_board": board,
-            "generated_audience": audience,
-            "generated_output_style": output_style,
-            "answers_result": None,
-            "answers_model": None,
-            "show_answers": False,
-            "fullpaper_result": None,
-            "fullpaper_model": None,
-            "show_fullpaper": False,
+            "generated_result":result,"generated_model":model_used,
+            "generated_label":eff_label,"generated_tool":tool,
+            "generated_chapter":chapter,"generated_subject":subject,
+            "generated_topic":topic,"generated_course":course,
+            "generated_stream":stream,"generated_board":board,
+            "generated_audience":audience,"generated_output_style":style,
+            "answers_result":None,"answers_model":None,"show_answers":False,
+            "fullpaper_result":None,"fullpaper_model":None,"show_fullpaper":False,
         })
+        if model_used!="None":
+            add_to_history(eff_label,chapter,subject,result)
+            award_xp(username,25)
+            award_badge(username,"first_gen","Starter Spark")
+            if eff_label=="Question Paper": award_badge(username,"qp_generated","Paper Setter")
+            if eff_label=="Quiz":           award_badge(username,"quiz_done","Quiz Taker")
 
-        if model_used != "None":
-            add_to_history(effective_label, chapter, subject, result)
-            award_xp(username, 25)
-            award_badge(username, "first_gen")
+    # ── Output display ──
+    if st.session_state.generated_result:
+        result    =st.session_state.generated_result
+        g_label   =st.session_state.generated_label
+        g_chapter =st.session_state.generated_chapter
+        g_subject =st.session_state.generated_subject
+        g_topic   =st.session_state.generated_topic
+        g_course  =st.session_state.generated_course
+        g_stream  =st.session_state.generated_stream
+        g_board   =st.session_state.generated_board
+        g_audience=st.session_state.generated_audience
 
-            if effective_label == "Question Paper":
-                award_badge(username, "qp_generated")
-            if effective_label == "Quiz":
-                award_badge(username, "quiz_done")
+        if st.session_state.generated_model=="None":
+            st.error("❌ Generation failed."); st.markdown(result); return
 
-    if st.session_state.generated_result and st.session_state.generated_model != "None":
-        result = st.session_state.generated_result
-        g_label = st.session_state.generated_label
-        g_chapter = st.session_state.generated_chapter
-        g_subject = st.session_state.generated_subject
-        g_topic = st.session_state.generated_topic
-        g_course = st.session_state.generated_course
-        g_stream = st.session_state.generated_stream
-        g_board = st.session_state.generated_board
-        g_audience = st.session_state.generated_audience
-
-        st.markdown('<div class="sf-output">', unsafe_allow_html=True)
+        is_qp=(g_label=="Question Paper")
+        box_cls="sf-fullpaper" if is_qp else "sf-output"
+        st.markdown(f'<div class="{box_cls}">', unsafe_allow_html=True)
         st.markdown(f"### {g_label} — {g_chapter}")
         st.markdown(result)
         st.markdown('</div>', unsafe_allow_html=True)
 
-        if g_label != "Question Paper":
-            if st.button("🗂️ Save Key Points as Flashcards", use_container_width=True):
-                with st.spinner("Generating flashcards..."):
-                    raw, model = generate_with_fallback(
-                        build_flashcard_prompt(g_subject, g_chapter, g_topic)
-                    )
-                if model != "None":
-                    cards = parse_flashcards(raw)
-                    for card in cards:
-                        save_flashcard(username, card["front"], card["back"], g_subject, g_chapter)
-                    award_xp(username, len(cards) * 5 if cards else 0)
-                    st.success(f"✅ {len(cards)} flashcards saved.")
-                else:
-                    st.error("❌ Flashcard generation failed.")
-
-        if g_label == "Question Paper":
+        if not is_qp:
+            if st.button("🗂️ Save as Flashcards",use_container_width=True,key="save_fc_btn"):
+                with st.spinner("Creating flashcards..."):
+                    raw,mdl=generate_with_fallback(build_flashcard_prompt(g_subject,g_chapter,g_topic or ""))
+                if mdl!="None":
+                    cards=parse_flashcards(raw)
+                    for c in cards: save_flashcard(username,c["front"],c["back"],g_subject,g_chapter)
+                    award_xp(username,len(cards)*5); st.success(f"✅ {len(cards)} flashcards saved! +{len(cards)*5} XP")
+                else: st.error("❌ Flashcard generation failed.")
             try:
-                qp_pdf = generate_pdf(
-                    f"Question Paper — {g_chapter}",
-                    f"{g_subject} | {g_board} | {g_course}",
-                    result,
-                    "#1d4ed8"
-                )
-                safe_qp = g_chapter.replace(" ", "_").replace(":", "").replace("/", "-") + "_QP.pdf"
-                st.download_button(
-                    "⬇️ Download Question Paper PDF",
-                    data=qp_pdf,
-                    file_name=safe_qp,
-                    mime="application/pdf",
-                    use_container_width=True
-                )
-            except Exception as e:
-                st.warning(f"⚠️ PDF generation error: {e}")
+                pdf=generate_pdf(f"{g_label} — {g_chapter}",f"{g_subject} | {g_topic} | {g_course}",result)
+                safe=(g_chapter.replace(" ","_").replace(":","").replace("/","-")+".pdf")
+                st.download_button("⬇️ Download PDF",data=pdf,file_name=safe,mime="application/pdf",use_container_width=True,key="dl_main_pdf")
+            except Exception as e: st.warning(f"⚠️ PDF error: {e}")
+        else:
+            try:
+                qp_pdf=generate_pdf(f"Question Paper — {g_chapter}",f"{g_subject} | {g_board} | {g_course}",result,"#1d4ed8")
+                safe_q=(g_chapter.replace(" ","_").replace(":","").replace("/","-")+"_QP.pdf")
+                st.download_button("⬇️ Download Question Paper PDF",data=qp_pdf,file_name=safe_q,mime="application/pdf",use_container_width=True,key="dl_qp_pdf")
+            except Exception as e: st.warning(f"⚠️ PDF error: {e}")
 
-            if st.button("📋 Get Answers for this Paper", use_container_width=True):
+            if st.button("📋 Get Answers for this Paper",use_container_width=True,key="get_ans_btn"):
                 with st.spinner("Generating answer key..."):
-                    ans_r, ans_m = generate_with_fallback(
-                        build_answers_prompt(result, g_board, g_course, g_subject, g_chapter)
-                    )
-                st.session_state.answers_result = ans_r
-                st.session_state.answers_model = ans_m
-                st.session_state.show_answers = True
+                    ans_r,ans_m=generate_with_fallback(build_answers_prompt(result,g_board,g_course,g_subject,g_chapter))
+                st.session_state.answers_result=ans_r; st.session_state.answers_model=ans_m
+                st.session_state.show_answers=True
 
             if st.session_state.show_answers and st.session_state.answers_result:
-                if st.session_state.answers_model != "None":
+                if st.session_state.answers_model!="None":
                     st.markdown('<div class="sf-answers">', unsafe_allow_html=True)
                     st.markdown(f"### 📚 Answer Key — {g_chapter}")
                     st.markdown(st.session_state.answers_result)
                     st.markdown('</div>', unsafe_allow_html=True)
+                    try:
+                        ans_pdf=generate_pdf(f"Answer Key — {g_chapter}",f"{g_subject} | {g_board} | {g_course}",st.session_state.answers_result,"#15803d")
+                        safe_a=(g_chapter.replace(" ","_").replace(":","").replace("/","-")+"_Answers.pdf")
+                        st.download_button("⬇️ Download Answer Key PDF",data=ans_pdf,file_name=safe_a,mime="application/pdf",use_container_width=True,key="dl_ans_pdf")
+                    except Exception as e: st.warning(f"⚠️ PDF error: {e}")
 
-            st.info(f"💡 Need a full **{g_subject}** paper covering the whole syllabus in **{g_board}** format?")
-
-            if st.button(f"🗂️ Generate Full {g_subject} Question Paper", use_container_width=True):
+            st.info(f"💡 Want a full **{g_subject}** paper covering the whole syllabus ({g_board})?")
+            if st.button(f"🗂️ Generate Full {g_subject} Paper",use_container_width=True,key="full_qp_btn"):
                 with st.spinner("Generating full subject paper..."):
-                    full_r, full_m = generate_with_fallback(
-                        build_full_subject_qp_prompt(g_board, g_course, g_stream, g_subject, g_audience)
-                    )
-                st.session_state.fullpaper_result = full_r
-                st.session_state.fullpaper_model = full_m
-                st.session_state.show_fullpaper = True
+                    full_r,full_m=generate_with_fallback(build_full_qp_prompt(g_board,g_course,g_stream,g_subject,g_audience))
+                st.session_state.fullpaper_result=full_r; st.session_state.fullpaper_model=full_m
+                st.session_state.show_fullpaper=True
 
             if st.session_state.show_fullpaper and st.session_state.fullpaper_result:
-                if st.session_state.fullpaper_model != "None":
+                if st.session_state.fullpaper_model!="None":
                     st.markdown('<div class="sf-fullpaper">', unsafe_allow_html=True)
                     st.markdown(f"### 🗂️ Full Subject Paper — {g_subject}")
                     st.markdown(st.session_state.fullpaper_result)
                     st.markdown('</div>', unsafe_allow_html=True)
+                    try:
+                        full_pdf=generate_pdf(f"Full Paper — {g_subject}",f"{g_board} | {g_course} | {g_stream}",st.session_state.fullpaper_result,"#7c3aed")
+                        safe_f=f"{g_subject}_{g_board}_FullPaper.pdf".replace(" ","_")
+                        st.download_button("⬇️ Download Full Paper PDF",data=full_pdf,file_name=safe_f,mime="application/pdf",use_container_width=True,key="dl_full_pdf")
+                    except Exception as e: st.warning(f"⚠️ PDF error: {e}")
 
-        else:
-            try:
-                pdf = generate_pdf(
-                    f"{g_label} — {g_chapter}",
-                    f"{g_subject} | {g_topic} | {g_course}",
-                    result
-                )
-                safe = g_chapter.replace(" ", "_").replace(":", "").replace("/", "-") + ".pdf"
-                st.download_button(
-                    "⬇️ Download PDF",
-                    data=pdf,
-                    file_name=safe,
-                    mime="application/pdf",
-                    use_container_width=True
-                )
-            except Exception as e:
-                st.warning(f"⚠️ PDF generation error: {e}")
-
-    elif st.session_state.generated_result and st.session_state.generated_model == "None":
-        st.error("❌ AI generation failed")
-        st.markdown(st.session_state.generated_result)
-
+# ─────────────────────────────────────────────────────────────────────────────
+# AUTH UI
+# ─────────────────────────────────────────────────────────────────────────────
 def auth_ui():
-    _, col, _ = st.columns([1, 1.6, 1])
-
+    _,col,_=st.columns([1,1.4,1])
     with col:
-        render_top_header(
-            title="StudySmart",
-            subtitle="Your Smart Exam Preparation Platform"
-        )
-
+        render_header("StudySmart","Your Smart Exam Preparation Platform")
         st.markdown('<div class="sf-card">', unsafe_allow_html=True)
-        tab1, tab2 = st.tabs(["🔐 Login", "📝 Register"])
+        tab1,tab2=st.tabs(["🔐 Login","📝 Register"])
 
         with tab1:
-            with st.form("login_form", clear_on_submit=False):
-                u = st.text_input("👤 Username", placeholder="Enter your username", key="login_u")
-                p = st.text_input(
-                    "🔑 Password",
-                    type="password",
-                    placeholder="Enter password — press Enter to login",
-                    key="login_p"
-                )
-                submitted = st.form_submit_button("Sign In 🚀", use_container_width=True)
-
+            with st.form("login_form",clear_on_submit=False):
+                u=st.text_input("👤 Username",placeholder="Enter your username",key="login_u")
+                p=st.text_input("🔑 Password",placeholder="Enter password",type="password",key="login_p")
+                submitted=st.form_submit_button("Sign In 🚀",use_container_width=True)
             if submitted:
-                success, result = do_login(u, p)
-                if success:
-                    st.session_state.logged_in = True
-                    st.session_state.username = result
-                    check_result = check_daily_login(result)
-                    st.session_state.daily_checkin_done = True
-                    st.success(f"✅ Login successful! {check_result.get('message', '')}")
-                    time.sleep(0.8)
-                    st.rerun()
-                else:
-                    st.error(result)
+                ok,res=do_login(u,p)
+                if ok:
+                    st.session_state.logged_in=True; st.session_state.username=res
+                    result=check_daily_login(res); st.session_state.daily_checkin_done=True
+                    st.success(f"✅ Welcome back, {res}! {result.get('message','')}"); time.sleep(0.6); st.rerun()
+                else: st.error(res)
 
         with tab2:
-            with st.form("register_form", clear_on_submit=True):
-                nu = st.text_input("👤 New Username", placeholder="Minimum 3 characters", key="reg_u")
-                np = st.text_input("🔑 New Password", type="password", placeholder="Minimum 6 characters", key="reg_p")
-                cp = st.text_input("🔑 Confirm Password", type="password", placeholder="Re-enter your password", key="reg_cp")
-                reg_submitted = st.form_submit_button("Create Account ✨", use_container_width=True)
-
-            if reg_submitted:
-                if not nu.strip():
-                    st.error("❌ Username cannot be empty")
-                elif len(nu.strip()) < 3:
-                    st.error("❌ Username must be at least 3 characters")
-                elif len(np.strip()) < 6:
-                    st.error("❌ Password must be at least 6 characters")
-                elif np != cp:
-                    st.error("❌ Passwords do not match")
+            with st.form("register_form",clear_on_submit=True):
+                nu=st.text_input("👤 Username",placeholder="Min 3 characters",key="reg_u")
+                np=st.text_input("🔑 Password",placeholder="Min 6 characters",type="password",key="reg_p")
+                cp=st.text_input("🔑 Confirm Password",placeholder="Re-enter password",type="password",key="reg_cp")
+                reg_sub=st.form_submit_button("Create Account ✨",use_container_width=True)
+            if reg_sub:
+                if   not nu.strip():      st.error("❌ Username cannot be empty")
+                elif len(nu.strip())<3:   st.error("❌ Username: min 3 characters")
+                elif len(np.strip())<6:   st.error("❌ Password: min 6 characters")
+                elif np!=cp:              st.error("❌ Passwords do not match")
                 else:
                     try:
-                        conn = sqlite3.connect("users.db")
-                        c = conn.cursor()
-                        c.execute(
-                            "INSERT INTO users (username, password) VALUES (?, ?)",
-                            (nu.strip(), hash_p(np))
-                        )
-                        conn.commit()
-                        conn.close()
-
-                        st.session_state.logged_in = True
-                        st.session_state.username = nu.strip()
-                        check_daily_login(nu.strip())
-                        st.session_state.daily_checkin_done = True
-
-                        st.success("✅ Account created successfully!")
-                        time.sleep(0.8)
-                        st.rerun()
-                    except sqlite3.IntegrityError:
-                        st.error("❌ Username already exists. Please choose another.")
-
+                        conn=sqlite3.connect("users.db"); c=conn.cursor()
+                        c.execute("INSERT INTO users (username,password) VALUES (?,?)",(nu.strip(),hash_p(np)))
+                        conn.commit(); conn.close()
+                        st.session_state.logged_in=True; st.session_state.username=nu.strip()
+                        check_daily_login(nu.strip()); st.session_state.daily_checkin_done=True
+                        st.success("✅ Account created!"); time.sleep(0.6); st.rerun()
+                    except sqlite3.IntegrityError: st.error("❌ Username already exists.")
         st.markdown('</div>', unsafe_allow_html=True)
 
+# ─────────────────────────────────────────────────────────────────────────────
+# MAIN ROUTER
+# ─────────────────────────────────────────────────────────────────────────────
 def main_app():
     render_sidebar(st.session_state.username)
-
-    if st.session_state.active_page == "dashboard":
-        show_dashboard(st.session_state.username)
-    elif st.session_state.active_page == "study":
-        show_study_tools(st.session_state.username)
-    elif st.session_state.active_page == "flashcards":
-        show_flashcards(st.session_state.username)
-    elif st.session_state.active_page == "achievements":
-        show_achievements(st.session_state.username)
-    else:
-        show_dashboard(st.session_state.username)
+    page=st.session_state.active_page
+    if   page=="dashboard":    show_dashboard(st.session_state.username)
+    elif page=="study":        show_study_tools(st.session_state.username)
+    elif page=="flashcards":   show_flashcards(st.session_state.username)
+    elif page=="achievements": show_achievements(st.session_state.username)
+    else:                      show_dashboard(st.session_state.username)
 
 # ─────────────────────────────────────────────────────────────────────────────
 # ENTRY POINT
