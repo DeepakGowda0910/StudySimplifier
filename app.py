@@ -1,11 +1,11 @@
 # ═══════════════════════════════════════════════════════════════════════════════
-# STUDYSMART AI — APP v3.3
+# STUDYSMART AI — APP v3.4
 # FIXES:
-# ✅ Dark mode: uses [data-theme="dark"] — NOT @media (prefers-color-scheme)
-# ✅ Single generate button ALWAYS at top — no preview blocking it
-# ✅ QP format shown BELOW the button as an expander (non-blocking)
-# ✅ Light clean theme by default
-# ✅ All existing features retained
+# ✅ Removed "View QP Format" expander clutter
+# ✅ Input box border fixed — targets BaseWeb wrapper correctly
+# ✅ Cursor/caret now visible in password field
+# ✅ Dark mode via [data-theme="dark"] — correct Streamlit selector
+# ✅ All features retained
 # ═══════════════════════════════════════════════════════════════════════════════
 
 import streamlit as st
@@ -45,8 +45,6 @@ BOARDS = ["CBSE", "ICSE", "State Board", "ISC", "IB", "Cambridge"]
 
 # ─────────────────────────────────────────────────────────────────────────────
 # STEP 2: PAGE CONFIG & CSS
-# KEY FIX: Use [data-theme="dark"] NOT @media (prefers-color-scheme: dark)
-# Streamlit sets data-theme on the root element — media queries are ignored.
 # ─────────────────────────────────────────────────────────────────────────────
 
 st.set_page_config(
@@ -60,13 +58,12 @@ st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
-/* ═══════════════════════════
-   GLOBAL BASE
-═══════════════════════════ */
 html, body, [class*="css"], [class*="st-"] {
     font-family: 'Inter', sans-serif !important;
 }
+
 #MainMenu, footer, header { visibility: hidden; }
+
 .block-container {
     max-width: 1200px;
     padding-top: 1rem !important;
@@ -75,15 +72,12 @@ html, body, [class*="css"], [class*="st-"] {
     padding-right: 1.5rem !important;
 }
 
-/* ═══════════════════════════
-   LIGHT MODE (DEFAULT)
-═══════════════════════════ */
-
+/* ═══════════════ APP BACKGROUND ═══════════════ */
 .stApp {
     background: #f0f4f8 !important;
 }
 
-/* Header */
+/* ═══════════════ HEADER ═══════════════ */
 .sf-header {
     text-align: center;
     padding: 28px 0 8px 0;
@@ -104,7 +98,7 @@ html, body, [class*="css"], [class*="st-"] {
     font-size: 1rem;
 }
 
-/* Cards */
+/* ═══════════════ CARDS ═══════════════ */
 .sf-card {
     background: #ffffff !important;
     border-radius: 14px;
@@ -114,10 +108,10 @@ html, body, [class*="css"], [class*="st-"] {
     margin-bottom: 16px;
 }
 
-/* Output boxes */
+/* ═══════════════ OUTPUT BOXES ═══════════════ */
 .sf-output {
     background: #eff6ff !important;
-    border-left: 4px solid #2563eb !important;
+    border-left: 4px solid #2563eb;
     border-radius: 14px;
     padding: 22px 24px;
     border: 1px solid #bfdbfe !important;
@@ -126,10 +120,9 @@ html, body, [class*="css"], [class*="st-"] {
 .sf-output h1,.sf-output h2,.sf-output h3 { color: #1d4ed8 !important; margin-top:0; }
 .sf-output p,.sf-output li,.sf-output span,.sf-output strong { color: #1e293b !important; }
 
-/* Answer box */
 .sf-answers {
     background: #f0fdf4 !important;
-    border-left: 4px solid #16a34a !important;
+    border-left: 4px solid #16a34a;
     border-radius: 14px;
     padding: 22px 24px;
     border: 1px solid #bbf7d0 !important;
@@ -138,10 +131,9 @@ html, body, [class*="css"], [class*="st-"] {
 .sf-answers h1,.sf-answers h2,.sf-answers h3 { color: #15803d !important; margin-top:0; }
 .sf-answers p,.sf-answers li,.sf-answers span,.sf-answers strong { color: #1e293b !important; }
 
-/* Full paper box */
 .sf-fullpaper {
     background: #faf5ff !important;
-    border-left: 4px solid #7c3aed !important;
+    border-left: 4px solid #7c3aed;
     border-radius: 14px;
     padding: 22px 24px;
     border: 1px solid #ddd6fe !important;
@@ -150,7 +142,7 @@ html, body, [class*="css"], [class*="st-"] {
 .sf-fullpaper h1,.sf-fullpaper h2,.sf-fullpaper h3 { color: #6d28d9 !important; margin-top:0; }
 .sf-fullpaper p,.sf-fullpaper li,.sf-fullpaper span,.sf-fullpaper strong { color: #1e293b !important; }
 
-/* History */
+/* ═══════════════ HISTORY ═══════════════ */
 .sf-history-item {
     background: #eff6ff;
     border-left: 3px solid #3b82f6;
@@ -159,22 +151,25 @@ html, body, [class*="css"], [class*="st-"] {
     margin-bottom: 8px;
     font-size: 0.88rem;
 }
-.sf-history-item,.sf-history-item b,.sf-history-item small { color: #1e293b !important; }
+.sf-history-item { color: #1e293b !important; }
 .sf-history-item b { color: #1d4ed8 !important; }
 .sf-history-item small { color: #64748b !important; }
 
-/* Radio labels — LIGHT */
+/* ═══════════════ RADIO LABELS — LIGHT ═══════════════ */
 div[data-testid="stRadio"] label p,
 div[data-testid="stRadio"] label span,
-div[data-testid="stRadio"] [data-testid="stMarkdownContainer"] p {
+div[data-testid="stRadio"] [data-testid="stMarkdownContainer"] p,
+div[data-testid="stRadio"] > div > label > div > p {
     color: #1e293b !important;
     font-weight: 500 !important;
 }
-div[data-testid="stRadio"] > div > label > div > p {
+div[data-testid="stRadio"] > label,
+div[data-testid="stRadio"] > label p {
     color: #1e293b !important;
+    font-weight: 700 !important;
 }
 
-/* Widget labels — LIGHT */
+/* ═══════════════ WIDGET LABELS — LIGHT ═══════════════ */
 [data-testid="stWidgetLabel"] p,
 [data-testid="stWidgetLabel"] label,
 div.stSelectbox > label,
@@ -185,7 +180,48 @@ label[data-testid="stWidgetLabel"] {
     font-size: 0.88rem !important;
 }
 
-/* Selectbox — LIGHT */
+/* ═══════════════════════════════════════════════════════
+   INPUT BOXES — THE REAL FIX
+   Streamlit wraps inputs inside div[data-baseweb="input"]
+   Targeting bare input[type] is not enough — must target
+   the BaseWeb wrapper to fix border and background.
+   Also caret-color fixes the invisible cursor issue.
+═══════════════════════════════════════════════════════ */
+
+/* Wrapper div that BaseWeb renders around the input */
+div[data-baseweb="input"],
+div[data-baseweb="base-input"] {
+    background: #ffffff !important;
+    border: 1.5px solid #cbd5e1 !important;
+    border-radius: 10px !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+/* The actual input element inside the wrapper */
+div[data-baseweb="input"] input,
+div[data-baseweb="base-input"] input,
+input[type="text"],
+input[type="password"] {
+    background: #ffffff !important;
+    color: #1e293b !important;
+    caret-color: #2563eb !important;   /* ← fixes invisible cursor */
+    border: none !important;           /* border is on wrapper, not input */
+    border-radius: 10px !important;
+    font-size: 0.95rem !important;
+    padding: 0.45rem 0.75rem !important;
+}
+
+/* Remove black outline on focus — replace with blue */
+div[data-baseweb="input"]:focus-within,
+div[data-baseweb="base-input"]:focus-within {
+    border: 1.5px solid #3b82f6 !important;
+    box-shadow: 0 0 0 3px rgba(59,130,246,0.12) !important;
+}
+
+input::placeholder { color: #94a3b8 !important; }
+
+/* ═══════════════ SELECTBOX — LIGHT ═══════════════ */
 div[data-baseweb="select"] > div {
     border-radius: 10px !important;
     border: 1.5px solid #e2e8f0 !important;
@@ -198,28 +234,19 @@ div[role="listbox"] { background: #ffffff !important; }
 div[role="option"]  { color: #1e293b !important; background: #ffffff !important; }
 div[role="option"]:hover { background: #eff6ff !important; }
 
-/* Inputs — LIGHT */
-input[type="text"], input[type="password"] {
-    background: #ffffff !important;
-    color: #1e293b !important;
-    border: 1.5px solid #e2e8f0 !important;
-    border-radius: 10px !important;
-}
-input::placeholder { color: #94a3b8 !important; }
-
-/* Sidebar — LIGHT */
+/* ═══════════════ SIDEBAR — LIGHT ═══════════════ */
 [data-testid="stSidebar"] {
     background: #ffffff !important;
     border-right: 1px solid #e2e8f0 !important;
 }
 [data-testid="stSidebar"] * { color: #1e293b !important; }
 
-/* Tabs — LIGHT */
+/* ═══════════════ TABS ═══════════════ */
 .stTabs [data-baseweb="tab-list"] { border-bottom: 2px solid #e2e8f0 !important; }
 .stTabs [data-baseweb="tab"] { color: #64748b !important; font-weight: 500 !important; }
 .stTabs [aria-selected="true"] { color: #1e293b !important; border-bottom: 3px solid #3b82f6 !important; }
 
-/* Expanders — LIGHT */
+/* ═══════════════ EXPANDERS ═══════════════ */
 details {
     background: #ffffff !important;
     border: 1px solid #e2e8f0 !important;
@@ -227,14 +254,14 @@ details {
 }
 details summary { color: #1e293b !important; font-weight: 600 !important; }
 
-/* Markdown text — LIGHT */
+/* ═══════════════ MARKDOWN TEXT ═══════════════ */
 [data-testid="stMarkdownContainer"] p,
 [data-testid="stMarkdownContainer"] li,
 [data-testid="stMarkdownContainer"] span {
     color: #1e293b !important;
 }
 
-/* Buttons */
+/* ═══════════════ BUTTONS ═══════════════ */
 .stButton > button {
     background: linear-gradient(135deg, #3b82f6, #2563eb) !important;
     color: #ffffff !important;
@@ -263,7 +290,7 @@ details summary { color: #1e293b !important; font-weight: 600 !important; }
     transform: translateY(-1px) !important;
 }
 
-/* Alerts — LIGHT */
+/* ═══════════════ ALERTS ═══════════════ */
 div[data-testid="stSuccessMessage"] {
     background: rgba(16,185,129,0.08) !important;
     border: 1.5px solid rgba(16,185,129,0.3) !important;
@@ -279,77 +306,40 @@ div[data-testid="stErrorMessage"] {
     border: 1.5px solid rgba(239,68,68,0.3) !important;
     border-radius: 10px !important;
 }
-
 hr { border-color: #e2e8f0 !important; }
 
 /* ═══════════════════════════════════════════════════════
    DARK MODE — [data-theme="dark"] is what Streamlit sets
-   This is the CORRECT selector. @media does NOT work.
+   @media (prefers-color-scheme) does NOT work in Streamlit
 ═══════════════════════════════════════════════════════ */
 
-[data-theme="dark"] .stApp,
-[data-theme="dark"] .main {
-    background: #0f172a !important;
-}
+[data-theme="dark"] .stApp { background: #0f172a !important; }
+[data-theme="dark"] .sf-card { background: #1e293b !important; border-color: #334155 !important; }
 
-[data-theme="dark"] .sf-card {
-    background: #1e293b !important;
-    border-color: #334155 !important;
-}
+[data-theme="dark"] .sf-output  { background: rgba(37,99,235,0.12) !important; border-color: #3b82f6 !important; }
+[data-theme="dark"] .sf-output h1,[data-theme="dark"] .sf-output h2,[data-theme="dark"] .sf-output h3 { color: #93c5fd !important; }
+[data-theme="dark"] .sf-output p,[data-theme="dark"] .sf-output li,[data-theme="dark"] .sf-output span { color: #dbeafe !important; }
 
-[data-theme="dark"] .sf-output {
-    background: rgba(37,99,235,0.12) !important;
-    border-color: #3b82f6 !important;
-}
-[data-theme="dark"] .sf-output h1,
-[data-theme="dark"] .sf-output h2,
-[data-theme="dark"] .sf-output h3 { color: #93c5fd !important; }
-[data-theme="dark"] .sf-output p,
-[data-theme="dark"] .sf-output li,
-[data-theme="dark"] .sf-output span,
-[data-theme="dark"] .sf-output strong { color: #dbeafe !important; }
+[data-theme="dark"] .sf-answers { background: rgba(22,163,74,0.12) !important; border-color: #16a34a !important; }
+[data-theme="dark"] .sf-answers h1,[data-theme="dark"] .sf-answers h2,[data-theme="dark"] .sf-answers h3 { color: #86efac !important; }
+[data-theme="dark"] .sf-answers p,[data-theme="dark"] .sf-answers li,[data-theme="dark"] .sf-answers span { color: #dcfce7 !important; }
 
-[data-theme="dark"] .sf-answers {
-    background: rgba(22,163,74,0.12) !important;
-    border-color: #16a34a !important;
-}
-[data-theme="dark"] .sf-answers h1,
-[data-theme="dark"] .sf-answers h2,
-[data-theme="dark"] .sf-answers h3 { color: #86efac !important; }
-[data-theme="dark"] .sf-answers p,
-[data-theme="dark"] .sf-answers li,
-[data-theme="dark"] .sf-answers span,
-[data-theme="dark"] .sf-answers strong { color: #dcfce7 !important; }
+[data-theme="dark"] .sf-fullpaper { background: rgba(109,40,217,0.12) !important; border-color: #7c3aed !important; }
+[data-theme="dark"] .sf-fullpaper h1,[data-theme="dark"] .sf-fullpaper h2,[data-theme="dark"] .sf-fullpaper h3 { color: #c4b5fd !important; }
+[data-theme="dark"] .sf-fullpaper p,[data-theme="dark"] .sf-fullpaper li,[data-theme="dark"] .sf-fullpaper span { color: #ede9fe !important; }
 
-[data-theme="dark"] .sf-fullpaper {
-    background: rgba(109,40,217,0.12) !important;
-    border-color: #7c3aed !important;
-}
-[data-theme="dark"] .sf-fullpaper h1,
-[data-theme="dark"] .sf-fullpaper h2,
-[data-theme="dark"] .sf-fullpaper h3 { color: #c4b5fd !important; }
-[data-theme="dark"] .sf-fullpaper p,
-[data-theme="dark"] .sf-fullpaper li,
-[data-theme="dark"] .sf-fullpaper span,
-[data-theme="dark"] .sf-fullpaper strong { color: #ede9fe !important; }
-
-[data-theme="dark"] .sf-history-item {
-    background: rgba(37,99,235,0.15) !important;
-    border-left-color: #60a5fa !important;
-}
-[data-theme="dark"] .sf-history-item,
-[data-theme="dark"] .sf-history-item b,
-[data-theme="dark"] .sf-history-item small { color: #cbd5e1 !important; }
+[data-theme="dark"] .sf-history-item { background: rgba(37,99,235,0.15) !important; border-left-color: #60a5fa !important; }
+[data-theme="dark"] .sf-history-item,[data-theme="dark"] .sf-history-item small { color: #cbd5e1 !important; }
 [data-theme="dark"] .sf-history-item b { color: #93c5fd !important; }
-[data-theme="dark"] .sf-history-item small { color: #94a3b8 !important; }
 
-/* Radio labels — DARK */
+/* Radio — DARK */
 [data-theme="dark"] div[data-testid="stRadio"] label p,
 [data-theme="dark"] div[data-testid="stRadio"] label span,
 [data-theme="dark"] div[data-testid="stRadio"] [data-testid="stMarkdownContainer"] p,
-[data-theme="dark"] div[data-testid="stRadio"] > div > label > div > p {
+[data-theme="dark"] div[data-testid="stRadio"] > div > label > div > p,
+[data-theme="dark"] div[data-testid="stRadio"] > label,
+[data-theme="dark"] div[data-testid="stRadio"] > label p {
     color: #e2e8f0 !important;
-    font-weight: 500 !important;
 }
 
 /* Widget labels — DARK */
@@ -361,32 +351,37 @@ hr { border-color: #e2e8f0 !important; }
     color: #e2e8f0 !important;
 }
 
-/* Selectbox — DARK */
-[data-theme="dark"] div[data-baseweb="select"] > div {
+/* Input wrappers — DARK */
+[data-theme="dark"] div[data-baseweb="input"],
+[data-theme="dark"] div[data-baseweb="base-input"] {
     background: #1e293b !important;
-    border-color: #334155 !important;
-    color: #e2e8f0 !important;
+    border: 1.5px solid #334155 !important;
 }
-[data-theme="dark"] div[data-baseweb="select"] span,
-[data-theme="dark"] div[data-baseweb="select"] div { color: #e2e8f0 !important; }
-[data-theme="dark"] div[role="listbox"]  { background: #1e293b !important; }
-[data-theme="dark"] div[role="option"]   { color: #e2e8f0 !important; background: #1e293b !important; }
-[data-theme="dark"] div[role="option"]:hover { background: #334155 !important; }
-
-/* Inputs — DARK */
+[data-theme="dark"] div[data-baseweb="input"] input,
+[data-theme="dark"] div[data-baseweb="base-input"] input,
 [data-theme="dark"] input[type="text"],
 [data-theme="dark"] input[type="password"] {
     background: #1e293b !important;
     color: #e2e8f0 !important;
-    border-color: #334155 !important;
+    caret-color: #60a5fa !important;
+}
+[data-theme="dark"] div[data-baseweb="input"]:focus-within,
+[data-theme="dark"] div[data-baseweb="base-input"]:focus-within {
+    border: 1.5px solid #60a5fa !important;
+    box-shadow: 0 0 0 3px rgba(96,165,250,0.15) !important;
 }
 [data-theme="dark"] input::placeholder { color: #64748b !important; }
 
+/* Selectbox — DARK */
+[data-theme="dark"] div[data-baseweb="select"] > div { background: #1e293b !important; border-color: #334155 !important; color: #e2e8f0 !important; }
+[data-theme="dark"] div[data-baseweb="select"] span,
+[data-theme="dark"] div[data-baseweb="select"] div  { color: #e2e8f0 !important; }
+[data-theme="dark"] div[role="listbox"]  { background: #1e293b !important; }
+[data-theme="dark"] div[role="option"]   { color: #e2e8f0 !important; background: #1e293b !important; }
+[data-theme="dark"] div[role="option"]:hover { background: #334155 !important; }
+
 /* Sidebar — DARK */
-[data-theme="dark"] [data-testid="stSidebar"] {
-    background: #0f172a !important;
-    border-right-color: #334155 !important;
-}
+[data-theme="dark"] [data-testid="stSidebar"] { background: #0f172a !important; border-right-color: #334155 !important; }
 [data-theme="dark"] [data-testid="stSidebar"] * { color: #e2e8f0 !important; }
 
 /* Tabs — DARK */
@@ -395,10 +390,7 @@ hr { border-color: #e2e8f0 !important; }
 [data-theme="dark"] .stTabs [aria-selected="true"] { color: #f1f5f9 !important; border-bottom-color: #60a5fa !important; }
 
 /* Expanders — DARK */
-[data-theme="dark"] details {
-    background: #1e293b !important;
-    border-color: #334155 !important;
-}
+[data-theme="dark"] details { background: #1e293b !important; border-color: #334155 !important; }
 [data-theme="dark"] details summary { color: #e2e8f0 !important; }
 
 /* Markdown — DARK */
@@ -412,27 +404,12 @@ hr { border-color: #e2e8f0 !important; }
 }
 
 /* Alerts — DARK */
-[data-theme="dark"] div[data-testid="stSuccessMessage"] {
-    background: rgba(16,185,129,0.15) !important;
-    border-color: rgba(16,185,129,0.4) !important;
-    color: #d1fae5 !important;
-}
-[data-theme="dark"] div[data-testid="stWarningMessage"] {
-    background: rgba(245,158,11,0.15) !important;
-    border-color: rgba(245,158,11,0.4) !important;
-    color: #fef3c7 !important;
-}
-[data-theme="dark"] div[data-testid="stErrorMessage"] {
-    background: rgba(239,68,68,0.15) !important;
-    border-color: rgba(239,68,68,0.4) !important;
-    color: #fee2e2 !important;
-}
-
+[data-theme="dark"] div[data-testid="stSuccessMessage"] { background: rgba(16,185,129,0.15) !important; color: #d1fae5 !important; }
+[data-theme="dark"] div[data-testid="stWarningMessage"] { background: rgba(245,158,11,0.15) !important; color: #fef3c7 !important; }
+[data-theme="dark"] div[data-testid="stErrorMessage"]   { background: rgba(239,68,68,0.15) !important;  color: #fee2e2 !important; }
 [data-theme="dark"] hr { border-color: #334155 !important; }
 
-/* ═══════════════════════
-   MOBILE
-═══════════════════════ */
+/* ═══════════════ MOBILE ═══════════════ */
 @media (max-width: 768px) {
     .sf-header-title { font-size: 2.3rem !important; }
     .sf-card,.sf-output,.sf-answers,.sf-fullpaper { padding: 14px 16px; }
@@ -483,12 +460,10 @@ def add_to_history(label, chapter, subject, result_preview):
 def init_db():
     conn = sqlite3.connect("users.db")
     c = conn.cursor()
-    c.execute("""
-        CREATE TABLE IF NOT EXISTS users (
-            username TEXT PRIMARY KEY,
-            password TEXT NOT NULL
-        )
-    """)
+    c.execute("""CREATE TABLE IF NOT EXISTS users (
+        username TEXT PRIMARY KEY,
+        password TEXT NOT NULL
+    )""")
     conn.commit()
     conn.close()
 
@@ -504,16 +479,14 @@ def configure_gemini():
 
 def get_available_models():
     ok, msg = configure_gemini()
-    if not ok:
-        return [f"Error: {msg}"]
+    if not ok: return [f"Error: {msg}"]
     try:
         models  = genai.list_models()
-        working = []
-        for m in models:
-            name    = getattr(m, "name", "")
-            methods = getattr(m, "supported_generation_methods", [])
-            if "gemini" in name.lower() and "generateContent" in methods:
-                working.append(name)
+        working = [
+            getattr(m,"name","") for m in models
+            if "gemini" in getattr(m,"name","").lower()
+            and "generateContent" in getattr(m,"supported_generation_methods",[])
+        ]
         return working if working else ["No models available"]
     except Exception as e:
         return [f"Error: {str(e)}"]
@@ -532,16 +505,11 @@ def get_effective_output_name(tool, output_style):
     return "Content"
 
 def get_button_label(tool, output_style):
-    name = get_effective_output_name(tool, output_style)
+    name  = get_effective_output_name(tool, output_style)
     icons = {
-        "Question Paper":   "🧪",
-        "Notes":            "📋",
-        "Detailed Summary": "📄",
-        "Quick Summary":    "⚡",
-        "Summary":          "📝",
-        "Quiz":             "🧠",
-        "Revision Notes":   "📌",
-        "Exam Q&A":         "❓",
+        "Question Paper":"🧪","Notes":"📋","Detailed Summary":"📄",
+        "Quick Summary":"⚡","Summary":"📝","Quiz":"🧠",
+        "Revision Notes":"📌","Exam Q&A":"❓",
     }
     return f"{icons.get(name,'✨')} Generate {name}"
 
@@ -617,7 +585,7 @@ def get_qp_format_spec(board, course, subject):
             "board_label":"COUNCIL FOR THE INDIAN SCHOOL CERTIFICATE EXAMINATIONS",
             "exam_label":"ICSE EXAMINATION","class_label":course.upper(),
             "total_marks":80,"time":"2 Hours",
-            "instructions":["Attempt all from Section A.","Attempt any four from Section B.","Marks shown in brackets [ ]."],
+            "instructions":["Attempt all from Section A.","Attempt any four from Section B.","Marks in brackets [ ]."],
             "sections":[
                 {"name":"SECTION A","type":"Compulsory Objective / Short Answer","q_count":10,"marks_each":"varied","total":40},
                 {"name":"SECTION B","type":"Descriptive (Attempt 4 of 6)","q_count":6,"marks_each":10,"total":40},
@@ -629,7 +597,7 @@ def get_qp_format_spec(board, course, subject):
             "board_label":"COUNCIL FOR THE INDIAN SCHOOL CERTIFICATE EXAMINATIONS",
             "exam_label":"ISC EXAMINATION","class_label":course.upper(),
             "total_marks":70,"time":"3 Hours",
-            "instructions":["Attempt all from Section A.","Attempt any four from Section B.","Marks shown in brackets [ ].","Draw neat labelled diagrams where necessary."],
+            "instructions":["Attempt all from Section A.","Attempt any four from Section B.","Marks in brackets [ ].","Draw neat labelled diagrams where necessary."],
             "sections":[
                 {"name":"SECTION A","type":"Compulsory","q_count":10,"marks_each":"varied","total":30},
                 {"name":"SECTION B","type":"Descriptive (4 of 6)","q_count":6,"marks_each":10,"total":40},
@@ -683,23 +651,6 @@ def get_qp_format_spec(board, course, subject):
             {"name":"SECTION C","type":"Long Answer","q_count":4,"marks_each":10,"total":40},
         ]
     }
-
-
-def render_qp_preview(board, course, subject):
-    fmt = get_qp_format_spec(board, course, subject)
-    lines = [
-        f"**Board:** {fmt['board_label']}",
-        f"**Exam:** {fmt['exam_label']}",
-        f"**Class / Course:** {fmt['class_label']}",
-        f"**Time:** {fmt['time']}  |  **Max Marks:** {fmt['total_marks']}",
-        "", "**Sections:**"
-    ]
-    for s in fmt["sections"]:
-        lines.append(f"- **{s['name']}** — {s['type']} | {s['q_count']} Qs × {s['marks_each']} marks = {s['total']}")
-    lines += ["","**General Instructions:**"]
-    for ins in fmt["instructions"]:
-        lines.append(f"- {ins}")
-    return "\n".join(lines)
 
 # ─────────────────────────────────────────────────────────────────────────────
 # STEP 5: PROMPTS
@@ -766,7 +717,7 @@ STRUCTURE (follow exactly):
 {secs}
 
 RULES:
-1. Cover the FULL syllabus — not just one chapter.
+1. Cover the FULL syllabus.
 2. Distribute questions across all major units.
 3. Follow official format exactly.
 4. Number all questions.
@@ -784,7 +735,7 @@ You are preparing the OFFICIAL ANSWER KEY for the EXACT question paper below.
 BOARD: {board} | COURSE: {course} | SUBJECT: {subject} | CHAPTER: {chapter}
 
 CRITICAL RULES:
-1. Answer ONLY the questions in the paper below.
+1. Answer ONLY the questions in the paper below — do not invent new ones.
 2. Keep the EXACT same section names and question numbers.
 3. For each question: question number → brief restatement → answer.
 4. MCQs: correct option letter + 2-3 line explanation.
@@ -793,7 +744,7 @@ CRITICAL RULES:
 7. Long Answer: 150-250 words with examples.
 8. Case-Based: full analysis + all sub-question answers.
 9. If OR choices exist, answer BOTH.
-10. DO NOT create a new paper — only answer the one below.
+10. DO NOT create a new paper.
 
 ===== QUESTION PAPER =====
 {question_paper_text}
@@ -809,60 +760,21 @@ def build_prompt(tool, chapter, topic, subject, audience, output_style, board=""
     base = f"""
 You are an expert educator creating study material for {audience}.
 Subject: {subject} | Topic: {topic} | Chapter: {chapter}
-Requirements: Accurate, exam-focused, well-structured, with examples, and error-free.
+Requirements: Accurate, exam-focused, well-structured, with examples, error-free.
 """
     if tool == "📝 Summary":
         if output_style == "📄 Detailed":
-            return base + """
-Create a detailed summary:
-- Chapter overview (150-200 words)
-- Key concepts (300-400 words)
-- Important definitions and formulas
-- 2-3 worked examples
-- Common mistakes to avoid
-- Exam tips
-"""
+            return base + """Create a detailed summary:\n- Chapter overview\n- Key concepts\n- Definitions and formulas\n- Worked examples\n- Common mistakes\n- Exam tips"""
         elif output_style == "⚡ Short & Quick":
-            return base + """
-Create a concise quick-reference guide (max 500 words):
-- One-line definition
-- 5-7 key points
-- Important formulas / facts
-- Quick revision tips
-"""
+            return base + """Create a concise quick-reference guide (max 500 words):\n- One-line definition\n- 5-7 key points\n- Important formulas\n- Quick revision tips"""
         elif output_style == "📋 Notes Format":
-            return base + """
-Create structured study notes:
-- Clear headings and subheadings
-- Bullet points per concept
-- Definitions highlighted
-- Important facts and examples
-- Revision points
-"""
+            return base + """Create structured study notes:\n- Clear headings\n- Bullet points\n- Definitions\n- Examples\n- Revision points"""
     if tool == "🧠 Quiz":
-        return base + """
-Create a quiz:
-- 5 MCQs with 4 options (mark correct answer)
-- 5 short answer questions with answers
-- 3 long answer questions with answers
-"""
+        return base + """Create a quiz:\n- 5 MCQs with 4 options (mark correct)\n- 5 short answer Q&A\n- 3 long answer Q&A"""
     if tool == "📌 Revision Notes":
-        return base + """
-Create revision notes:
-- Top 10 must-know points
-- Formula / fact sheet
-- Mnemonics and memory tricks
-- Key comparisons / tables
-- Exam focus areas
-"""
+        return base + """Create revision notes:\n- Top 10 must-know points\n- Formula sheet\n- Mnemonics\n- Key comparisons\n- Exam focus areas"""
     if tool == "❓ Exam Q&A":
-        return base + """
-Create an exam Q&A bank:
-- 8-10 frequently asked questions with answers
-- 5 conceptual questions with answers
-- 5 application questions with answers
-- 5 why / how questions with answers
-"""
+        return base + """Create an exam Q&A bank:\n- 8-10 frequently asked questions\n- 5 conceptual Q&A\n- 5 application Q&A\n- 5 why/how Q&A"""
     return base + "Create comprehensive exam-ready study material."
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -870,7 +782,7 @@ Create an exam Q&A bank:
 # ─────────────────────────────────────────────────────────────────────────────
 
 def generate_with_fallback(prompt):
-    api_key = st.secrets.get("GEMINI_API_KEY", "")
+    api_key = st.secrets.get("GEMINI_API_KEY","")
     if not api_key:
         return ("⚠️ API key missing! Add GEMINI_API_KEY to `.streamlit/secrets.toml`","None")
     try:
@@ -926,11 +838,11 @@ def generate_pdf(title, subtitle, content, color_hex="#1d4ed8"):
         textColor=colors.HexColor("#64748b"), spaceAfter=10, alignment=TA_CENTER, fontName="Helvetica")))
     story.append(HRFlowable(width="100%", thickness=2, color=colors.HexColor(color_hex), spaceAfter=14))
 
-    body_sty = ParagraphStyle("B", parent=styles["Normal"], fontSize=10.5, leading=15,
+    bs = ParagraphStyle("B", parent=styles["Normal"],  fontSize=10.5, leading=15,
         textColor=colors.HexColor("#1e293b"), spaceAfter=5, fontName="Helvetica")
-    head_sty = ParagraphStyle("H", parent=styles["Heading2"], fontSize=12.5,
+    hs = ParagraphStyle("H", parent=styles["Heading2"], fontSize=12.5,
         textColor=colors.HexColor(color_hex), spaceBefore=10, spaceAfter=6, fontName="Helvetica-Bold")
-    bull_sty = ParagraphStyle("BL", parent=styles["Normal"], fontSize=10.5, leading=15,
+    bl = ParagraphStyle("BL", parent=styles["Normal"], fontSize=10.5, leading=15,
         leftIndent=16, bulletIndent=6, textColor=colors.HexColor("#334155"), spaceAfter=4, fontName="Helvetica")
 
     for line in content.split("\n"):
@@ -938,11 +850,11 @@ def generate_pdf(title, subtitle, content, color_hex="#1d4ed8"):
         if not line: story.append(Spacer(1, 0.18*cm)); continue
         safe = line.replace("&","&amp;").replace("<","&lt;").replace(">","&gt;")
         if line.startswith(("###","##","#")):
-            story.append(Paragraph(line.lstrip("#").strip(), head_sty))
+            story.append(Paragraph(line.lstrip("#").strip(), hs))
         elif line.startswith(("- ","• ","* ")):
-            story.append(Paragraph(f"• {safe[2:]}", bull_sty))
+            story.append(Paragraph(f"• {safe[2:]}", bl))
         else:
-            story.append(Paragraph(safe, body_sty))
+            story.append(Paragraph(safe, bs))
 
     story.append(Spacer(1,0.3*cm))
     story.append(HRFlowable(width="100%",thickness=1,color=colors.HexColor("#e2e8f0"),spaceAfter=5))
@@ -987,6 +899,8 @@ def reset_generation_state():
 # ─────────────────────────────────────────────────────────────────────────────
 
 def main_app():
+
+    # ── Sidebar ───────────────────────────────────────────────────────────────
     with st.sidebar:
         st.markdown(f"""
             <div style="text-align:center;padding:18px 0 14px 0;">
@@ -999,7 +913,7 @@ def main_app():
         """, unsafe_allow_html=True)
         st.divider()
 
-        tool = st.radio("SELECT TOOL", [
+        tool = st.radio("SELECT TOOL",[
             "📝 Summary","🧠 Quiz","📌 Revision Notes","🧪 Question Paper","❓ Exam Q&A"
         ])
         st.divider()
@@ -1033,7 +947,7 @@ def main_app():
             reset_generation_state()
             st.rerun()
 
-    # Header
+    # ── Header ─────────────────────────────────────────────────────────────────
     st.markdown("""
         <div class="sf-header">
             <div class="sf-header-title">StudySmart</div>
@@ -1041,7 +955,7 @@ def main_app():
         </div>
     """, unsafe_allow_html=True)
 
-    # Selection card
+    # ── Selection Card ──────────────────────────────────────────────────────────
     st.markdown('<div class="sf-card">', unsafe_allow_html=True)
     if not STUDY_DATA:
         st.error("No study data found.")
@@ -1063,18 +977,19 @@ def main_app():
     chapter = st.selectbox("📝 Chapter", st.session_state.current_chapters)
     st.markdown('</div>', unsafe_allow_html=True)
 
-    # Output style
+    # ── Output Style ────────────────────────────────────────────────────────────
     output_style = st.radio(
         "⚙️ Output Style",
-        ["📄 Detailed", "⚡ Short & Quick", "📋 Notes Format", "🧪 Question Paper"],
+        ["📄 Detailed","⚡ Short & Quick","📋 Notes Format","🧪 Question Paper"],
         horizontal=True
     )
 
     effective_label = get_effective_output_name(tool, output_style)
     btn_label       = get_button_label(tool, output_style)
 
-    # ── SINGLE GENERATE BUTTON — always here, never blocked ───────────────────
     st.markdown('<div style="margin-top:12px;"></div>', unsafe_allow_html=True)
+
+    # ── SINGLE GENERATE BUTTON — always at top, no clutter ────────────────────
     if st.button(btn_label, use_container_width=True):
         if not chapter or chapter == "No chapters found":
             st.warning("⚠️ Please select a valid chapter first.")
@@ -1100,11 +1015,6 @@ def main_app():
         if model_used != "None":
             add_to_history(effective_label, chapter, subject, result)
 
-    # QP format preview shown BELOW button as a collapsible — non-blocking
-    if effective_label == "Question Paper":
-        with st.expander("📄 View Question Paper Format for this Board/Course", expanded=False):
-            st.markdown(render_qp_preview(board, course, subject))
-
     # ── OUTPUT DISPLAY ─────────────────────────────────────────────────────────
     if st.session_state.generated_result and st.session_state.generated_model != "None":
         result    = st.session_state.generated_result
@@ -1118,7 +1028,6 @@ def main_app():
         g_audience= st.session_state.generated_audience
 
         st.markdown("---")
-
         st.markdown('<div class="sf-output">', unsafe_allow_html=True)
         st.markdown(f"### {g_label} — {g_chapter}")
         st.markdown(result)
@@ -1174,7 +1083,7 @@ def main_app():
 
             # Full Subject QP
             st.markdown("---")
-            st.info(f"💡 Want a full **{g_subject}** paper covering the entire syllabus in **{g_board}** format?")
+            st.info(f"💡 Want a complete **{g_subject}** paper covering the entire syllabus in **{g_board}** format?")
             if st.button(f"🗂️ Generate Full {g_subject} Question Paper ({g_board})",
                          use_container_width=True, key="full_qp_btn"):
                 with st.spinner(f"Generating full {g_subject} question paper... ⏳"):
@@ -1221,7 +1130,7 @@ def main_app():
         st.markdown(st.session_state.generated_result)
 
 # ─────────────────────────────────────────────────────────────────────────────
-# STEP 10: AUTH UI
+# STEP 10: AUTH UI — fixed borders + cursor
 # ─────────────────────────────────────────────────────────────────────────────
 
 def auth_ui():
@@ -1238,8 +1147,8 @@ def auth_ui():
         tab1, tab2 = st.tabs(["🔐 Login","📝 Register"])
 
         with tab1:
-            u = st.text_input("👤 Username", key="login_u", placeholder="Enter username")
-            p = st.text_input("🔑 Password", type="password", key="login_p", placeholder="Enter password")
+            u = st.text_input("👤 Username",key="login_u",placeholder="Enter username")
+            p = st.text_input("🔑 Password",type="password",key="login_p",placeholder="Enter password")
             if st.button("Sign In 🚀", use_container_width=True):
                 if u.strip() and p.strip():
                     conn = sqlite3.connect("users.db"); c = conn.cursor()
@@ -1256,14 +1165,14 @@ def auth_ui():
                     st.warning("⚠️ Please fill in both fields.")
 
         with tab2:
-            nu = st.text_input("👤 New Username",     key="reg_u",  placeholder="Min 3 characters")
-            np = st.text_input("🔑 New Password",     type="password", key="reg_p",  placeholder="Min 6 characters")
-            cp = st.text_input("🔑 Confirm Password", type="password", key="reg_cp", placeholder="Re-enter password")
+            nu = st.text_input("👤 New Username",    key="reg_u",  placeholder="Min 3 characters")
+            np = st.text_input("🔑 New Password",    type="password",key="reg_p",  placeholder="Min 6 characters")
+            cp = st.text_input("🔑 Confirm Password",type="password",key="reg_cp", placeholder="Re-enter password")
             if st.button("Create Account ✨", use_container_width=True):
-                if not nu.strip():        st.error("❌ Username cannot be empty")
-                elif len(nu.strip()) < 3: st.error("❌ Username min 3 characters")
-                elif len(np.strip()) < 6: st.error("❌ Password min 6 characters")
-                elif np != cp:            st.error("❌ Passwords do not match")
+                if not nu.strip():         st.error("❌ Username cannot be empty")
+                elif len(nu.strip()) < 3:  st.error("❌ Username min 3 characters")
+                elif len(np.strip()) < 6:  st.error("❌ Password min 6 characters")
+                elif np != cp:             st.error("❌ Passwords do not match")
                 else:
                     try:
                         conn = sqlite3.connect("users.db"); c = conn.cursor()
