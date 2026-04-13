@@ -607,11 +607,13 @@ def hash_p(pw): return hashlib.sha256(pw.encode()).hexdigest()
 
 def do_login(username, password):
     u = username.strip()
-    if not u or not password.strip(): return False, "⚠️ Please fill in both fields."
-    conn = sqlite3.connect("users.db"); c = conn.cursor()
-    c.execute("SELECT * FROM users WHERE username=? AND password=?", (u, hash_p(password)))
-    user = c.fetchone(); conn.close()
-    return (True, u) if user else (False, "❌ Invalid username or password.")
+    # ONLY allow your specific username
+    ALLOWED_USERS = ["Deepak"] 
+    
+    if u not in ALLOWED_USERS:
+        return False, "❌ Access Denied: You are not authorized to use this app."
+    
+    # ... rest of the existing login code ...
 
 # ─────────────────────────────────────────────────────────────────────────────
 # HISTORY
