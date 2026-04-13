@@ -1,6 +1,7 @@
 # ═══════════════════════════════════════════════════════════════════════════════
-# STUDYSMART AI — CLEAN APP v2.3 (WITH "GET ANSWERS" FEATURE)
-# Auto-detects available Gemini models dynamically
+# STUDYSMART AI — APP v2.4
+# Fix 1: Session state persistence for Get Answers button
+# Fix 2: temperature=0.1 for consistent, trustworthy results
 # ═══════════════════════════════════════════════════════════════════════════════
 
 import streamlit as st
@@ -24,14 +25,12 @@ from reportlab.lib.enums import TA_LEFT, TA_CENTER
 
 @st.cache_data
 def load_study_data():
-    """Load study data from external JSON file"""
     try:
         data_path = Path("data/study_data.json")
         with open(data_path, "r", encoding="utf-8") as f:
             return json.load(f)
     except FileNotFoundError:
         st.error("❌ Error: data/study_data.json not found!")
-        st.info("📁 Please create the file structure as shown in the setup guide")
         return {}
     except json.JSONDecodeError:
         st.error("❌ Error: study_data.json is not valid JSON!")
@@ -154,7 +153,13 @@ st.markdown("""
         color: #1e293b;
     }
 
-    /* ✅ NEW: Answers section styling */
+    .sf-output h3, .sf-output h2 {
+        color: #3b82f6 !important;
+        margin-top: 0;
+        font-weight: 700;
+    }
+
+    /* ✅ Green answer box */
     .sf-answers {
         background: linear-gradient(135deg,
             rgba(34, 197, 94, 0.05) 0%,
@@ -174,12 +179,6 @@ st.markdown("""
         font-weight: 700;
     }
 
-    .sf-output h3, .sf-output h2 {
-        color: #3b82f6 !important;
-        margin-top: 0;
-        font-weight: 700;
-    }
-
     .sf-history-item {
         background: rgba(59,130,246,0.05);
         border-radius: 10px;
@@ -190,7 +189,6 @@ st.markdown("""
         color: #475569;
     }
 
-    /* Buttons */
     .stButton > button {
         background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
         color: #ffffff !important;
@@ -205,26 +203,6 @@ st.markdown("""
     }
     .stButton > button:hover {
         box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4) !important;
-        transform: translateY(-2px) !important;
-    }
-
-    /* ✅ NEW: Get Answers button styling (Green) */
-    .sf-get-answers {
-        background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%) !important;
-        color: #ffffff !important;
-        border: none !important;
-        border-radius: 12px !important;
-        padding: 0.7rem 2rem !important;
-        font-weight: 600 !important;
-        font-size: 0.95rem !important;
-        letter-spacing: 0.4px !important;
-        transition: all 0.2s ease !important;
-        box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3) !important;
-        width: 100% !important;
-        margin-top: 16px !important;
-    }
-    .sf-get-answers:hover {
-        box-shadow: 0 8px 25px rgba(34, 197, 94, 0.4) !important;
         transform: translateY(-2px) !important;
     }
 
@@ -288,7 +266,6 @@ st.markdown("""
         border-radius: 10px !important;
     }
 
-    /* Mobile responsive */
     @media (max-width: 768px) {
         .sf-header-title { font-size: 2.8rem !important; }
         .block-container {
@@ -379,7 +356,6 @@ def init_db():
     conn.close()
 
 def configure_gemini():
-    """Configure Gemini once if API key exists."""
     api_key = st.secrets.get("GEMINI_API_KEY", "")
     if not api_key:
         return False, "GEMINI_API_KEY not found in secrets"
@@ -390,10 +366,6 @@ def configure_gemini():
         return False, str(e)
 
 def list_working_gemini_models():
-    """
-    Dynamically list only Gemini models that support generateContent.
-    Avoids hardcoding model names that may not exist for the API key.
-    """
     ok, msg = configure_gemini()
     if not ok:
         return [], msg
@@ -410,7 +382,6 @@ def list_working_gemini_models():
         return [], str(e)
 
 def get_available_models():
-    """Return available models list for sidebar display."""
     working_models, err = list_working_gemini_models()
     if err:
         return [f"Error: {err}"]
@@ -419,11 +390,9 @@ def get_available_models():
     return working_models
 
 def count_words(text):
-    """Count words in generated text."""
     return len(text.split())
 
 def add_to_history(tool, chapter, subject, result_preview):
-    """Add generated content to session history (max 5 items)."""
     if "history" not in st.session_state:
         st.session_state.history = []
     entry = {
@@ -441,8 +410,6 @@ def add_to_history(tool, chapter, subject, result_preview):
 # ═════════════════════════════════════════════════════════════════════════════
 
 def build_prompt(tool, chapter, topic, subject, audience, output_style):
-    """Build detailed prompts for AI"""
-
     base_context = f"""
 You are an expert educator creating study material for {audience}.
 Subject: {subject} | Topic: {topic} | Chapter: {chapter}
@@ -506,14 +473,30 @@ Create revision notes with:
 
     elif tool == "🧪 Question Paper":
         return base_context + """
-Create a full exam question paper:
-- Section A: 10 MCQs (1 mark each = 10 marks)
-- Section B: 5 Short Answer Questions (3 marks each = 15 marks)
-- Section C: 4 Long Answer Questions (5 marks each = 20 marks)
-- Section D: 1-2 Case Studies (6-8 marks each)
-Total: 100 marks | Difficulty: 30% easy, 50% medium, 20% hard
-DO NOT provide answers in this question paper.
-"""
+Create a full exam question paper. Do NOT include answers anywhere.
+Format exactly as follows:
+
+## QUESTION PAPER
+**Subject:** {subject} | **Chapter:** {chapter}
+**Total Marks:** 55 | **Time:** 2 Hours
+
+---
+### SECTION A — Multiple Choice Questions (1 mark each)
+(List 10 MCQs with 4 options each. Do not mark the answer.)
+
+### SECTION B — Short Answer Questions (3 marks each)
+(List 5 short answer questions.)
+
+### SECTION C — Long Answer Questions (5 marks each)
+(List 4 long answer questions.)
+
+### SECTION D — Case Study (6 marks)
+(1 case study with 3 sub-questions.)
+
+---
+Difficulty: 30% easy, 50% medium, 20% hard.
+DO NOT provide answers or hints anywhere in this paper.
+""".format(subject=subject, chapter=chapter)
 
     elif tool == "❓ Exam Q&A":
         return base_context + """
@@ -529,52 +512,72 @@ Each answer: 150-300 words minimum with examples
 
     elif output_style == "🧪 Question Paper":
         return base_context + """
-Create a well-structured question paper based on this chapter:
-- Section A: 10 MCQs (1 mark each = 10 marks)
-- Section B: 5 Short Answer Questions (3 marks each = 15 marks)
-- Section C: 4 Long Answer Questions (5 marks each = 20 marks)
-- Section D: 1-2 Case/Application-Based Questions (6-8 marks each)
-Total: 100 marks | Difficulty: 30% easy, 50% medium, 20% hard
-DO NOT provide answers. Format like a real exam paper.
-"""
+Create a well-structured exam question paper. Do NOT include answers.
+Format exactly as follows:
+
+## QUESTION PAPER
+**Subject:** {subject} | **Chapter:** {chapter}
+**Total Marks:** 55 | **Time:** 2 Hours
+
+---
+### SECTION A — Multiple Choice Questions (1 mark each)
+(List 10 MCQs with 4 options each. Do not mark the answer.)
+
+### SECTION B — Short Answer Questions (3 marks each)
+(List 5 short answer questions.)
+
+### SECTION C — Long Answer Questions (5 marks each)
+(List 4 long answer questions.)
+
+### SECTION D — Case Study (6 marks)
+(1 case study with 3 sub-questions.)
+
+---
+Difficulty: 30% easy, 50% medium, 20% hard.
+DO NOT provide answers anywhere.
+""".format(subject=subject, chapter=chapter)
 
     return base_context + "Create comprehensive and exam-ready study material."
 
-# ✅ NEW: Function to generate answers for question paper
-def build_answers_prompt(chapter, topic, subject, audience):
-    """Build prompt to generate answers for question paper"""
+
+def build_answers_prompt(chapter, topic, subject, audience, question_paper_text):
+    """
+    ✅ FIX: Pass the actual question paper text so AI answers
+    exactly those questions — not random new ones.
+    """
     return f"""
-You are an expert educator. Generate detailed ANSWERS ONLY for a question paper on:
-Subject: {subject} | Topic: {topic} | Chapter: {chapter}
-Audience: {audience}
+You are an expert educator. Below is a question paper that was given to students.
+Provide COMPLETE and DETAILED answers for EVERY question in this paper.
 
-Provide complete answers with:
-- For MCQs: Show correct option and brief explanation
-- For Short Answer Questions: 3-5 line answers with examples
-- For Long Answer Questions: Detailed 250-400 word answers with explanations, examples, and key points
-- For Case Studies: Comprehensive analysis with solutions
+Subject: {subject} | Topic: {topic} | Chapter: {chapter} | Audience: {audience}
 
-Structure answers in clear sections matching the question paper format.
+===== QUESTION PAPER =====
+{question_paper_text}
+===== END OF PAPER =====
+
+Now write the ANSWER KEY:
+- For each MCQ: State the correct option letter AND a brief explanation (2-3 lines)
+- For each Short Answer: Write a clear 4-6 line answer
+- For each Long Answer: Write a detailed answer (200-300 words) with examples
+- For Case Study: Provide full analysis and answers to each sub-question
+
+Label each answer clearly matching the question number and section.
+Be accurate, educational, and thorough.
 """
 
 # ═════════════════════════════════════════════════════════════════════════════
 # STEP 5: AI GENERATION ENGINE
+# ✅ FIX: temperature=0.1 for consistent, trustworthy results
 # ═════════════════════════════════════════════════════════════════════════════
 
 def generate_with_fallback(prompt):
-    """
-    Automatically uses whatever Gemini model is currently working.
-    Discovers available models dynamically, then tries them one by one.
-    """
     api_key = st.secrets.get("GEMINI_API_KEY", "")
     if not api_key:
         return (
             "⚠️ API key missing!\n\n"
-            "**How to fix:**\n"
-            "1. Create `.streamlit/secrets.toml` in your project folder\n"
+            "1. Create `.streamlit/secrets.toml`\n"
             "2. Add: `GEMINI_API_KEY = \"your_key_here\"`\n"
-            "3. Get your free key at https://aistudio.google.com/app/apikey\n"
-            "4. Restart the app",
+            "3. Get your free key at https://aistudio.google.com/app/apikey",
             "None"
         )
 
@@ -592,25 +595,10 @@ def generate_with_fallback(prompt):
             if "gemini" in name.lower() and "generateContent" in methods:
                 available_models.append(name)
     except Exception as e:
-        return (
-            f"❌ Could not list Gemini models: {str(e)}\n\n"
-            "**Possible causes:**\n"
-            "- Invalid or expired API key\n"
-            "- No internet connection\n"
-            "- Gemini API not enabled for this key",
-            "None"
-        )
+        return (f"❌ Could not list Gemini models: {str(e)}", "None")
 
     if not available_models:
-        return (
-            "❌ No Gemini models available for this API key.\n\n"
-            "**How to fix:**\n"
-            "- Check that your Gemini API key is valid\n"
-            "- Make sure Gemini API is enabled in Google Cloud Console\n"
-            "- Verify your quota and billing\n"
-            "- Confirm internet access",
-            "None"
-        )
+        return ("❌ No Gemini models available for this API key.", "None")
 
     last_error = "Unknown error"
     for model_name in available_models:
@@ -619,7 +607,7 @@ def generate_with_fallback(prompt):
             response = model.generate_content(
                 prompt,
                 generation_config=genai.types.GenerationConfig(
-                    temperature=0.7,
+                    temperature=0.1,      # ✅ FIX: was 0.7 — now 0.1 for consistent results
                     max_output_tokens=4096,
                     top_p=0.95,
                 ),
@@ -632,9 +620,7 @@ def generate_with_fallback(prompt):
 
     return (
         f"❌ All AI models failed.\n\n**Last error:** {last_error}\n\n"
-        "**How to fix:**\n"
         "- Check your API key is active\n"
-        "- Check quota and billing at console.cloud.google.com\n"
         "- Check internet connection\n"
         "- Try again after a few minutes",
         "None"
@@ -645,7 +631,6 @@ def generate_with_fallback(prompt):
 # ═════════════════════════════════════════════════════════════════════════════
 
 def generate_pdf(title, subtitle, content):
-    """Generate professional PDF"""
     buffer = io.BytesIO()
     doc = SimpleDocTemplate(
         buffer,
@@ -769,11 +754,41 @@ def generate_pdf(title, subtitle, content):
     return buffer
 
 # ═════════════════════════════════════════════════════════════════════════════
-# STEP 7: MAIN APPLICATION UI
+# STEP 7: SESSION STATE INITIALISATION
+# ✅ FIX: All session keys declared upfront so nothing is ever lost on re-run
+# ═════════════════════════════════════════════════════════════════════════════
+
+def init_session_state():
+    defaults = {
+        "logged_in": False,
+        "username": "",
+        "current_chapters": [],
+        "history": [],
+        "last_chapter_key": "",
+        # ✅ These persist the generated content across button clicks
+        "generated_result": None,
+        "generated_model": None,
+        "generated_tool": None,
+        "generated_chapter": None,
+        "generated_subject": None,
+        "generated_topic": None,
+        "generated_course": None,
+        "generated_audience": None,
+        "generated_output_style": None,
+        # ✅ These persist the answers
+        "answers_result": None,
+        "answers_model": None,
+        "show_answers": False,
+    }
+    for key, val in defaults.items():
+        if key not in st.session_state:
+            st.session_state[key] = val
+
+# ═════════════════════════════════════════════════════════════════════════════
+# STEP 8: MAIN APPLICATION UI
 # ═════════════════════════════════════════════════════════════════════════════
 
 def main_app():
-    """Main application UI + AI Logic"""
 
     with st.sidebar:
         st.markdown(f"""
@@ -825,9 +840,12 @@ def main_app():
             st.session_state.logged_in = False
             st.session_state.username = ""
             st.session_state.history = []
+            st.session_state.generated_result = None
+            st.session_state.answers_result = None
+            st.session_state.show_answers = False
             st.rerun()
 
-    # ── Header ──────────────────────────────────────────────────────────────
+    # ── Header ────────────────────────────────────────────────────────────────
     st.markdown("""
         <div class="sf-header">
             <div class="sf-header-title">StudySmart</div>
@@ -836,7 +854,7 @@ def main_app():
         <div class="sf-watermark">POWERED BY AI</div>
     """, unsafe_allow_html=True)
 
-    # ── Selection Card ───────────────────────────────────────────────────────
+    # ── Selection Card ─────────────────────────────────────────────────────────
     st.markdown('<div class="sf-card">', unsafe_allow_html=True)
 
     if not STUDY_DATA:
@@ -859,12 +877,16 @@ def main_app():
     if st.session_state.get("last_chapter_key") != chapter_key:
         st.session_state.current_chapters = get_chapters(category, course, stream, subject, topic)
         st.session_state.last_chapter_key = chapter_key
+        # ✅ Clear previous results when selection changes
+        st.session_state.generated_result = None
+        st.session_state.answers_result   = None
+        st.session_state.show_answers     = False
 
     chapter = st.selectbox("📝 Chapter", st.session_state.get("current_chapters", ["No chapters found"]))
 
     st.markdown('</div>', unsafe_allow_html=True)
 
-    # ── Output Style ─────────────────────────────────────────────────────────
+    # ── Output Style ───────────────────────────────────────────────────────────
     output_style = st.radio(
         "⚙️ Output Style",
         ["📄 Detailed", "⚡ Short & Quick", "📋 Notes Format", "🧪 Question Paper"],
@@ -873,7 +895,7 @@ def main_app():
 
     st.markdown('<div style="margin-top:20px;"></div>', unsafe_allow_html=True)
 
-    # ── Generate Button ───────────────────────────────────────────────────────
+    # ── Generate Button ────────────────────────────────────────────────────────
     if st.button(f"✨ Generate {tool}", use_container_width=True):
         if not chapter or chapter == "No chapters found":
             st.warning("⚠️ Please select a valid chapter before generating.")
@@ -885,87 +907,156 @@ def main_app():
         with st.spinner(f"🧠 Generating {tool}... please wait ⏳"):
             result, model_used = generate_with_fallback(final_prompt)
 
-        st.markdown("---")
+        # ✅ FIX: Store everything in session_state so it survives "Get Answers" click
+        st.session_state.generated_result       = result
+        st.session_state.generated_model        = model_used
+        st.session_state.generated_tool         = tool
+        st.session_state.generated_chapter      = chapter
+        st.session_state.generated_subject      = subject
+        st.session_state.generated_topic        = topic
+        st.session_state.generated_course       = course
+        st.session_state.generated_audience     = audience
+        st.session_state.generated_output_style = output_style
+        # Reset answers whenever a new paper is generated
+        st.session_state.answers_result         = None
+        st.session_state.show_answers           = False
 
         if model_used != "None":
-            word_count = count_words(result)
-            col_a, col_b = st.columns(2)
-            col_a.metric("🤖 Model Used", model_used.split("/")[-1] if "/" in model_used else model_used)
-            col_b.metric("📝 Word Count", f"{word_count:,}")
-
-            st.markdown('<div class="sf-output">', unsafe_allow_html=True)
-            st.markdown(f"### {tool} — {chapter}")
-            st.markdown(result)
-            st.markdown('</div>', unsafe_allow_html=True)
-
             add_to_history(tool, chapter, subject, result)
 
-            # ✅ NEW: "Get Answers" button for Question Paper output style
-            if output_style == "🧪 Question Paper":
-                st.markdown('<br>', unsafe_allow_html=True)
-                if st.button("📋 Get Answers", key="get_answers_btn"):
-                    with st.spinner("📚 Generating detailed answers... please wait ⏳"):
-                        answers_prompt = build_answers_prompt(chapter, topic, subject, audience)
-                        answers_result, answers_model = generate_with_fallback(answers_prompt)
-                    
-                    if answers_model != "None":
-                        st.markdown('<div class="sf-answers">', unsafe_allow_html=True)
-                        st.markdown(f"### 📚 Answer Key — {chapter}")
-                        st.markdown(answers_result)
-                        st.markdown('</div>', unsafe_allow_html=True)
+    # ── Display Previously Generated Result (persists across re-runs) ──────────
+    if st.session_state.generated_result and st.session_state.generated_model != "None":
 
-                        # Download answers as PDF
-                        try:
-                            answers_pdf_buffer = generate_pdf(
-                                f"Answer Key — {chapter}",
-                                f"{subject} | {topic} | {course}",
-                                answers_result
-                            )
-                            safe_ans_name = chapter.replace(" ", "_").replace(":", "").replace("/", "-") + "_Answers.pdf"
-                            st.download_button(
-                                label="⬇️ Download Answers as PDF",
-                                data=answers_pdf_buffer,
-                                file_name=safe_ans_name,
-                                mime="application/pdf",
-                                use_container_width=True,
-                            )
-                            st.info("✅ Answer PDF ready — click above to download.")
-                        except Exception as pdf_err:
-                            st.warning(f"⚠️ Answer PDF generation failed: {str(pdf_err)}")
-                    else:
-                        st.error("❌ Failed to generate answers")
-                        st.markdown(answers_result)
+        result       = st.session_state.generated_result
+        model_used   = st.session_state.generated_model
+        g_tool       = st.session_state.generated_tool
+        g_chapter    = st.session_state.generated_chapter
+        g_subject    = st.session_state.generated_subject
+        g_topic      = st.session_state.generated_topic
+        g_course     = st.session_state.generated_course
+        g_audience   = st.session_state.generated_audience
+        g_style      = st.session_state.generated_output_style
 
-            st.markdown("---")
+        st.markdown("---")
 
+        word_count = count_words(result)
+        col_a, col_b = st.columns(2)
+        col_a.metric("🤖 Model Used", model_used.split("/")[-1] if "/" in model_used else model_used)
+        col_b.metric("📝 Word Count", f"{word_count:,}")
+
+        st.markdown('<div class="sf-output">', unsafe_allow_html=True)
+        st.markdown(f"### {g_tool} — {g_chapter}")
+        st.markdown(result)
+        st.markdown('</div>', unsafe_allow_html=True)
+
+        # ── Question Paper PDF + Get Answers ──────────────────────────────────
+        is_question_paper = (
+            g_tool  == "🧪 Question Paper" or
+            g_style == "🧪 Question Paper"
+        )
+
+        if is_question_paper:
+
+            # Download question paper PDF
+            st.markdown('<div style="margin-top:16px;"></div>', unsafe_allow_html=True)
             try:
-                pdf_buffer = generate_pdf(
-                    f"{tool} — {chapter}",
-                    f"{subject} | {topic} | {course}",
+                qp_pdf = generate_pdf(
+                    f"Question Paper — {g_chapter}",
+                    f"{g_subject} | {g_topic} | {g_course}",
                     result
                 )
-                safe_name = chapter.replace(" ", "_").replace(":", "").replace("/", "-") + ".pdf"
+                safe_qp = g_chapter.replace(" ", "_").replace(":", "").replace("/", "-") + "_QuestionPaper.pdf"
+                st.download_button(
+                    label="⬇️ Download Question Paper as PDF",
+                    data=qp_pdf,
+                    file_name=safe_qp,
+                    mime="application/pdf",
+                    use_container_width=True,
+                    key="dl_qp"
+                )
+            except Exception as e:
+                st.warning(f"⚠️ PDF generation failed: {str(e)}")
+
+            st.markdown('<div style="margin-top:12px;"></div>', unsafe_allow_html=True)
+
+            # ✅ FIX: "Get Answers" button — uses session_state, never loses context
+            if st.button("📋 Get Answers", use_container_width=True, key="get_answers_btn"):
+                with st.spinner("📚 Generating detailed answers... please wait ⏳"):
+                    ans_prompt = build_answers_prompt(
+                        g_chapter, g_topic, g_subject, g_audience,
+                        result   # ✅ Pass the actual question paper text
+                    )
+                    ans_result, ans_model = generate_with_fallback(ans_prompt)
+                st.session_state.answers_result = ans_result
+                st.session_state.answers_model  = ans_model
+                st.session_state.show_answers   = True
+
+            # ── Display Answers (also persisted in session_state) ──────────────
+            if st.session_state.show_answers and st.session_state.answers_result:
+                ans_result = st.session_state.answers_result
+                ans_model  = st.session_state.answers_model
+
+                if ans_model != "None":
+                    st.markdown('<div class="sf-answers">', unsafe_allow_html=True)
+                    st.markdown(f"### 📚 Answer Key — {g_chapter}")
+                    st.markdown(ans_result)
+                    st.markdown('</div>', unsafe_allow_html=True)
+
+                    # Download answers PDF
+                    try:
+                        ans_pdf = generate_pdf(
+                            f"Answer Key — {g_chapter}",
+                            f"{g_subject} | {g_topic} | {g_course}",
+                            ans_result
+                        )
+                        safe_ans = g_chapter.replace(" ", "_").replace(":", "").replace("/", "-") + "_Answers.pdf"
+                        st.download_button(
+                            label="⬇️ Download Answer Key as PDF",
+                            data=ans_pdf,
+                            file_name=safe_ans,
+                            mime="application/pdf",
+                            use_container_width=True,
+                            key="dl_ans"
+                        )
+                        st.info("✅ Answer Key PDF ready — click above to download.")
+                    except Exception as e:
+                        st.warning(f"⚠️ Answer PDF failed: {str(e)}")
+                else:
+                    st.error("❌ Failed to generate answers. Please try again.")
+                    st.markdown(ans_result)
+
+        else:
+            # ── Non-question-paper: standard PDF download ──────────────────────
+            st.markdown("---")
+            try:
+                pdf_buffer = generate_pdf(
+                    f"{g_tool} — {g_chapter}",
+                    f"{g_subject} | {g_topic} | {g_course}",
+                    result
+                )
+                safe_name = g_chapter.replace(" ", "_").replace(":", "").replace("/", "-") + ".pdf"
                 st.download_button(
                     label="⬇️ Download as PDF",
                     data=pdf_buffer,
                     file_name=safe_name,
                     mime="application/pdf",
                     use_container_width=True,
+                    key="dl_main"
                 )
                 st.info("✅ PDF ready — click above to download.")
             except Exception as pdf_err:
                 st.warning(f"⚠️ PDF generation failed: {str(pdf_err)}")
-        else:
-            st.error("❌ AI Generation Failed")
-            st.markdown(result)
+
+    elif st.session_state.generated_result and st.session_state.generated_model == "None":
+        st.markdown("---")
+        st.error("❌ AI Generation Failed")
+        st.markdown(st.session_state.generated_result)
 
 # ═════════════════════════════════════════════════════════════════════════════
-# STEP 8: AUTHENTICATION UI
+# STEP 9: AUTHENTICATION UI
 # ═════════════════════════════════════════════════════════════════════════════
 
 def auth_ui():
-    """Login and Registration screen"""
-
     _, col_c, _ = st.columns([1, 2, 1])
     with col_c:
         st.markdown("""
@@ -1001,14 +1092,14 @@ def auth_ui():
                         time.sleep(1)
                         st.rerun()
                     else:
-                        st.error("❌ Invalid username or password. Please try again.")
+                        st.error("❌ Invalid username or password.")
                 else:
                     st.warning("⚠️ Please fill in both fields")
 
         with tab2:
             nu = st.text_input("👤 New Username", key="reg_u", placeholder="Min 3 characters")
             np = st.text_input("🔑 New Password", type="password", key="reg_p", placeholder="Min 6 characters")
-            cp = st.text_input("🔑 Confirm Password", type="password", key="reg_cp", placeholder="Re-enter your password")
+            cp = st.text_input("🔑 Confirm Password", type="password", key="reg_cp", placeholder="Re-enter password")
 
             if st.button("Create Account ✨", use_container_width=True):
                 if not nu.strip():
@@ -1020,7 +1111,7 @@ def auth_ui():
                 elif len(np.strip()) < 6:
                     st.error("❌ Password must be at least 6 characters")
                 elif np != cp:
-                    st.error("❌ Passwords do not match. Please try again.")
+                    st.error("❌ Passwords do not match.")
                 else:
                     try:
                         conn = sqlite3.connect("users.db")
@@ -1037,24 +1128,16 @@ def auth_ui():
                         st.session_state.username = nu.strip()
                         st.rerun()
                     except sqlite3.IntegrityError:
-                        st.error("❌ Username already taken. Please choose another one.")
+                        st.error("❌ Username already taken.")
 
         st.markdown('</div>', unsafe_allow_html=True)
 
 # ═════════════════════════════════════════════════════════════════════════════
-# STEP 9: ENTRY POINT
+# STEP 10: ENTRY POINT
 # ═════════════════════════════════════════════════════════════════════════════
 
 init_db()
-
-if "logged_in" not in st.session_state:
-    st.session_state.logged_in = False
-if "username" not in st.session_state:
-    st.session_state.username = ""
-if "current_chapters" not in st.session_state:
-    st.session_state.current_chapters = []
-if "history" not in st.session_state:
-    st.session_state.history = []
+init_session_state()
 
 if st.session_state.logged_in:
     main_app()
