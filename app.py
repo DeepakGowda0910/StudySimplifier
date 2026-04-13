@@ -55,6 +55,48 @@ BOARDS = ["CBSE", "ICSE", "State Board", "ISC", "IB", "Cambridge"]
 # ─────────────────────────────────────────────────────────────────────────────
 st.markdown("""
 <style>
+
+/* ═══════════════════════════════
+   QUICK ACTIONS BUTTON FIX
+   ═══════════════════════════════ */
+
+/* Ensure quick action buttons are clickable */
+.stButton > button {
+    position: relative !important;
+    z-index: 100 !important;
+}
+
+/* Fix any overlapping elements */
+div[data-testid="stVerticalBlock"] > div > div {
+    z-index: auto !important;
+}
+
+/* Ensure dashboard cards don't block buttons */
+.sf-card {
+    position: relative !important;
+    z-index: 50 !important;
+    overflow: visible !important;
+}
+
+/* Fix sidebar overlap */
+[data-testid="stSidebar"] {
+    z-index: 999 !important;
+}
+
+/* Mobile-specific button click fix */
+@media (max-width: 768px) {
+    .stButton > button {
+        z-index: 200 !important;
+        pointer-events: all !important;
+    }
+    
+    /* Prevent any mobile overlay */
+    .block-container {
+        position: relative !important;
+        z-index: 1 !important;
+    }
+}
+
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
 html, body, [class*="css"], [class*="st-"] {
