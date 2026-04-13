@@ -1,6 +1,14 @@
 import streamlit as st
 import sqlite3
 import hashlib
+from daily_engagement import (
+    init_enhanced_db,
+    check_daily_login,
+    get_user_stats,
+    record_study_session,
+    award_xp,
+    award_badge
+)
 
 # --- DATABASE SETUP ---
 def init_db():
