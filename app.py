@@ -1,6 +1,9 @@
 # ═══════════════════════════════════════════════════════════════════════════════
-# STUDYSMART AI — APP v3.1
-# Fix: Full dark mode compatibility for all UI elements
+# STUDYSMART AI — APP v3.2
+# ✅ Removed: Model Used & Word Count
+# ✅ Single dynamic generate button (label changes with tool + output style)
+# ✅ Light clean theme — works in both light and dark OS modes
+# ✅ All existing features retained
 # ═══════════════════════════════════════════════════════════════════════════════
 
 import streamlit as st
@@ -39,7 +42,7 @@ STUDY_DATA = load_study_data()
 BOARDS = ["CBSE", "ICSE", "State Board", "ISC", "IB", "Cambridge"]
 
 # ─────────────────────────────────────────────────────────────────────────────
-# STEP 2: PAGE CONFIG & CSS (Dark Mode Safe)
+# STEP 2: PAGE CONFIG & CSS
 # ─────────────────────────────────────────────────────────────────────────────
 
 st.set_page_config(
@@ -53,435 +56,334 @@ st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
-/* ═══════════════════════════════════════════
-   BASE — applies in BOTH light and dark mode
-   ═══════════════════════════════════════════ */
+/* ── Base ── */
 html, body, [class*="css"], [class*="st-"] {
     font-family: 'Inter', sans-serif !important;
 }
-
 #MainMenu, footer, header { visibility: hidden; }
+.block-container {
+    max-width: 1200px;
+    padding-top: 1rem !important;
+    padding-bottom: 2rem !important;
+    padding-left: 1.5rem !important;
+    padding-right: 1.5rem !important;
+}
 
+/* ── App background — clean white ── */
+.stApp {
+    background: #f0f4f8 !important;
+}
+
+/* ── Header ── */
 .sf-header {
     text-align: center;
-    padding: 32px 0 10px 0;
+    padding: 28px 0 8px 0;
 }
 .sf-header-title {
-    font-size: 3.8rem;
+    font-size: 3.4rem;
     font-weight: 800;
     background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
     line-height: 1.1;
+    letter-spacing: -1px;
 }
 .sf-header-subtitle {
     color: #64748b;
     font-weight: 500;
-    margin-top: 8px;
-    font-size: 1.05rem;
+    margin-top: 6px;
+    font-size: 1rem;
 }
 
-.block-container {
-    max-width: 1250px;
-    padding-top: 1.2rem !important;
-    padding-bottom: 2rem !important;
-}
-
-/* ═══════════════════════════════════════════
-   LIGHT MODE STYLES
-   ═══════════════════════════════════════════ */
-
-/* App background */
-.stApp {
-    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #e8f0f7 100%) !important;
-}
-
-/* Cards */
+/* ── Cards ── */
 .sf-card {
-    background: rgba(255,255,255,0.9) !important;
-    border-radius: 16px;
-    padding: 24px 28px;
-    border: 1px solid rgba(59,130,246,0.14);
-    box-shadow: 0 4px 24px rgba(59,130,246,0.07);
-    margin-bottom: 18px;
-}
-
-/* Output boxes */
-.sf-output {
-    background: rgba(239,246,255,0.7) !important;
-    border-left: 5px solid #2563eb;
-    border-radius: 16px;
-    padding: 24px;
-    border: 1px solid rgba(59,130,246,0.2);
-    margin-top: 14px;
-    color: #1e293b !important;
-}
-.sf-output h3, .sf-output h2 { color: #1d4ed8 !important; margin-top: 0; }
-
-.sf-answers {
-    background: rgba(240,253,244,0.7) !important;
-    border-left: 5px solid #16a34a;
-    border-radius: 16px;
-    padding: 24px;
-    border: 1px solid rgba(34,197,94,0.2);
-    margin-top: 18px;
-    color: #1e293b !important;
-}
-.sf-answers h3, .sf-answers h2 { color: #15803d !important; margin-top: 0; }
-
-.sf-fullpaper {
-    background: rgba(245,243,255,0.7) !important;
-    border-left: 5px solid #7c3aed;
-    border-radius: 16px;
-    padding: 24px;
-    border: 1px solid rgba(139,92,246,0.2);
-    margin-top: 18px;
-    color: #1e293b !important;
-}
-.sf-fullpaper h3, .sf-fullpaper h2 { color: #6d28d9 !important; margin-top: 0; }
-
-.sf-preview {
-    background: rgba(248,250,252,0.9) !important;
-    border: 1px solid rgba(15,23,42,0.08);
+    background: #ffffff !important;
     border-radius: 14px;
-    padding: 18px 20px;
-    margin-top: 14px;
-    margin-bottom: 12px;
-    color: #1e293b !important;
+    padding: 22px 26px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 2px 12px rgba(59,130,246,0.06);
+    margin-bottom: 16px;
 }
 
-.sf-history-item {
-    background: rgba(239,246,255,0.7);
+/* ── Output box — blue ── */
+.sf-output {
+    background: #eff6ff !important;
     border-left: 4px solid #3b82f6;
-    border-radius: 10px;
-    padding: 12px 14px;
-    margin-bottom: 10px;
-    font-size: 0.9rem;
+    border-radius: 14px;
+    padding: 22px 24px;
+    border: 1px solid #bfdbfe;
+    margin-top: 12px;
     color: #1e293b !important;
 }
+.sf-output h1,.sf-output h2,.sf-output h3 { color: #1d4ed8 !important; margin-top:0; }
+.sf-output p,.sf-output li,.sf-output span { color: #1e293b !important; }
 
-/* ─── Radio buttons — LIGHT MODE ─── */
-div[data-testid="stRadio"] label {
+/* ── Answer box — green ── */
+.sf-answers {
+    background: #f0fdf4 !important;
+    border-left: 4px solid #16a34a;
+    border-radius: 14px;
+    padding: 22px 24px;
+    border: 1px solid #bbf7d0;
+    margin-top: 16px;
     color: #1e293b !important;
-    font-weight: 500 !important;
-    font-size: 0.95rem !important;
 }
-div[data-testid="stRadio"] > label {
+.sf-answers h1,.sf-answers h2,.sf-answers h3 { color: #15803d !important; margin-top:0; }
+.sf-answers p,.sf-answers li,.sf-answers span { color: #1e293b !important; }
+
+/* ── Full subject paper box — purple ── */
+.sf-fullpaper {
+    background: #faf5ff !important;
+    border-left: 4px solid #7c3aed;
+    border-radius: 14px;
+    padding: 22px 24px;
+    border: 1px solid #ddd6fe;
+    margin-top: 16px;
+    color: #1e293b !important;
+}
+.sf-fullpaper h1,.sf-fullpaper h2,.sf-fullpaper h3 { color: #6d28d9 !important; margin-top:0; }
+.sf-fullpaper p,.sf-fullpaper li,.sf-fullpaper span { color: #1e293b !important; }
+
+/* ── Format preview box ── */
+.sf-preview {
+    background: #f8fafc !important;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin: 10px 0 14px 0;
+    color: #1e293b !important;
+}
+.sf-preview p,.sf-preview li,.sf-preview span { color: #1e293b !important; }
+.sf-preview strong { color: #1d4ed8 !important; }
+
+/* ── History item ── */
+.sf-history-item {
+    background: #eff6ff;
+    border-left: 3px solid #3b82f6;
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+    font-size: 0.88rem;
+    color: #334155 !important;
+}
+.sf-history-item b { color: #1d4ed8 !important; }
+.sf-history-item small { color: #64748b !important; }
+
+/* ── Radio buttons ── */
+div[data-testid="stRadio"] > label,
+div[data-testid="stRadio"] > label p {
     color: #1e293b !important;
     font-weight: 700 !important;
     font-size: 0.9rem !important;
 }
-div[data-testid="stRadio"] p {
+div[data-testid="stRadio"] label,
+div[data-testid="stRadio"] label p,
+div[data-testid="stRadio"] [data-testid="stMarkdownContainer"] p {
     color: #1e293b !important;
     font-weight: 500 !important;
 }
 
-/* ─── All widget labels — LIGHT MODE ─── */
+/* ── All widget labels ── */
 div.stSelectbox > label,
 div.stTextInput > label,
 div.stRadio > label,
+[data-testid="stWidgetLabel"] p,
 [data-testid="stWidgetLabel"] {
     color: #1e293b !important;
     font-weight: 600 !important;
-    font-size: 0.9rem !important;
+    font-size: 0.88rem !important;
 }
 
-/* ─── Selectbox / dropdown — LIGHT MODE ─── */
+/* ── Selectbox ── */
 div[data-baseweb="select"] > div {
     border-radius: 10px !important;
-    border: 1.5px solid #cbd5e1 !important;
+    border: 1.5px solid #e2e8f0 !important;
     background: #ffffff !important;
     color: #1e293b !important;
 }
-div[data-baseweb="select"] span {
-    color: #1e293b !important;
-}
-div[role="listbox"] li {
-    color: #1e293b !important;
-    background: #ffffff !important;
-}
+div[data-baseweb="select"] span,
+div[data-baseweb="select"] div { color: #1e293b !important; }
+div[role="listbox"] { background: #ffffff !important; }
+div[role="option"]  { color: #1e293b !important; background: #ffffff !important; }
+div[role="option"]:hover { background: #eff6ff !important; }
 
-/* ─── Text inputs — LIGHT MODE ─── */
-input[type="text"],
-input[type="password"] {
+/* ── Text inputs ── */
+input[type="text"], input[type="password"] {
     background: #ffffff !important;
     color: #1e293b !important;
-    border: 1.5px solid #cbd5e1 !important;
+    border: 1.5px solid #e2e8f0 !important;
     border-radius: 10px !important;
 }
 input::placeholder { color: #94a3b8 !important; }
 
-/* ─── Sidebar — LIGHT MODE ─── */
+/* ── Sidebar ── */
 [data-testid="stSidebar"] {
-    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%) !important;
+    background: #ffffff !important;
     border-right: 1px solid #e2e8f0 !important;
 }
 [data-testid="stSidebar"] * { color: #1e293b !important; }
-[data-testid="stSidebar"] .sf-history-item { color: #1e293b !important; }
 
-/* ─── Metrics — LIGHT MODE ─── */
-[data-testid="metric-container"] label,
-[data-testid="metric-container"] div {
+/* ── Tabs ── */
+.stTabs [data-baseweb="tab-list"] { border-bottom: 2px solid #e2e8f0 !important; }
+.stTabs [data-baseweb="tab"]      { color: #64748b !important; font-weight: 500 !important; }
+.stTabs [aria-selected="true"]    { color: #1e293b !important; border-bottom: 3px solid #3b82f6 !important; }
+
+/* ── Buttons ── */
+.stButton > button {
+    background: linear-gradient(135deg, #3b82f6, #2563eb) !important;
+    color: #ffffff !important;
+    border: none !important;
+    border-radius: 11px !important;
+    font-weight: 600 !important;
+    padding: 0.6rem 1.4rem !important;
+    font-size: 0.95rem !important;
+    box-shadow: 0 3px 12px rgba(59,130,246,0.22) !important;
+    transition: all 0.18s ease !important;
+}
+.stButton > button:hover {
+    box-shadow: 0 6px 20px rgba(59,130,246,0.35) !important;
+    transform: translateY(-1px) !important;
+}
+.stDownloadButton > button {
+    background: linear-gradient(135deg, #10b981, #059669) !important;
+    color: #ffffff !important;
+    border: none !important;
+    border-radius: 11px !important;
+    font-weight: 600 !important;
+    box-shadow: 0 3px 12px rgba(16,185,129,0.22) !important;
+}
+.stDownloadButton > button:hover {
+    box-shadow: 0 6px 20px rgba(16,185,129,0.35) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* ── Alert banners ── */
+div[data-testid="stSuccessMessage"] {
+    background: rgba(16,185,129,0.08) !important;
+    border: 1.5px solid rgba(16,185,129,0.3) !important;
+    border-radius: 10px !important;
+    color: #065f46 !important;
+}
+div[data-testid="stWarningMessage"] {
+    background: rgba(245,158,11,0.08) !important;
+    border: 1.5px solid rgba(245,158,11,0.3) !important;
+    border-radius: 10px !important;
+    color: #78350f !important;
+}
+div[data-testid="stErrorMessage"] {
+    background: rgba(239,68,68,0.08) !important;
+    border: 1.5px solid rgba(239,68,68,0.3) !important;
+    border-radius: 10px !important;
+    color: #7f1d1d !important;
+}
+
+/* ── Expanders ── */
+details {
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 10px !important;
+}
+details summary { color: #1e293b !important; font-weight: 600 !important; }
+
+/* ── General markdown inside main area ── */
+[data-testid="stMarkdownContainer"] p,
+[data-testid="stMarkdownContainer"] li,
+[data-testid="stMarkdownContainer"] span {
     color: #1e293b !important;
 }
 
-/* ─── Tabs — LIGHT MODE ─── */
-.stTabs [data-baseweb="tab"] { color: #64748b !important; font-weight: 500 !important; }
-.stTabs [aria-selected="true"] { color: #0f172a !important; border-bottom: 3px solid #3b82f6 !important; }
+/* ── Divider ── */
+hr { border-color: #e2e8f0 !important; }
 
-/* ─── Buttons ─── */
-.stButton > button {
-    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
-    color: #ffffff !important;
-    border: none !important;
-    border-radius: 12px !important;
-    font-weight: 600 !important;
-    padding: 0.65rem 1.3rem !important;
-    box-shadow: 0 4px 15px rgba(59,130,246,0.25) !important;
-    transition: all 0.2s ease !important;
-}
-.stButton > button:hover {
-    box-shadow: 0 8px 25px rgba(59,130,246,0.4) !important;
-    transform: translateY(-2px) !important;
-}
-.stDownloadButton > button {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
-    color: #ffffff !important;
-    border: none !important;
-    border-radius: 12px !important;
-    font-weight: 600 !important;
-    box-shadow: 0 4px 15px rgba(16,185,129,0.25) !important;
-}
-.stDownloadButton > button:hover {
-    box-shadow: 0 8px 25px rgba(16,185,129,0.4) !important;
-    transform: translateY(-2px) !important;
-}
-
-/* ─── Alert banners ─── */
-div[data-testid="stSuccessMessage"] {
-    background: rgba(16,185,129,0.1) !important;
-    border: 1.5px solid rgba(16,185,129,0.35) !important;
-    border-radius: 10px !important;
-}
-div[data-testid="stWarningMessage"] {
-    background: rgba(245,158,11,0.1) !important;
-    border: 1.5px solid rgba(245,158,11,0.35) !important;
-    border-radius: 10px !important;
-}
-div[data-testid="stErrorMessage"] {
-    background: rgba(239,68,68,0.1) !important;
-    border: 1.5px solid rgba(239,68,68,0.35) !important;
-    border-radius: 10px !important;
-}
-
-/* ═══════════════════════════════════════════════════════════════════
-   DARK MODE OVERRIDES
-   These fire when the OS / browser is in dark mode.
-   Every color that was hardcoded for light is now flipped here.
-   ═══════════════════════════════════════════════════════════════════ */
+/* ════════════════════════════════════════
+   DARK MODE — keeps everything readable
+   ════════════════════════════════════════ */
 @media (prefers-color-scheme: dark) {
 
-    /* App background */
-    .stApp {
-        background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%) !important;
-    }
+    .stApp { background: #0f172a !important; }
 
-    /* Main body text */
-    .stApp, .stApp p, .stApp span, .stApp div {
+    .sf-card    { background: #1e293b !important; border-color: #334155 !important; }
+    .sf-output  { background: #172554 !important; border-color: #3b82f6 !important; }
+    .sf-answers { background: #052e16 !important; border-color: #16a34a !important; }
+    .sf-fullpaper { background: #2e1065 !important; border-color: #7c3aed !important; }
+    .sf-preview { background: #1e293b !important; border-color: #334155 !important; }
+    .sf-history-item { background: #1e3a5f !important; border-left-color: #60a5fa !important; }
+
+    .sf-output p,.sf-output li,.sf-output span,
+    .sf-output h1,.sf-output h2,.sf-output h3 { color: #bfdbfe !important; }
+    .sf-output h1,.sf-output h2,.sf-output h3 { color: #93c5fd !important; }
+
+    .sf-answers p,.sf-answers li,.sf-answers span { color: #bbf7d0 !important; }
+    .sf-answers h1,.sf-answers h2,.sf-answers h3 { color: #86efac !important; }
+
+    .sf-fullpaper p,.sf-fullpaper li,.sf-fullpaper span { color: #ddd6fe !important; }
+    .sf-fullpaper h1,.sf-fullpaper h2,.sf-fullpaper h3 { color: #c4b5fd !important; }
+
+    .sf-preview p,.sf-preview li,.sf-preview strong,
+    .sf-preview span { color: #e2e8f0 !important; }
+
+    .sf-history-item,.sf-history-item b,.sf-history-item small { color: #cbd5e1 !important; }
+
+    div[data-testid="stRadio"] > label,
+    div[data-testid="stRadio"] > label p,
+    div[data-testid="stRadio"] label,
+    div[data-testid="stRadio"] label p,
+    div[data-testid="stRadio"] [data-testid="stMarkdownContainer"] p {
         color: #e2e8f0 !important;
     }
 
-    /* Cards */
-    .sf-card {
-        background: rgba(30,41,59,0.95) !important;
-        border: 1px solid rgba(99,179,237,0.18) !important;
-        box-shadow: 0 4px 24px rgba(0,0,0,0.35) !important;
-    }
-
-    /* Output boxes */
-    .sf-output {
-        background: rgba(30,58,138,0.18) !important;
-        border: 1px solid rgba(96,165,250,0.25) !important;
-        color: #e2e8f0 !important;
-    }
-    .sf-output h3, .sf-output h2, .sf-output h1 { color: #93c5fd !important; }
-    .sf-output p, .sf-output li, .sf-output span { color: #e2e8f0 !important; }
-
-    .sf-answers {
-        background: rgba(20,83,45,0.2) !important;
-        border: 1px solid rgba(74,222,128,0.25) !important;
-        color: #e2e8f0 !important;
-    }
-    .sf-answers h3, .sf-answers h2, .sf-answers h1 { color: #86efac !important; }
-    .sf-answers p, .sf-answers li, .sf-answers span { color: #e2e8f0 !important; }
-
-    .sf-fullpaper {
-        background: rgba(76,29,149,0.18) !important;
-        border: 1px solid rgba(196,181,253,0.25) !important;
-        color: #e2e8f0 !important;
-    }
-    .sf-fullpaper h3, .sf-fullpaper h2, .sf-fullpaper h1 { color: #c4b5fd !important; }
-    .sf-fullpaper p, .sf-fullpaper li, .sf-fullpaper span { color: #e2e8f0 !important; }
-
-    .sf-preview {
-        background: rgba(30,41,59,0.85) !important;
-        border: 1px solid rgba(148,163,184,0.2) !important;
-        color: #e2e8f0 !important;
-    }
-    .sf-preview p, .sf-preview span, .sf-preview li { color: #e2e8f0 !important; }
-    .sf-preview strong { color: #93c5fd !important; }
-
-    .sf-history-item {
-        background: rgba(30,58,138,0.2) !important;
-        border-left: 4px solid #60a5fa !important;
-        color: #cbd5e1 !important;
-    }
-    .sf-history-item b { color: #93c5fd !important; }
-    .sf-history-item small { color: #94a3b8 !important; }
-
-    /* ─── Radio buttons — DARK MODE (THE MAIN FIX) ─── */
-    div[data-testid="stRadio"] label {
-        color: #e2e8f0 !important;
-        font-weight: 500 !important;
-    }
-    div[data-testid="stRadio"] > label {
-        color: #f1f5f9 !important;
-        font-weight: 700 !important;
-    }
-    div[data-testid="stRadio"] p {
-        color: #e2e8f0 !important;
-        font-weight: 500 !important;
-    }
-    /* The actual option text nodes */
-    [data-testid="stRadio"] [data-testid="stMarkdownContainer"] p {
-        color: #e2e8f0 !important;
-    }
-    /* Radio circle */
-    [data-testid="stRadio"] input[type="radio"] + div {
-        border-color: #60a5fa !important;
-    }
-    [data-testid="stRadio"] input[type="radio"]:checked + div {
-        background-color: #3b82f6 !important;
-        border-color: #3b82f6 !important;
-    }
-
-    /* ─── All widget labels — DARK MODE ─── */
     div.stSelectbox > label,
     div.stTextInput > label,
-    div.stRadio > label,
     [data-testid="stWidgetLabel"],
-    [data-testid="stWidgetLabel"] p {
-        color: #f1f5f9 !important;
-        font-weight: 600 !important;
-    }
+    [data-testid="stWidgetLabel"] p { color: #e2e8f0 !important; }
 
-    /* ─── Selectbox / dropdown — DARK MODE ─── */
-    div[data-baseweb="select"] > div {
-        background: #1e293b !important;
-        border: 1.5px solid #334155 !important;
-        color: #e2e8f0 !important;
-    }
+    div[data-baseweb="select"] > div { background: #1e293b !important; border-color: #334155 !important; color: #e2e8f0 !important; }
     div[data-baseweb="select"] span,
-    div[data-baseweb="select"] div {
-        color: #e2e8f0 !important;
-    }
-    div[role="listbox"] {
-        background: #1e293b !important;
-    }
-    div[role="listbox"] li,
-    div[role="option"] {
-        color: #e2e8f0 !important;
-        background: #1e293b !important;
-    }
-    div[role="option"]:hover {
-        background: #334155 !important;
-    }
+    div[data-baseweb="select"] div  { color: #e2e8f0 !important; }
+    div[role="listbox"]  { background: #1e293b !important; }
+    div[role="option"]   { background: #1e293b !important; color: #e2e8f0 !important; }
+    div[role="option"]:hover { background: #334155 !important; }
 
-    /* ─── Text inputs — DARK MODE ─── */
-    input[type="text"],
-    input[type="password"] {
+    input[type="text"], input[type="password"] {
         background: #1e293b !important;
         color: #e2e8f0 !important;
-        border: 1.5px solid #334155 !important;
+        border-color: #334155 !important;
     }
     input::placeholder { color: #64748b !important; }
 
-    /* ─── Sidebar — DARK MODE ─── */
-    [data-testid="stSidebar"] {
-        background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%) !important;
-        border-right: 1px solid #334155 !important;
-    }
+    [data-testid="stSidebar"] { background: #0f172a !important; border-right-color: #334155 !important; }
     [data-testid="stSidebar"] * { color: #e2e8f0 !important; }
-    [data-testid="stSidebar"] .sf-history-item { color: #cbd5e1 !important; }
 
-    /* ─── Metrics — DARK MODE ─── */
-    [data-testid="metric-container"] label,
-    [data-testid="metric-container"] div {
-        color: #e2e8f0 !important;
-    }
-    [data-testid="metric-container"] {
-        background: rgba(30,41,59,0.7) !important;
-        border-radius: 10px;
-    }
+    .stTabs [data-baseweb="tab-list"] { border-bottom-color: #334155 !important; }
+    .stTabs [data-baseweb="tab"]      { color: #94a3b8 !important; }
+    .stTabs [aria-selected="true"]    { color: #f1f5f9 !important; border-bottom-color: #60a5fa !important; }
 
-    /* ─── Tabs — DARK MODE ─── */
-    .stTabs [data-baseweb="tab"] { color: #94a3b8 !important; }
-    .stTabs [aria-selected="true"] { color: #f1f5f9 !important; border-bottom: 3px solid #60a5fa !important; }
-    .stTabs [data-baseweb="tab-list"] { border-bottom: 2px solid #334155 !important; }
-
-    /* ─── General markdown text — DARK MODE ─── */
-    [data-testid="stMarkdownContainer"] p,
-    [data-testid="stMarkdownContainer"] li,
-    [data-testid="stMarkdownContainer"] span,
-    [data-testid="stMarkdownContainer"] h1,
-    [data-testid="stMarkdownContainer"] h2,
-    [data-testid="stMarkdownContainer"] h3 {
-        color: #e2e8f0 !important;
-    }
-
-    /* ─── Alert banners — DARK MODE ─── */
-    div[data-testid="stSuccessMessage"] {
-        background: rgba(16,185,129,0.15) !important;
-        color: #d1fae5 !important;
-    }
-    div[data-testid="stWarningMessage"] {
-        background: rgba(245,158,11,0.15) !important;
-        color: #fef3c7 !important;
-    }
-    div[data-testid="stErrorMessage"] {
-        background: rgba(239,68,68,0.15) !important;
-        color: #fee2e2 !important;
-    }
-
-    /* ─── Expanders — DARK MODE ─── */
-    details {
-        background: rgba(30,41,59,0.6) !important;
-        border: 1px solid #334155 !important;
-        border-radius: 10px !important;
-    }
+    details { background: #1e293b !important; border-color: #334155 !important; }
     details summary { color: #e2e8f0 !important; }
 
-    /* ─── Divider ─── */
+    [data-testid="stMarkdownContainer"] p,
+    [data-testid="stMarkdownContainer"] li,
+    [data-testid="stMarkdownContainer"] span { color: #e2e8f0 !important; }
+
+    .stApp, .stApp p, .stApp span, .stApp div { color: #e2e8f0; }
     hr { border-color: #334155 !important; }
 
-    /* ─── Spinner text ─── */
-    [data-testid="stSpinner"] p { color: #94a3b8 !important; }
-
-    /* ─── Caption / small text ─── */
-    .stCaption, small { color: #94a3b8 !important; }
+    div[data-testid="stSuccessMessage"] { background: rgba(16,185,129,0.15) !important; color: #d1fae5 !important; }
+    div[data-testid="stWarningMessage"] { background: rgba(245,158,11,0.15) !important; color: #fef3c7 !important; }
+    div[data-testid="stErrorMessage"]   { background: rgba(239,68,68,0.15) !important;  color: #fee2e2 !important; }
 }
 
-/* ─── Mobile responsive ─── */
+/* ── Mobile ── */
 @media (max-width: 768px) {
-    .sf-header-title { font-size: 2.5rem !important; }
-    .sf-card, .sf-output, .sf-answers, .sf-fullpaper, .sf-preview { padding: 16px; }
-    .block-container { padding-left: 0.5rem !important; padding-right: 0.5rem !important; }
+    .sf-header-title { font-size: 2.4rem !important; }
+    .sf-card,.sf-output,.sf-answers,.sf-fullpaper,.sf-preview { padding: 14px 16px; }
+    .block-container { padding-left: 0.6rem !important; padding-right: 0.6rem !important; }
 }
 </style>
 """, unsafe_allow_html=True)
 # ─────────────────────────────────────────────────────────────────────────────
-# STEP 3: BASIC HELPERS
+# STEP 3: HELPERS
 # ─────────────────────────────────────────────────────────────────────────────
 
 def get_courses(category):
@@ -507,15 +409,12 @@ def get_chapters(category, course, stream, subject, topic):
 def hash_p(password):
     return hashlib.sha256(password.encode()).hexdigest()
 
-def count_words(text):
-    return len(text.split()) if text else 0
-
 def add_to_history(label, chapter, subject, result_preview):
     if "history" not in st.session_state:
         st.session_state.history = []
     entry = {
-        "time": time.strftime("%H:%M"),
-        "tool": label,
+        "time":    time.strftime("%H:%M"),
+        "tool":    label,
         "chapter": chapter,
         "subject": subject,
         "preview": result_preview[:120] + "..." if len(result_preview) > 120 else result_preview
@@ -550,10 +449,10 @@ def list_working_gemini_models():
     if not ok:
         return [], msg
     try:
-        models = genai.list_models()
+        models  = genai.list_models()
         working = []
         for m in models:
-            name = getattr(m, "name", "")
+            name    = getattr(m, "name", "")
             methods = getattr(m, "supported_generation_methods", [])
             if "gemini" in name.lower() and "generateContent" in methods:
                 working.append(name)
@@ -563,26 +462,42 @@ def list_working_gemini_models():
 
 def get_available_models():
     working_models, err = list_working_gemini_models()
-    if err: return [f"Error: {err}"]
+    if err:            return [f"Error: {err}"]
     if not working_models: return ["No Gemini models available for this API key"]
     return working_models
 
 def get_effective_output_name(tool, output_style):
-    if output_style == "🧪 Question Paper":
+    """
+    Single source of truth for what will be generated.
+    Output Style 'Question Paper' always wins over the tool.
+    This is also what drives the button label.
+    """
+    if output_style == "🧪 Question Paper" or tool == "🧪 Question Paper":
         return "Question Paper"
     if tool == "📝 Summary":
-        if output_style == "📋 Notes Format": return "Notes"
-        if output_style == "📄 Detailed":     return "Detailed Summary"
-        if output_style == "⚡ Short & Quick": return "Quick Summary"
+        if output_style == "📋 Notes Format":  return "Notes"
+        if output_style == "📄 Detailed":       return "Detailed Summary"
+        if output_style == "⚡ Short & Quick":  return "Quick Summary"
         return "Summary"
     if tool == "🧠 Quiz":           return "Quiz"
     if tool == "📌 Revision Notes": return "Revision Notes"
-    if tool == "🧪 Question Paper": return "Question Paper"
     if tool == "❓ Exam Q&A":       return "Exam Q&A"
     return "Content"
 
-def get_generate_button_label(tool, output_style):
-    return f"✨ Generate {get_effective_output_name(tool, output_style)}"
+def get_button_label(tool, output_style):
+    name = get_effective_output_name(tool, output_style)
+    icon_map = {
+        "Question Paper":   "🧪",
+        "Notes":            "📋",
+        "Detailed Summary": "📄",
+        "Quick Summary":    "⚡",
+        "Summary":          "📝",
+        "Quiz":             "🧠",
+        "Revision Notes":   "📌",
+        "Exam Q&A":         "❓",
+    }
+    icon = icon_map.get(name, "✨")
+    return f"{icon} Generate {name}"
 
 # ─────────────────────────────────────────────────────────────────────────────
 # STEP 4: QUESTION PAPER FORMAT SPECS
@@ -595,54 +510,57 @@ def get_qp_format_spec(board, course, subject):
         if any(x in course for x in ["10", "X", "Class 10"]):
             return {
                 "board_label": "CENTRAL BOARD OF SECONDARY EDUCATION",
-                "exam_label": "BOARD EXAMINATION",
+                "exam_label":  "BOARD EXAMINATION",
                 "class_label": "CLASS X",
                 "total_marks": 80, "time": "3 Hours",
                 "instructions": [
-                    "This paper has Sections A, B, C, D and E. All questions are compulsory.",
-                    "Section A — MCQ/Objective (1 mark each).",
+                    "This paper contains Sections A, B, C, D and E.",
+                    "All questions are compulsory.",
+                    "Section A — MCQ (1 mark each).",
                     "Section B — Very Short Answer (2 marks each).",
                     "Section C — Short Answer (3 marks each).",
                     "Section D — Long Answer (5 marks each).",
-                    "Section E — Case/Source Based (4 marks each).",
+                    "Section E — Case / Source Based (4 marks each).",
                     "Internal choices are provided in some questions.",
                 ],
                 "sections": [
-                    {"name": "SECTION A", "type": "MCQ / Objective",   "q_count": 20, "marks_each": 1, "total": 20},
-                    {"name": "SECTION B", "type": "Very Short Answer",  "q_count": 5,  "marks_each": 2, "total": 10},
-                    {"name": "SECTION C", "type": "Short Answer",       "q_count": 6,  "marks_each": 3, "total": 18},
-                    {"name": "SECTION D", "type": "Long Answer",        "q_count": 4,  "marks_each": 5, "total": 20},
-                    {"name": "SECTION E", "type": "Case / Source Based","q_count": 3,  "marks_each": 4, "total": 12},
+                    {"name": "SECTION A", "type": "MCQ / Objective",    "q_count": 20, "marks_each": 1, "total": 20},
+                    {"name": "SECTION B", "type": "Very Short Answer",   "q_count": 5,  "marks_each": 2, "total": 10},
+                    {"name": "SECTION C", "type": "Short Answer",        "q_count": 6,  "marks_each": 3, "total": 18},
+                    {"name": "SECTION D", "type": "Long Answer",         "q_count": 4,  "marks_each": 5, "total": 20},
+                    {"name": "SECTION E", "type": "Case / Source Based", "q_count": 3,  "marks_each": 4, "total": 12},
                 ]
             }
         if any(x in course for x in ["12", "XII", "Class 12"]):
             return {
                 "board_label": "CENTRAL BOARD OF SECONDARY EDUCATION",
-                "exam_label": "BOARD EXAMINATION",
+                "exam_label":  "BOARD EXAMINATION",
                 "class_label": "CLASS XII",
                 "total_marks": 70, "time": "3 Hours",
                 "instructions": [
-                    "This paper has Sections A, B, C, D and E. All questions are compulsory.",
-                    "Section A — MCQ/Objective (1 mark each).",
+                    "This paper contains Sections A, B, C, D and E.",
+                    "All questions are compulsory.",
+                    "Section A — MCQ (1 mark each).",
                     "Section B — Very Short Answer (2 marks each).",
                     "Section C — Short Answer (3 marks each).",
                     "Section D — Long Answer (5 marks each).",
-                    "Section E — Case/Source Based (4 marks each).",
+                    "Section E — Case / Source Based (4 marks each).",
                     "Internal choices are provided in Sections B, C and D.",
                 ],
                 "sections": [
-                    {"name": "SECTION A", "type": "MCQ / Objective",   "q_count": 18, "marks_each": 1, "total": 18},
-                    {"name": "SECTION B", "type": "Very Short Answer",  "q_count": 4,  "marks_each": 2, "total": 8},
-                    {"name": "SECTION C", "type": "Short Answer",       "q_count": 5,  "marks_each": 3, "total": 15},
-                    {"name": "SECTION D", "type": "Long Answer",        "q_count": 2,  "marks_each": 5, "total": 10},
-                    {"name": "SECTION E", "type": "Case / Source Based","q_count": 3,  "marks_each": 4, "total": 12},
+                    {"name": "SECTION A", "type": "MCQ / Objective",    "q_count": 18, "marks_each": 1, "total": 18},
+                    {"name": "SECTION B", "type": "Very Short Answer",   "q_count": 4,  "marks_each": 2, "total": 8},
+                    {"name": "SECTION C", "type": "Short Answer",        "q_count": 5,  "marks_each": 3, "total": 15},
+                    {"name": "SECTION D", "type": "Long Answer",         "q_count": 2,  "marks_each": 5, "total": 10},
+                    {"name": "SECTION E", "type": "Case / Source Based", "q_count": 3,  "marks_each": 4, "total": 12},
                 ]
             }
         return {
             "board_label": "CENTRAL BOARD OF SECONDARY EDUCATION",
-            "exam_label": "ANNUAL EXAMINATION", "class_label": course.upper(),
+            "exam_label":  "ANNUAL EXAMINATION",
+            "class_label": course.upper(),
             "total_marks": 80, "time": "3 Hours",
-            "instructions": ["All questions are compulsory.", "Read instructions on each section carefully."],
+            "instructions": ["All questions are compulsory.", "Read each section instructions carefully."],
             "sections": [
                 {"name": "SECTION A", "type": "Objective",       "q_count": 20, "marks_each": 1, "total": 20},
                 {"name": "SECTION B", "type": "Short Answer I",  "q_count": 6,  "marks_each": 2, "total": 12},
@@ -654,12 +572,13 @@ def get_qp_format_spec(board, course, subject):
     if "ICSE" in b:
         return {
             "board_label": "COUNCIL FOR THE INDIAN SCHOOL CERTIFICATE EXAMINATIONS",
-            "exam_label": "ICSE EXAMINATION", "class_label": course.upper(),
+            "exam_label":  "ICSE EXAMINATION",
+            "class_label": course.upper(),
             "total_marks": 80, "time": "2 Hours",
             "instructions": [
                 "Attempt all questions from Section A.",
-                "Attempt any four from Section B.",
-                "Marks are in brackets [ ].",
+                "Attempt any four questions from Section B.",
+                "Intended marks are shown in brackets [ ].",
             ],
             "sections": [
                 {"name": "SECTION A", "type": "Compulsory Objective / Short Answer", "q_count": 10, "marks_each": "varied", "total": 40},
@@ -670,68 +589,73 @@ def get_qp_format_spec(board, course, subject):
     if "ISC" in b:
         return {
             "board_label": "COUNCIL FOR THE INDIAN SCHOOL CERTIFICATE EXAMINATIONS",
-            "exam_label": "ISC EXAMINATION", "class_label": course.upper(),
+            "exam_label":  "ISC EXAMINATION",
+            "class_label": course.upper(),
             "total_marks": 70, "time": "3 Hours",
             "instructions": [
                 "Attempt all questions from Section A.",
-                "Attempt any four from Section B.",
-                "Marks are in brackets [ ].",
-                "Draw neat labelled diagrams wherever necessary.",
+                "Attempt any four questions from Section B.",
+                "Intended marks are shown in brackets [ ].",
+                "Neat labelled diagrams should be drawn wherever necessary.",
             ],
             "sections": [
-                {"name": "SECTION A", "type": "Compulsory",              "q_count": 10, "marks_each": "varied", "total": 30},
-                {"name": "SECTION B", "type": "Descriptive (4 of 6)",    "q_count": 6,  "marks_each": 10,       "total": 40},
+                {"name": "SECTION A", "type": "Compulsory",           "q_count": 10, "marks_each": "varied", "total": 30},
+                {"name": "SECTION B", "type": "Descriptive (4 of 6)", "q_count": 6,  "marks_each": 10,       "total": 40},
             ]
         }
 
     if "IB" in b:
         return {
             "board_label": "INTERNATIONAL BACCALAUREATE",
-            "exam_label": "FINAL EXAMINATION", "class_label": course.upper(),
+            "exam_label":  "FINAL EXAMINATION",
+            "class_label": course.upper(),
             "total_marks": 100, "time": "2 Hours 30 Minutes",
             "instructions": ["Answer required questions.", "Show all reasoning where necessary."],
             "sections": [
-                {"name": "SECTION A", "type": "Structured / Objective",  "q_count": 20, "marks_each": "varied", "total": 40},
-                {"name": "SECTION B", "type": "Extended Response",       "q_count": 4,  "marks_each": 15,       "total": 60},
+                {"name": "SECTION A", "type": "Structured / Objective", "q_count": 20, "marks_each": "varied", "total": 40},
+                {"name": "SECTION B", "type": "Extended Response",      "q_count": 4,  "marks_each": 15,       "total": 60},
             ]
         }
 
     if "CAMBRIDGE" in b:
         return {
             "board_label": "CAMBRIDGE ASSESSMENT INTERNATIONAL EDUCATION",
-            "exam_label": "INTERNATIONAL EXAMINATION", "class_label": course.upper(),
+            "exam_label":  "INTERNATIONAL EXAMINATION",
+            "class_label": course.upper(),
             "total_marks": 80, "time": "2 Hours",
             "instructions": ["Answer all questions as instructed.", "Show all working where required."],
             "sections": [
-                {"name": "SECTION A", "type": "Structured Questions",   "q_count": 10, "marks_each": 4,  "total": 40},
-                {"name": "SECTION B", "type": "Extended Response",      "q_count": 4,  "marks_each": 10, "total": 40},
+                {"name": "SECTION A", "type": "Structured Questions", "q_count": 10, "marks_each": 4,  "total": 40},
+                {"name": "SECTION B", "type": "Extended Response",    "q_count": 4,  "marks_each": 10, "total": 40},
             ]
         }
 
-    if any(k in course.upper() for k in ["MBBS","BDS","MD","MEDICAL"]):
+    if any(k in course.upper() for k in ["MBBS", "BDS", "MD", "MEDICAL"]):
         return {
             "board_label": "UNIVERSITY EXAMINATIONS",
-            "exam_label": f"{course.upper()} PROFESSIONAL EXAMINATION", "class_label": course.upper(),
+            "exam_label":  f"{course.upper()} PROFESSIONAL EXAMINATION",
+            "class_label": course.upper(),
             "total_marks": 100, "time": "3 Hours",
             "instructions": [
                 "Answer all questions in Part A.",
-                "Answer any five from Part B.",
-                "Draw neat labelled diagrams wherever necessary.",
+                "Answer any five questions from Part B.",
+                "Neat labelled diagrams should be drawn wherever necessary.",
             ],
             "sections": [
-                {"name": "PART A", "type": "Short Notes",   "q_count": 10, "marks_each": 5,  "total": 50},
-                {"name": "PART B", "type": "Long Essays",   "q_count": 8,  "marks_each": 10, "total": 50},
+                {"name": "PART A", "type": "Short Notes",  "q_count": 10, "marks_each": 5,  "total": 50},
+                {"name": "PART B", "type": "Long Essays",  "q_count": 8,  "marks_each": 10, "total": 50},
             ]
         }
 
     return {
         "board_label": "UNIVERSITY EXAMINATIONS",
-        "exam_label": f"{course.upper()} SEMESTER EXAMINATION", "class_label": course.upper(),
+        "exam_label":  f"{course.upper()} SEMESTER EXAMINATION",
+        "class_label": course.upper(),
         "total_marks": 100, "time": "3 Hours",
         "instructions": [
             "Answer all questions in Section A.",
-            "Answer any five from Section B.",
-            "Marks are in brackets.",
+            "Answer any five questions from Section B.",
+            "Figures in brackets indicate marks.",
         ],
         "sections": [
             {"name": "SECTION A", "type": "Short Answer",  "q_count": 10, "marks_each": 2,  "total": 20},
@@ -742,7 +666,7 @@ def get_qp_format_spec(board, course, subject):
 
 
 def render_qp_preview(board, course, subject):
-    fmt = get_qp_format_spec(board, course, subject)
+    fmt   = get_qp_format_spec(board, course, subject)
     lines = [
         f"**Board / Pattern:** {fmt['board_label']}",
         f"**Exam:** {fmt['exam_label']}",
@@ -763,7 +687,7 @@ def render_qp_preview(board, course, subject):
 # ─────────────────────────────────────────────────────────────────────────────
 
 def build_question_paper_prompt(board, course, subject, chapter, topic, audience):
-    fmt = get_qp_format_spec(board, course, subject)
+    fmt   = get_qp_format_spec(board, course, subject)
     instr = "\n".join([f"{i+1}. {x}" for i, x in enumerate(fmt["instructions"])])
     secs  = "\n".join([
         f"- {s['name']} | {s['type']} | {s['q_count']} questions | {s['marks_each']} marks each | Total {s['total']}"
@@ -804,7 +728,7 @@ Generate the complete question paper now.
 """
 
 def build_full_subject_qp_prompt(board, course, stream, subject, audience):
-    fmt = get_qp_format_spec(board, course, subject)
+    fmt   = get_qp_format_spec(board, course, subject)
     instr = "\n".join([f"{i+1}. {x}" for i, x in enumerate(fmt["instructions"])])
     secs  = "\n".join([
         f"- {s['name']} | {s['type']} | {s['q_count']} questions | {s['marks_each']} marks each | Total {s['total']}"
@@ -868,14 +792,18 @@ Generate the answer key now, following the same section and question order.
 """
 
 def build_prompt(tool, chapter, topic, subject, audience, output_style, board="", course=""):
-    """Output Style Question Paper always takes priority over tool selection."""
+    """
+    Output Style 'Question Paper' OR tool '🧪 Question Paper' → always generates QP.
+    This is the single entry point — no separate button needed.
+    """
+    if output_style == "🧪 Question Paper" or tool == "🧪 Question Paper":
+        return build_question_paper_prompt(board, course, subject, chapter, topic, audience)
+
     base = f"""
 You are an expert educator creating study material for {audience}.
 Subject: {subject} | Topic: {topic} | Chapter: {chapter}
 Requirements: Accurate, exam-focused, well-structured, with examples, and error-free.
 """
-    if output_style == "🧪 Question Paper" or tool == "🧪 Question Paper":
-        return build_question_paper_prompt(board, course, subject, chapter, topic, audience)
 
     if tool == "📝 Summary":
         if output_style == "📄 Detailed":
@@ -883,8 +811,8 @@ Requirements: Accurate, exam-focused, well-structured, with examples, and error-
 Create a detailed summary with:
 - Chapter overview (150-200 words)
 - Key concepts (300-400 words)
-- Important definitions
-- Worked examples
+- Important definitions and formulas
+- 2-3 worked examples
 - Common mistakes to avoid
 - Exam tips
 """
@@ -899,10 +827,10 @@ Create a concise quick-reference guide (max 500 words):
         elif output_style == "📋 Notes Format":
             return base + """
 Create structured study notes:
-- Headings and subheadings
-- Bullet points
+- Clear headings and subheadings
+- Bullet points for each concept
 - Definitions highlighted
-- Important facts boxed
+- Important facts
 - Examples
 - Revision points
 """
@@ -911,8 +839,8 @@ Create structured study notes:
         return base + """
 Create a quiz:
 - 5 MCQs with 4 options each (mark correct answer)
-- 5 short questions with answers
-- 3 long questions with answers
+- 5 short answer questions with answers
+- 3 long answer questions with answers
 """
 
     if tool == "📌 Revision Notes":
@@ -920,8 +848,8 @@ Create a quiz:
 Create revision notes:
 - Top 10 must-know points
 - Formula / fact sheet
-- Mnemonics
-- Key comparisons
+- Mnemonics and memory tricks
+- Key comparisons / tables
 - Exam focus areas
 """
 
@@ -929,9 +857,9 @@ Create revision notes:
         return base + """
 Create an exam Q&A bank:
 - 8-10 frequently asked questions with answers
-- Conceptual questions with answers
-- Application questions with answers
-- Why / How questions with answers
+- 5 conceptual questions with answers
+- 5 application questions with answers
+- 5 why / how questions with answers
 """
 
     return base + "Create comprehensive exam-ready study material."
@@ -998,23 +926,24 @@ def generate_pdf(title, subtitle, content, color_hex="#1d4ed8"):
     story  = []
 
     story.append(Paragraph(title, ParagraphStyle(
-        "T", parent=styles["Heading1"], fontSize=21,
-        textColor=colors.HexColor(color_hex), spaceAfter=6,
-        alignment=TA_CENTER, fontName="Helvetica-Bold"
+        "T", parent=styles["Heading1"], fontSize=20,
+        textColor=colors.HexColor(color_hex),
+        spaceAfter=6, alignment=TA_CENTER, fontName="Helvetica-Bold"
     )))
     story.append(Paragraph(subtitle, ParagraphStyle(
-        "S", parent=styles["Normal"], fontSize=10.5,
-        textColor=colors.HexColor("#64748b"), spaceAfter=10,
-        alignment=TA_CENTER, fontName="Helvetica"
+        "S", parent=styles["Normal"], fontSize=10,
+        textColor=colors.HexColor("#64748b"),
+        spaceAfter=10, alignment=TA_CENTER, fontName="Helvetica"
     )))
     story.append(HRFlowable(width="100%", thickness=2,
         color=colors.HexColor(color_hex), spaceAfter=14))
 
-    body_style    = ParagraphStyle("B", parent=styles["Normal"], fontSize=10.5,
+    body_style    = ParagraphStyle("B",  parent=styles["Normal"],  fontSize=10.5,
         leading=15, textColor=colors.HexColor("#1e293b"), spaceAfter=5, fontName="Helvetica")
-    heading_style = ParagraphStyle("H", parent=styles["Heading2"], fontSize=12.5,
-        textColor=colors.HexColor(color_hex), spaceBefore=10, spaceAfter=6, fontName="Helvetica-Bold")
-    bullet_style  = ParagraphStyle("BL", parent=styles["Normal"], fontSize=10.5,
+    heading_style = ParagraphStyle("H",  parent=styles["Heading2"], fontSize=12.5,
+        textColor=colors.HexColor(color_hex),
+        spaceBefore=10, spaceAfter=6, fontName="Helvetica-Bold")
+    bullet_style  = ParagraphStyle("BL", parent=styles["Normal"],  fontSize=10.5,
         leading=15, leftIndent=16, bulletIndent=6,
         textColor=colors.HexColor("#334155"), spaceAfter=4, fontName="Helvetica")
 
@@ -1050,13 +979,13 @@ def init_session_state():
         "logged_in": False, "username": "",
         "history": [], "current_chapters": [], "last_chapter_key": "",
         "generated_result": None, "generated_model": None,
-        "generated_label": None,  "generated_tool": None,
+        "generated_label":  None, "generated_tool": None,
         "generated_chapter": None,"generated_subject": None,
-        "generated_topic": None,  "generated_course": None,
-        "generated_stream": None, "generated_board": None,
+        "generated_topic":   None,"generated_course": None,
+        "generated_stream":  None,"generated_board": None,
         "generated_audience": None,"generated_output_style": None,
-        "answers_result": None,   "answers_model": None,  "show_answers": False,
-        "fullpaper_result": None, "fullpaper_model": None,"show_fullpaper": False,
+        "answers_result": None, "answers_model": None, "show_answers": False,
+        "fullpaper_result": None,"fullpaper_model": None,"show_fullpaper": False,
     }
     for k, v in defaults.items():
         if k not in st.session_state:
@@ -1067,13 +996,14 @@ def reset_generation_state():
         "generated_result","generated_model","generated_label","generated_tool",
         "generated_chapter","generated_subject","generated_topic","generated_course",
         "generated_stream","generated_board","generated_audience","generated_output_style",
-        "answers_result","answers_model","show_answers",
-        "fullpaper_result","fullpaper_model","show_fullpaper",
+        "answers_result","answers_model","fullpaper_result","fullpaper_model",
     ]:
-        st.session_state[k] = None if k not in ("show_answers","show_fullpaper") else False
+        st.session_state[k] = None
+    st.session_state.show_answers   = False
+    st.session_state.show_fullpaper = False
 
 # ─────────────────────────────────────────────────────────────────────────────
-# STEP 9: MAIN APP UI
+# STEP 9: MAIN APP
 # ─────────────────────────────────────────────────────────────────────────────
 
 def main_app():
@@ -1081,10 +1011,13 @@ def main_app():
     # ── Sidebar ───────────────────────────────────────────────────────────────
     with st.sidebar:
         st.markdown(f"""
-            <div style="text-align:center;padding:18px 0 12px 0;">
-                <div style="font-size:2.8rem;">🎓</div>
-                <div style="font-size:1.3rem;font-weight:800;color:#2563eb;">StudySmart</div>
-                <div style="font-size:0.9rem;color:#64748b;margin-top:4px;">
+            <div style="text-align:center;padding:18px 0 14px 0;">
+                <div style="font-size:2.6rem;">🎓</div>
+                <div style="font-size:1.25rem;font-weight:800;
+                     background:linear-gradient(135deg,#3b82f6,#1d4ed8);
+                     -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+                     background-clip:text;">StudySmart</div>
+                <div style="font-size:0.88rem;color:#64748b;margin-top:4px;">
                     Welcome, {st.session_state.username} 👋
                 </div>
             </div>
@@ -1140,10 +1073,10 @@ def main_app():
         st.error("No study data found.")
         st.stop()
 
-    category = st.selectbox("📚 Category", list(STUDY_DATA.keys()))
-    course   = st.selectbox("🎓 Program / Class", get_courses(category))
-    stream   = st.selectbox("📖 Stream", get_streams(category, course))
-    subject  = st.selectbox("🧾 Subject", get_subjects(category, course, stream))
+    category = st.selectbox("📚 Category",        list(STUDY_DATA.keys()))
+    course   = st.selectbox("🎓 Program / Class",  get_courses(category))
+    stream   = st.selectbox("📖 Stream",           get_streams(category, course))
+    subject  = st.selectbox("🧾 Subject",          get_subjects(category, course, stream))
 
     board = st.selectbox("🏫 Board", BOARDS) if category == "K-12th" else "University / National Syllabus"
 
@@ -1165,25 +1098,31 @@ def main_app():
         horizontal=True
     )
 
-    effective_label  = get_effective_output_name(tool, output_style)
-    btn_label        = get_generate_button_label(tool, output_style)
+    # derived values (drive button label and logic)
+    effective_label = get_effective_output_name(tool, output_style)
+    btn_label       = get_button_label(tool, output_style)
 
-    # QP format preview
+    # Show format preview when QP mode is active
     if effective_label == "Question Paper":
         st.markdown('<div class="sf-preview">', unsafe_allow_html=True)
-        st.markdown("#### 📄 Question Paper Pattern Preview")
+        st.markdown("#### 📄 Question Paper Format Preview")
         st.markdown(render_qp_preview(board, course, subject))
         st.markdown('</div>', unsafe_allow_html=True)
 
-    # ── Dynamic Generate Button ─────────────────────────────────────────────────
+    st.markdown('<div style="margin-top:14px;"></div>', unsafe_allow_html=True)
+
+    # ── ONE SINGLE GENERATE BUTTON ──────────────────────────────────────────────
     if st.button(btn_label, use_container_width=True):
         if not chapter or chapter == "No chapters found":
             st.warning("⚠️ Please select a valid chapter first.")
             return
 
         audience = f"{board} {course} students" if category == "K-12th" else f"{course} students"
-        prompt   = build_prompt(tool, chapter, topic, subject, audience,
-                                output_style, board=board, course=course)
+        prompt   = build_prompt(
+            tool=tool, chapter=chapter, topic=topic, subject=subject,
+            audience=audience, output_style=output_style,
+            board=board, course=course
+        )
 
         with st.spinner(f"Generating {effective_label}... ⏳"):
             result, model_used = generate_with_fallback(prompt)
@@ -1223,39 +1162,43 @@ def main_app():
         g_stream   = st.session_state.generated_stream
         g_board    = st.session_state.generated_board
         g_audience = st.session_state.generated_audience
-        model_used = st.session_state.generated_model
 
         st.markdown("---")
-        c1, c2 = st.columns(2)
-        c1.metric("🤖 Model Used", model_used.split("/")[-1] if "/" in model_used else model_used)
-        c2.metric("📝 Word Count", f"{count_words(result):,}")
 
+        # Output display
         st.markdown('<div class="sf-output">', unsafe_allow_html=True)
         st.markdown(f"### {g_label} — {g_chapter}")
         st.markdown(result)
         st.markdown('</div>', unsafe_allow_html=True)
 
-        is_qp = g_label == "Question Paper"
+        is_qp = (g_label == "Question Paper")
 
+        # ── Question Paper actions ──────────────────────────────────────────────
         if is_qp:
-            st.markdown("---")
+            st.markdown('<div style="margin-top:14px;"></div>', unsafe_allow_html=True)
 
             # Download QP PDF
             try:
-                qp_pdf  = generate_pdf(f"Question Paper — {g_chapter}",
-                                       f"{g_subject} | {g_board} | {g_course}",
-                                       result, color_hex="#1d4ed8")
+                qp_pdf  = generate_pdf(
+                    f"Question Paper — {g_chapter}",
+                    f"{g_subject} | {g_board} | {g_course}",
+                    result, color_hex="#1d4ed8"
+                )
                 safe_qp = g_chapter.replace(" ","_").replace(":","").replace("/","-") + "_QP.pdf"
-                st.download_button("⬇️ Download Question Paper as PDF",
+                st.download_button(
+                    "⬇️ Download Question Paper as PDF",
                     data=qp_pdf, file_name=safe_qp,
-                    mime="application/pdf", use_container_width=True, key="dl_qp")
+                    mime="application/pdf", use_container_width=True, key="dl_qp"
+                )
             except Exception as e:
                 st.warning(f"⚠️ PDF error: {e}")
 
-            # Get Answers button
+            st.markdown('<div style="margin-top:8px;"></div>', unsafe_allow_html=True)
+
+            # Get Answers
             if st.button("📋 Get Answers", use_container_width=True, key="get_answers_btn"):
                 with st.spinner("Generating answer key for the exact paper above... ⏳"):
-                    ans_prompt  = build_answers_prompt(
+                    ans_prompt           = build_answers_prompt(
                         st.session_state.generated_result,
                         g_board, g_course, g_subject, g_chapter
                     )
@@ -1271,13 +1214,17 @@ def main_app():
                     st.markdown(st.session_state.answers_result)
                     st.markdown('</div>', unsafe_allow_html=True)
                     try:
-                        ans_pdf  = generate_pdf(f"Answer Key — {g_chapter}",
-                                               f"{g_subject} | {g_board} | {g_course}",
-                                               st.session_state.answers_result, color_hex="#15803d")
+                        ans_pdf  = generate_pdf(
+                            f"Answer Key — {g_chapter}",
+                            f"{g_subject} | {g_board} | {g_course}",
+                            st.session_state.answers_result, color_hex="#15803d"
+                        )
                         safe_ans = g_chapter.replace(" ","_").replace(":","").replace("/","-") + "_Answers.pdf"
-                        st.download_button("⬇️ Download Answer Key as PDF",
+                        st.download_button(
+                            "⬇️ Download Answer Key as PDF",
                             data=ans_pdf, file_name=safe_ans,
-                            mime="application/pdf", use_container_width=True, key="dl_ans")
+                            mime="application/pdf", use_container_width=True, key="dl_ans"
+                        )
                     except Exception as e:
                         st.warning(f"⚠️ Answer PDF error: {e}")
                 else:
@@ -1289,15 +1236,17 @@ def main_app():
             st.markdown(f"""
                 <div class="sf-preview">
                     <strong>🗂️ Generate Full Subject Question Paper</strong><br/>
-                    A complete <strong>{g_subject}</strong> paper covering the full syllabus,
+                    Generate a complete <strong>{g_subject}</strong> paper covering the entire syllabus,
                     following the official <strong>{g_board}</strong> / <strong>{g_course}</strong> format.
                 </div>
             """, unsafe_allow_html=True)
 
-            if st.button(f"🗂️ Generate Full {g_subject} Question Paper",
-                         use_container_width=True, key="full_qp_btn"):
+            if st.button(
+                f"🗂️ Generate Full {g_subject} Question Paper",
+                use_container_width=True, key="full_qp_btn"
+            ):
                 with st.spinner(f"Generating full {g_subject} question paper... ⏳"):
-                    full_prompt  = build_full_subject_qp_prompt(
+                    full_prompt            = build_full_subject_qp_prompt(
                         g_board, g_course, g_stream, g_subject, g_audience)
                     full_result, full_model = generate_with_fallback(full_prompt)
                 st.session_state.fullpaper_result = full_result
@@ -1307,32 +1256,40 @@ def main_app():
             if st.session_state.show_fullpaper and st.session_state.fullpaper_result:
                 if st.session_state.fullpaper_model != "None":
                     st.markdown('<div class="sf-fullpaper">', unsafe_allow_html=True)
-                    st.markdown(f"### 🗂️ Full Subject Paper — {g_subject} ({g_board} {g_course})")
+                    st.markdown(f"### 🗂️ Full Subject Paper — {g_subject} ({g_board} · {g_course})")
                     st.markdown(st.session_state.fullpaper_result)
                     st.markdown('</div>', unsafe_allow_html=True)
                     try:
-                        full_pdf  = generate_pdf(f"Full Question Paper — {g_subject}",
-                                                f"{g_board} | {g_course} | {g_stream}",
-                                                st.session_state.fullpaper_result, color_hex="#6d28d9")
+                        full_pdf  = generate_pdf(
+                            f"Full Question Paper — {g_subject}",
+                            f"{g_board} | {g_course} | {g_stream}",
+                            st.session_state.fullpaper_result, color_hex="#6d28d9"
+                        )
                         safe_full = f"{g_subject}_{g_board}_{g_course}_FullPaper.pdf".replace(" ","_")
-                        st.download_button("⬇️ Download Full Subject Paper as PDF",
+                        st.download_button(
+                            "⬇️ Download Full Subject Paper as PDF",
                             data=full_pdf, file_name=safe_full,
-                            mime="application/pdf", use_container_width=True, key="dl_full")
+                            mime="application/pdf", use_container_width=True, key="dl_full"
+                        )
                     except Exception as e:
                         st.warning(f"⚠️ Full paper PDF error: {e}")
                 else:
                     st.error("❌ Failed to generate full subject paper.")
                     st.markdown(st.session_state.fullpaper_result)
 
+        # ── Non-QP: standard PDF download ───────────────────────────────────────
         else:
-            # Non-QP PDF download
-            st.markdown("---")
+            st.markdown('<div style="margin-top:12px;"></div>', unsafe_allow_html=True)
             try:
-                pdf = generate_pdf(f"{g_label} — {g_chapter}",
-                                   f"{g_subject} | {g_topic} | {g_course}", result)
+                pdf  = generate_pdf(
+                    f"{g_label} — {g_chapter}",
+                    f"{g_subject} | {g_topic} | {g_course}", result
+                )
                 safe = g_chapter.replace(" ","_").replace(":","").replace("/","-") + ".pdf"
-                st.download_button("⬇️ Download as PDF", data=pdf, file_name=safe,
-                    mime="application/pdf", use_container_width=True, key="dl_main")
+                st.download_button(
+                    "⬇️ Download as PDF", data=pdf, file_name=safe,
+                    mime="application/pdf", use_container_width=True, key="dl_main"
+                )
             except Exception as e:
                 st.warning(f"⚠️ PDF error: {e}")
 
@@ -1379,14 +1336,14 @@ def auth_ui():
                     st.warning("⚠️ Please fill in both fields.")
 
         with tab2:
-            nu = st.text_input("👤 New Username",  key="reg_u",  placeholder="Min 3 characters")
-            np = st.text_input("🔑 New Password",  type="password", key="reg_p", placeholder="Min 6 characters")
+            nu = st.text_input("👤 New Username",     key="reg_u",  placeholder="Min 3 characters")
+            np = st.text_input("🔑 New Password",     type="password", key="reg_p",  placeholder="Min 6 characters")
             cp = st.text_input("🔑 Confirm Password", type="password", key="reg_cp", placeholder="Re-enter password")
             if st.button("Create Account ✨", use_container_width=True):
-                if not nu.strip():          st.error("❌ Username cannot be empty")
-                elif len(nu.strip()) < 3:   st.error("❌ Username min 3 characters")
-                elif len(np.strip()) < 6:   st.error("❌ Password min 6 characters")
-                elif np != cp:              st.error("❌ Passwords do not match")
+                if not nu.strip():         st.error("❌ Username cannot be empty")
+                elif len(nu.strip()) < 3:  st.error("❌ Username min 3 characters")
+                elif len(np.strip()) < 6:  st.error("❌ Password min 6 characters")
+                elif np != cp:             st.error("❌ Passwords do not match")
                 else:
                     try:
                         conn = sqlite3.connect("users.db"); c = conn.cursor()
