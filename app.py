@@ -1,6 +1,8 @@
 # ═══════════════════════════════════════════════════════════════════════════════
-# STUDYSMART AI — CLEAN APP (UI + AI LOGIC ONLY)
+# STUDYSMART AI — ENHANCED APP v2.0
 # Auto-detects available Gemini models dynamically
+# Improvements: Dark Mode, Study History, Audience Levels, Custom Topic,
+#               Confirm Password, Word Count, Better PDF, Mobile-responsive CSS
 # ═══════════════════════════════════════════════════════════════════════════════
 
 import streamlit as st
@@ -51,7 +53,157 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-st.markdown("""
+def get_theme_css(dark_mode=False):
+    if dark_mode:
+        return """
+    <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap');
+
+    html, body, [class*="css"], [class*="st-"] {
+        font-family: 'Inter', 'Poppins', sans-serif !important;
+        letter-spacing: 0.3px;
+    }
+
+    .stApp {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%) !important;
+        min-height: 100vh;
+    }
+
+    .block-container {
+        padding-top: 1.5rem !important;
+        padding-bottom: 2rem !important;
+        padding-left: 1.2rem !important;
+        padding-right: 1.2rem !important;
+        max-width: 1300px;
+    }
+
+    #MainMenu  { visibility: hidden; }
+    footer     { visibility: hidden; }
+    header     { visibility: hidden; }
+
+    .stTabs [data-baseweb="tab-list"] {
+        background-color: transparent !important;
+        border-bottom: 2px solid #334155 !important;
+        gap: 20px;
+    }
+    .stTabs [data-baseweb="tab"] {
+        background-color: transparent !important;
+        border: none !important;
+        color: #94a3b8 !important;
+        font-weight: 500 !important;
+    }
+    .stTabs [aria-selected="true"] {
+        color: #60a5fa !important;
+        border-bottom: 3px solid #3b82f6 !important;
+    }
+
+    .sf-header {
+        text-align: center;
+        padding: 50px 0 15px 0;
+        position: relative;
+    }
+
+    .sf-header-title {
+        font-size: 4.2rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 50%, #2563eb 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin: 0;
+        line-height: 1.1;
+        letter-spacing: -1.5px;
+    }
+
+    .sf-header-subtitle {
+        font-size: 1.1rem;
+        color: #94a3b8;
+        margin-top: 12px;
+        font-weight: 500;
+        letter-spacing: 0.4px;
+    }
+
+    .sf-watermark {
+        font-size: 0.7rem;
+        color: #475569;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        margin-top: 8px;
+    }
+
+    .sf-card {
+        background: rgba(30, 41, 59, 0.9) !important;
+        border-radius: 16px;
+        padding: 28px 32px;
+        border: 1px solid #334155;
+        margin-bottom: 20px;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    }
+
+    .sf-output {
+        background: rgba(15, 23, 42, 0.8);
+        border-radius: 12px;
+        padding: 28px 32px;
+        border: 1px solid #334155;
+        margin-top: 16px;
+        color: #e2e8f0;
+    }
+
+    .sf-history-item {
+        background: rgba(30, 41, 59, 0.7);
+        border-radius: 10px;
+        padding: 12px 16px;
+        border-left: 4px solid #3b82f6;
+        margin-bottom: 10px;
+        font-size: 0.9rem;
+        color: #94a3b8;
+        cursor: pointer;
+    }
+
+    /* Inputs dark */
+    .stTextInput > div > div > input,
+    .stSelectbox > div > div,
+    .stTextArea textarea {
+        background-color: #1e293b !important;
+        color: #e2e8f0 !important;
+        border-color: #334155 !important;
+    }
+
+    /* Mobile responsive */
+    @media (max-width: 768px) {
+        .sf-header-title { font-size: 2.8rem !important; }
+        .block-container {
+            padding-left: 0.6rem !important;
+            padding-right: 0.6rem !important;
+        }
+        .sf-card { padding: 16px 14px; }
+        .sf-output { padding: 14px 12px; }
+
+        .stSelectbox > div > div {
+            min-height: 48px !important;
+            font-size: 15px !important;
+        }
+
+        div[role="listbox"] {
+            max-height: 38vh !important;
+            overflow-y: auto !important;
+            -webkit-overflow-scrolling: touch !important;
+            position: fixed !important;
+            z-index: 9999 !important;
+        }
+
+        div[role="option"] {
+            min-height: 48px !important;
+            padding: 12px 16px !important;
+            font-size: 15px !important;
+            display: flex !important;
+            align-items: center !important;
+        }
+    }
+    </style>
+"""
+    else:
+        return """
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap');
 
@@ -120,168 +272,56 @@ st.markdown("""
     }
 
     .sf-watermark {
-        font-size: 4.4rem;
-        font-weight: 900;
-        color: rgba(59, 130, 246, 0.08);
+        font-size: 0.7rem;
+        color: #cbd5e1;
+        letter-spacing: 3px;
         text-transform: uppercase;
-        letter-spacing: 12px;
-        margin-top: 12px;
-        margin-bottom: -42px;
-        position: relative;
-        top: -8px;
-        z-index: 10;
-        pointer-events: none;
-        user-select: none;
-        text-align: center;
-        width: 100%;
-        line-height: 1;
+        margin-top: 8px;
     }
 
     .sf-card {
-        background: rgba(255, 255, 255, 0.75);
-        backdrop-filter: blur(10px);
-        border-radius: 20px;
-        padding: 32px;
-        box-shadow: 0 4px 30px rgba(15, 23, 42, 0.08),
-                    inset 0 1px 0 rgba(255, 255, 255, 0.9);
-        margin-bottom: 28px;
-        border: 1px solid rgba(59, 130, 246, 0.15);
-    }
-
-    .stButton > button {
-        width: 100% !important;
-        border-radius: 12px !important;
-        height: 3.2rem !important;
-        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
-        color: #ffffff !important;
-        border: none !important;
-        font-weight: 600 !important;
-        font-size: 15px !important;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-        box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3) !important;
-        letter-spacing: 0.4px !important;
-    }
-    .stButton > button:hover {
-        opacity: 0.9 !important;
-        transform: translateY(-2px) !important;
-        box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4) !important;
-    }
-
-    .stDownloadButton > button {
-        background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
-        color: #ffffff !important;
-        box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3) !important;
-    }
-    .stDownloadButton > button:hover {
-        box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4) !important;
-        transform: translateY(-2px) !important;
-    }
-
-    div[data-baseweb="select"] > div {
-        border-radius: 10px !important;
-        border: 1.5px solid #e2e8f0 !important;
-        background: #ffffff !important;
-        color: #1e293b !important;
-    }
-
-    input[type="text"], input[type="password"] {
-        background: #ffffff !important;
-        color: #1e293b !important;
-        border: 1.5px solid #e2e8f0 !important;
-        border-radius: 10px !important;
-    }
-
-    input[type="text"]::placeholder, input[type="password"]::placeholder {
-        color: #cbd5e1 !important;
-    }
-
-    div.stSelectbox label, div.stTextInput label, div.stRadio label {
-        font-weight: 600 !important;
-        color: #1e293b !important;
-        font-size: 0.9rem !important;
-        letter-spacing: 0.3px !important;
-    }
-
-    [data-testid="stSidebar"] {
-        background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%) !important;
-        border-right: 1px solid #e2e8f0 !important;
-    }
-
-    [data-testid="stSidebar"] * {
-        color: #1e293b !important;
+        background: rgba(255,255,255,0.85);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-radius: 16px;
+        padding: 28px 32px;
+        border: 1px solid rgba(59,130,246,0.15);
+        margin-bottom: 20px;
+        box-shadow: 0 4px 24px rgba(59,130,246,0.07);
     }
 
     .sf-output {
-        background: linear-gradient(135deg,
-            rgba(59, 130, 246, 0.05) 0%,
-            rgba(37, 99, 235, 0.05) 100%);
-        border-radius: 18px;
-        padding: 28px;
-        border-left: 5px solid #3b82f6;
-        box-shadow: 0 2px 15px rgba(59, 130, 246, 0.1);
-        margin-top: 12px;
-        border: 1px solid rgba(59, 130, 246, 0.2);
-        color: #1e293b;
+        background: rgba(255,255,255,0.9);
+        border-radius: 12px;
+        padding: 28px 32px;
+        border: 1px solid #e2e8f0;
+        margin-top: 16px;
     }
 
-    .sf-output h3, .sf-output h2 {
-        color: #3b82f6 !important;
-        margin-top: 0;
-        font-weight: 700;
+    .sf-history-item {
+        background: rgba(59,130,246,0.05);
+        border-radius: 10px;
+        padding: 12px 16px;
+        border-left: 4px solid #3b82f6;
+        margin-bottom: 10px;
+        font-size: 0.9rem;
+        color: #475569;
+        cursor: pointer;
     }
 
-    div[data-testid="stSuccessMessage"] {
-        background: rgba(16, 185, 129, 0.08) !important;
-        border: 1.5px solid rgba(16, 185, 129, 0.3) !important;
-        border-radius: 10px !important;
-    }
-
-    div[data-testid="stErrorMessage"] {
-        background: rgba(239, 68, 68, 0.08) !important;
-        border: 1.5px solid rgba(239, 68, 68, 0.3) !important;
-        border-radius: 10px !important;
-    }
-
-    div[data-testid="stInfoMessage"] {
-        background: rgba(59, 130, 246, 0.08) !important;
-        border: 1.5px solid rgba(59, 130, 246, 0.3) !important;
-        border-radius: 10px !important;
-    }
-
-    hr {
-        border: none;
-        border-top: 1px solid #e2e8f0;
-        margin: 20px 0;
-    }
-
+    /* Mobile responsive */
     @media (max-width: 768px) {
         .sf-header-title { font-size: 2.8rem !important; }
-        .sf-header-subtitle { font-size: 1rem !important; }
-        .sf-watermark {
-            font-size: 2.4rem !important;
-            letter-spacing: 6px !important;
+        .block-container {
+            padding-left: 0.6rem !important;
+            padding-right: 0.6rem !important;
         }
+        .sf-card { padding: 16px 14px; }
+        .sf-output { padding: 14px 12px; }
 
-        html, body, .stApp {
-            overflow-x: hidden !important;
-            overscroll-behavior: none !important;
-            scroll-behavior: auto !important;
-            position: relative !important;
-        }
-
-        div[data-baseweb="select"] input,
-        div[data-baseweb="select"] [role="combobox"],
-        div[data-baseweb="select"] > div {
-            font-size: 16px !important;
-            -webkit-text-size-adjust: 100% !important;
-        }
-
-        input, textarea, select,
-        [contenteditable="true"],
-        [role="combobox"] {
-            font-size: 16px !important;
-            -webkit-text-size-adjust: 100% !important;
-            touch-action: manipulation !important;
+        .stSelectbox > div > div {
+            min-height: 48px !important;
+            font-size: 15px !important;
         }
 
         div[role="listbox"] {
@@ -301,7 +341,7 @@ st.markdown("""
         }
     }
     </style>
-""", unsafe_allow_html=True)
+"""
 
 # ═════════════════════════════════════════════════════════════════════════════
 # STEP 3: HELPER FUNCTIONS
@@ -378,7 +418,6 @@ def list_working_gemini_models():
 
         for m in models:
             name = getattr(m, "name", "")
-            display_name = getattr(m, "display_name", name)
             methods = getattr(m, "supported_generation_methods", [])
 
             if "gemini" in name.lower() and "generateContent" in methods:
@@ -397,16 +436,41 @@ def get_available_models():
         return ["No Gemini models available for this API key"]
     return working_models
 
+def count_words(text):
+    """Count words in generated text."""
+    return len(text.split())
+
+def add_to_history(tool, chapter, subject, result_preview):
+    """Add generated content to session history (max 5 items)."""
+    if "history" not in st.session_state:
+        st.session_state.history = []
+    entry = {
+        "time": time.strftime("%H:%M"),
+        "tool": tool,
+        "chapter": chapter,
+        "subject": subject,
+        "preview": result_preview[:120] + "..." if len(result_preview) > 120 else result_preview
+    }
+    st.session_state.history.insert(0, entry)
+    st.session_state.history = st.session_state.history[:5]  # Keep only last 5
+
 # ═════════════════════════════════════════════════════════════════════════════
 # STEP 4: PROMPT BUILDER
 # ═════════════════════════════════════════════════════════════════════════════
 
-def build_prompt(tool, chapter, topic, subject, audience, output_style):
-    """Build detailed prompts for AI"""
+def build_prompt(tool, chapter, topic, subject, audience, output_style, level="Intermediate"):
+    """Build detailed prompts for AI with difficulty level support"""
+
+    level_note = {
+        "Beginner": "Use simple language, avoid jargon, include basic definitions, and provide plenty of examples.",
+        "Intermediate": "Use standard academic language with clear explanations and relevant examples.",
+        "Advanced": "Use technical language, include deep insights, edge cases, and higher-order thinking questions."
+    }.get(level, "")
 
     base_context = f"""
 You are an expert educator creating study material for {audience}.
 Subject: {subject} | Topic: {topic} | Chapter: {chapter}
+Difficulty Level: {level} — {level_note}
 Requirements: Accurate, Exam-focused, Well-structured, With examples, Error-free.
 """
 
@@ -503,7 +567,12 @@ def generate_with_fallback(prompt):
     api_key = st.secrets.get("GEMINI_API_KEY", "")
     if not api_key:
         return (
-            "⚠️ API key missing! Please add GEMINI_API_KEY to .streamlit/secrets.toml",
+            "⚠️ API key missing!\n\n"
+            "**How to fix:**\n"
+            "1. Create `.streamlit/secrets.toml` in your project folder\n"
+            "2. Add this line: `GEMINI_API_KEY = \"your_key_here\"`\n"
+            "3. Get your free key at https://aistudio.google.com/app/apikey\n"
+            "4. Restart the app",
             "None"
         )
 
@@ -522,14 +591,21 @@ def generate_with_fallback(prompt):
             if "gemini" in name.lower() and "generateContent" in methods:
                 available_models.append(name)
     except Exception as e:
-        return (f"❌ Could not list Gemini models: {str(e)}", "None")
+        return (
+            f"❌ Could not list Gemini models: {str(e)}\n\n"
+            "**Possible causes:**\n"
+            "- Invalid or expired API key\n"
+            "- No internet connection\n"
+            "- Gemini API not enabled for this key",
+            "None"
+        )
 
     if not available_models:
         return (
             "❌ No Gemini models with generateContent support are available for this API key.\n\n"
-            "Fix:\n"
+            "**How to fix:**\n"
             "- Check that your Gemini API key is valid\n"
-            "- Make sure Gemini API is enabled for the key\n"
+            "- Make sure Gemini API is enabled in Google Cloud Console\n"
             "- Verify your quota and billing\n"
             "- Confirm internet access",
             "None"
@@ -557,10 +633,10 @@ def generate_with_fallback(prompt):
             continue
 
     return (
-        f"❌ All AI models failed.\n\nLast error: {last_error}\n\n"
-        "Fix:\n"
-        "- Check your API key\n"
-        "- Check quota and billing\n"
+        f"❌ All AI models failed.\n\n**Last error:** {last_error}\n\n"
+        "**How to fix:**\n"
+        "- Check your API key is active\n"
+        "- Check quota and billing at console.cloud.google.com\n"
         "- Check internet connection\n"
         "- Try again after a few minutes",
         "None"
@@ -570,8 +646,8 @@ def generate_with_fallback(prompt):
 # STEP 6: PDF GENERATION
 # ═════════════════════════════════════════════════════════════════════════════
 
-def generate_pdf(title, subtitle, content):
-    """Generate professional PDF"""
+def generate_pdf(title, subtitle, content, level="Intermediate"):
+    """Generate professional PDF with improved formatting"""
     buffer = io.BytesIO()
     doc = SimpleDocTemplate(
         buffer,
@@ -585,56 +661,129 @@ def generate_pdf(title, subtitle, content):
     styles = getSampleStyleSheet()
     story = []
 
-    title_style = ParagraphStyle(
-        "CustomTitle",
-        parent=styles["Heading1"],
-        fontSize=24,
-        textColor=colors.HexColor("#3b82f6"),
-        spaceAfter=6,
-        alignment=TA_CENTER,
-        fontName="Helvetica-Bold"
-    )
-    story.append(Paragraph(title, title_style))
+    # Title
+    story.append(Paragraph(
+        title,
+        ParagraphStyle(
+            "CustomTitle",
+            parent=styles["Heading1"],
+            fontSize=22,
+            textColor=colors.HexColor("#1d4ed8"),
+            spaceAfter=6,
+            alignment=TA_CENTER,
+            fontName="Helvetica-Bold"
+        )
+    ))
 
-    subtitle_style = ParagraphStyle(
-        "CustomSubtitle",
+    # Subtitle
+    story.append(Paragraph(
+        subtitle,
+        ParagraphStyle(
+            "CustomSubtitle",
+            parent=styles["Normal"],
+            fontSize=11,
+            textColor=colors.HexColor("#64748b"),
+            spaceAfter=4,
+            alignment=TA_CENTER,
+            fontName="Helvetica"
+        )
+    ))
+
+    # Level badge
+    story.append(Paragraph(
+        f"Difficulty Level: {level}",
+        ParagraphStyle(
+            "LevelBadge",
+            parent=styles["Normal"],
+            fontSize=9,
+            textColor=colors.HexColor("#3b82f6"),
+            spaceAfter=10,
+            alignment=TA_CENTER,
+            fontName="Helvetica-Oblique"
+        )
+    ))
+
+    story.append(HRFlowable(
+        width="100%",
+        thickness=2,
+        color=colors.HexColor("#3b82f6"),
+        spaceAfter=16
+    ))
+
+    # Content — process line by line
+    body_style = ParagraphStyle(
+        "CustomBody",
         parent=styles["Normal"],
-        fontSize=11,
-        textColor=colors.HexColor("#64748b"),
-        spaceAfter=20,
-        alignment=TA_CENTER,
+        fontSize=10.5,
+        textColor=colors.HexColor("#1e293b"),
+        leading=16,
+        spaceAfter=6,
         fontName="Helvetica"
     )
-    story.append(Paragraph(subtitle, subtitle_style))
-    story.append(HRFlowable(width="100%", thickness=1, color=colors.HexColor("#e2e8f0")))
-    story.append(Spacer(1, 0.5 * cm))
 
-    content_style = ParagraphStyle(
-        "CustomContent",
+    heading_style = ParagraphStyle(
+        "SectionHeading",
+        parent=styles["Heading2"],
+        fontSize=13,
+        textColor=colors.HexColor("#1d4ed8"),
+        spaceBefore=12,
+        spaceAfter=6,
+        fontName="Helvetica-Bold"
+    )
+
+    bullet_style = ParagraphStyle(
+        "BulletPoint",
         parent=styles["Normal"],
-        fontSize=10,
-        textColor=colors.HexColor("#1e293b"),
-        spaceAfter=12,
-        leading=14,
-        alignment=TA_LEFT
+        fontSize=10.5,
+        textColor=colors.HexColor("#334155"),
+        leading=15,
+        leftIndent=16,
+        spaceAfter=4,
+        bulletIndent=6,
+        fontName="Helvetica"
     )
 
     for line in content.split("\n"):
         line = line.strip()
-        if line:
-            try:
-                story.append(Paragraph(line, content_style))
-            except Exception:
-                safe_line = line.encode("ascii", "ignore").decode()
-                story.append(Paragraph(safe_line, content_style))
-        else:
+        if not line:
             story.append(Spacer(1, 0.2 * cm))
+            continue
+        # Headings (##, ###, ####)
+        if line.startswith("####"):
+            story.append(Paragraph(line.lstrip("#").strip(), body_style))
+        elif line.startswith("###"):
+            story.append(Paragraph(line.lstrip("#").strip(), heading_style))
+        elif line.startswith("##"):
+            story.append(Paragraph(line.lstrip("#").strip(), heading_style))
+        elif line.startswith("#"):
+            story.append(Paragraph(line.lstrip("#").strip(), heading_style))
+        # Bold lines
+        elif line.startswith("**") and line.endswith("**"):
+            safe = line.replace("**", "")
+            story.append(Paragraph(f"<b>{safe}</b>", body_style))
+        # Bullet points
+        elif line.startswith(("- ", "• ", "* ")):
+            safe = line[2:].replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+            story.append(Paragraph(f"• {safe}", bullet_style))
+        # Numbered list
+        elif line and line[0].isdigit() and ". " in line[:5]:
+            safe = line.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+            story.append(Paragraph(safe, bullet_style))
+        # Regular text
+        else:
+            safe = line.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+            story.append(Paragraph(safe, body_style))
 
-    story.append(Spacer(1, 1 * cm))
-    story.append(HRFlowable(width="100%", thickness=0.5, color=colors.HexColor("#e2e8f0")))
-    story.append(Spacer(1, 0.2 * cm))
+    # Footer
+    story.append(Spacer(1, 0.4 * cm))
+    story.append(HRFlowable(
+        width="100%",
+        thickness=1,
+        color=colors.HexColor("#e2e8f0"),
+        spaceAfter=6
+    ))
     story.append(Paragraph(
-        f"<i>Generated by StudySmart AI | {time.strftime('%Y-%m-%d %H:%M')}</i>",
+        f"<i>Generated by StudySmart AI | {time.strftime('%Y-%m-%d %H:%M')} | studysmart.ai</i>",
         ParagraphStyle(
             "Footer",
             parent=styles["Normal"],
@@ -654,6 +803,10 @@ def generate_pdf(title, subtitle, content):
 
 def main_app():
     """Main application UI + AI Logic"""
+
+    # Apply theme
+    dark_mode = st.session_state.get("dark_mode", False)
+    st.markdown(get_theme_css(dark_mode), unsafe_allow_html=True)
 
     with st.sidebar:
         st.markdown(f"""
@@ -677,6 +830,31 @@ def main_app():
         )
         st.divider()
 
+        # 🌙 Dark Mode Toggle — NEW
+        dark_toggle = st.toggle("🌙 Dark Mode", value=st.session_state.get("dark_mode", False))
+        if dark_toggle != st.session_state.get("dark_mode", False):
+            st.session_state.dark_mode = dark_toggle
+            st.rerun()
+
+        st.divider()
+
+        # 📜 Study History — NEW
+        with st.expander("📜 Recent History"):
+            history = st.session_state.get("history", [])
+            if not history:
+                st.caption("No history yet. Generate something first!")
+            else:
+                for i, h in enumerate(history):
+                    st.markdown(f"""
+                        <div class="sf-history-item">
+                            🕐 {h['time']} &nbsp;|&nbsp; <b>{h['tool']}</b><br/>
+                            📖 {h['chapter']} — {h['subject']}<br/>
+                            <small style="opacity:0.7">{h['preview']}</small>
+                        </div>
+                    """, unsafe_allow_html=True)
+
+        st.divider()
+
         with st.expander("🤖 AI Model Status"):
             if st.button("Check Models", use_container_width=True):
                 with st.spinner("Checking..."):
@@ -688,6 +866,7 @@ def main_app():
         if st.button("🚪 Logout", use_container_width=True):
             st.session_state.logged_in = False
             st.session_state.username = ""
+            st.session_state.history = []
             st.rerun()
 
     st.markdown("""
@@ -707,11 +886,11 @@ def main_app():
             st.stop()
         category = st.selectbox("📚 Category", list(STUDY_DATA.keys()))
     with c2:
-        st.info("📌 Select your options below")
+        st.info("📌 Select your study options below")
 
-    course = st.selectbox("🎓 Program / Class", get_courses(category))
-    stream = st.selectbox("📖 Stream", get_streams(category, course))
-    subject = st.selectbox("🧾 Subject", get_subjects(category, course, stream))
+    course   = st.selectbox("🎓 Program / Class", get_courses(category))
+    stream   = st.selectbox("📖 Stream", get_streams(category, course))
+    subject  = st.selectbox("🧾 Subject", get_subjects(category, course, stream))
 
     if category == "K-12th":
         board = st.selectbox("🏫 Board", BOARDS)
@@ -728,6 +907,16 @@ def main_app():
 
     chapter = st.selectbox("📝 Chapter", st.session_state.get("current_chapters", ["No chapters found"]))
 
+    # ✏️ Custom Chapter/Topic Input — NEW
+    use_custom = st.checkbox("✏️ Enter a custom chapter or topic instead")
+    if use_custom:
+        custom_input = st.text_input(
+            "📌 Custom Chapter / Topic",
+            placeholder="e.g. Electrostatics – Coulomb's Law, or The French Revolution"
+        )
+        if custom_input.strip():
+            chapter = custom_input.strip()
+
     st.markdown('</div>', unsafe_allow_html=True)
 
     col1, col2 = st.columns(2)
@@ -737,15 +926,23 @@ def main_app():
             ["📄 Detailed", "⚡ Short & Quick", "📋 Notes Format"]
         )
     with col2:
-        st.markdown("""
-        <div style="padding:12px; background:rgba(59,130,246,0.08);
-                    border-radius:10px; border-left:4px solid #3b82f6;">
-            <strong>💡 Output Styles:</strong><br/>
-            📄 <strong>Detailed</strong> — Complete & thorough<br/>
-            ⚡ <strong>Quick</strong> — Concise & scannable<br/>
-            📋 <strong>Notes</strong> — Structured format
-        </div>
-        """, unsafe_allow_html=True)
+        # 🎯 Difficulty Level — NEW
+        level = st.radio(
+            "🎯 Difficulty Level",
+            ["Beginner", "Intermediate", "Advanced"],
+            index=1
+        )
+
+    # Output style info
+    st.markdown("""
+    <div style="padding:12px; background:rgba(59,130,246,0.08);
+                border-radius:10px; border-left:4px solid #3b82f6; margin-top:8px;">
+        <strong>💡 Output Styles:</strong><br/>
+        📄 <strong>Detailed</strong> — Complete & thorough<br/>
+        ⚡ <strong>Quick</strong> — Concise & scannable<br/>
+        📋 <strong>Notes</strong> — Structured format
+    </div>
+    """, unsafe_allow_html=True)
 
     st.markdown('<div style="margin-top:24px;"></div>', unsafe_allow_html=True)
 
@@ -755,7 +952,7 @@ def main_app():
             return
 
         audience = f"{board} {course} students" if category == "K-12th" else f"{course} students"
-        final_prompt = build_prompt(tool, chapter, topic, subject, audience, output_style)
+        final_prompt = build_prompt(tool, chapter, topic, subject, audience, output_style, level)
 
         with st.spinner(f"🧠 Generating {tool}... please wait ⏳"):
             result, model_used = generate_with_fallback(final_prompt)
@@ -763,12 +960,20 @@ def main_app():
         st.markdown("---")
 
         if model_used != "None":
-            st.success(f"✅ Generated using **{model_used}**")
+            # ─── Stats bar — NEW ───
+            word_count = count_words(result)
+            col_a, col_b, col_c = st.columns(3)
+            col_a.metric("🤖 Model Used", model_used.split("/")[-1] if "/" in model_used else model_used)
+            col_b.metric("📝 Word Count", f"{word_count:,}")
+            col_c.metric("🎯 Level", level)
 
             st.markdown('<div class="sf-output">', unsafe_allow_html=True)
             st.markdown(f"### {tool} — {chapter}")
             st.markdown(result)
             st.markdown('</div>', unsafe_allow_html=True)
+
+            # ─── Add to history — NEW ───
+            add_to_history(tool, chapter, subject, result)
 
             st.markdown("---")
 
@@ -776,7 +981,8 @@ def main_app():
                 pdf_buffer = generate_pdf(
                     f"{tool} — {chapter}",
                     f"{subject} | {topic} | {course}",
-                    result
+                    result,
+                    level
                 )
                 safe_name = chapter.replace(" ", "_").replace(":", "").replace("/", "-") + ".pdf"
                 st.download_button(
@@ -799,6 +1005,9 @@ def main_app():
 
 def auth_ui():
     """Login and Registration screen"""
+
+    dark_mode = st.session_state.get("dark_mode", False)
+    st.markdown(get_theme_css(dark_mode), unsafe_allow_html=True)
 
     _, col_c, _ = st.columns([1, 2, 1])
     with col_c:
@@ -835,13 +1044,15 @@ def auth_ui():
                         time.sleep(1)
                         st.rerun()
                     else:
-                        st.error("❌ Invalid username or password")
+                        st.error("❌ Invalid username or password. Please try again.")
                 else:
                     st.warning("⚠️ Please fill in both fields")
 
         with tab2:
             nu = st.text_input("👤 New Username", key="reg_u", placeholder="Min 3 characters")
             np = st.text_input("🔑 New Password", type="password", key="reg_p", placeholder="Min 6 characters")
+            # ✅ Confirm Password — NEW
+            cp = st.text_input("🔑 Confirm Password", type="password", key="reg_cp", placeholder="Re-enter your password")
 
             if st.button("Create Account ✨", use_container_width=True):
                 if not nu.strip():
@@ -852,6 +1063,8 @@ def auth_ui():
                     st.error("❌ Password cannot be empty")
                 elif len(np.strip()) < 6:
                     st.error("❌ Password must be at least 6 characters")
+                elif np != cp:
+                    st.error("❌ Passwords do not match. Please try again.")
                 else:
                     try:
                         conn = sqlite3.connect("users.db")
@@ -868,7 +1081,7 @@ def auth_ui():
                         st.session_state.username = nu.strip()
                         st.rerun()
                     except sqlite3.IntegrityError:
-                        st.error("❌ Username already taken. Choose another.")
+                        st.error("❌ Username already taken. Please choose another one.")
 
         st.markdown('</div>', unsafe_allow_html=True)
 
@@ -884,6 +1097,10 @@ if "username" not in st.session_state:
     st.session_state.username = ""
 if "current_chapters" not in st.session_state:
     st.session_state.current_chapters = []
+if "history" not in st.session_state:
+    st.session_state.history = []
+if "dark_mode" not in st.session_state:
+    st.session_state.dark_mode = False
 
 if st.session_state.logged_in:
     main_app()
