@@ -1,5 +1,5 @@
 # ═══════════════════════════════════════════════════════════════════════════════
-# STUDYSMART AI — CLEAN APP v2.1
+# STUDYSMART AI — CLEAN APP v2.3 (WITH "GET ANSWERS" FEATURE)
 # Auto-detects available Gemini models dynamically
 # ═══════════════════════════════════════════════════════════════════════════════
 
@@ -125,6 +125,9 @@ st.markdown("""
         letter-spacing: 3px;
         text-transform: uppercase;
         margin-top: 8px;
+        text-align: center !important;
+        width: 100% !important;
+        display: block !important;
     }
 
     .sf-card {
@@ -149,6 +152,26 @@ st.markdown("""
         margin-top: 12px;
         border: 1px solid rgba(59, 130, 246, 0.2);
         color: #1e293b;
+    }
+
+    /* ✅ NEW: Answers section styling */
+    .sf-answers {
+        background: linear-gradient(135deg,
+            rgba(34, 197, 94, 0.05) 0%,
+            rgba(22, 163, 74, 0.05) 100%);
+        border-radius: 18px;
+        padding: 28px;
+        border-left: 5px solid #22c55e;
+        box-shadow: 0 2px 15px rgba(34, 197, 94, 0.1);
+        margin-top: 20px;
+        border: 1px solid rgba(34, 197, 94, 0.2);
+        color: #1e293b;
+    }
+
+    .sf-answers h3, .sf-answers h2 {
+        color: #16a34a !important;
+        margin-top: 0;
+        font-weight: 700;
     }
 
     .sf-output h3, .sf-output h2 {
@@ -184,6 +207,27 @@ st.markdown("""
         box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4) !important;
         transform: translateY(-2px) !important;
     }
+
+    /* ✅ NEW: Get Answers button styling (Green) */
+    .sf-get-answers {
+        background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%) !important;
+        color: #ffffff !important;
+        border: none !important;
+        border-radius: 12px !important;
+        padding: 0.7rem 2rem !important;
+        font-weight: 600 !important;
+        font-size: 0.95rem !important;
+        letter-spacing: 0.4px !important;
+        transition: all 0.2s ease !important;
+        box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3) !important;
+        width: 100% !important;
+        margin-top: 16px !important;
+    }
+    .sf-get-answers:hover {
+        box-shadow: 0 8px 25px rgba(34, 197, 94, 0.4) !important;
+        transform: translateY(-2px) !important;
+    }
+
     .stDownloadButton > button {
         background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
         color: #ffffff !important;
@@ -253,6 +297,7 @@ st.markdown("""
         }
         .sf-card { padding: 16px 14px; }
         .sf-output { padding: 14px 12px; }
+        .sf-answers { padding: 14px 12px; }
 
         .stSelectbox > div > div {
             min-height: 48px !important;
@@ -273,6 +318,12 @@ st.markdown("""
             font-size: 15px !important;
             display: flex !important;
             align-items: center !important;
+        }
+
+        .sf-watermark {
+            text-align: center !important;
+            width: 100% !important;
+            display: block !important;
         }
     }
     </style>
@@ -476,7 +527,35 @@ Create a complete Q&A bank with:
 Each answer: 150-300 words minimum with examples
 """
 
+    elif output_style == "🧪 Question Paper":
+        return base_context + """
+Create a well-structured question paper based on this chapter:
+- Section A: 10 MCQs (1 mark each = 10 marks)
+- Section B: 5 Short Answer Questions (3 marks each = 15 marks)
+- Section C: 4 Long Answer Questions (5 marks each = 20 marks)
+- Section D: 1-2 Case/Application-Based Questions (6-8 marks each)
+Total: 100 marks | Difficulty: 30% easy, 50% medium, 20% hard
+DO NOT provide answers. Format like a real exam paper.
+"""
+
     return base_context + "Create comprehensive and exam-ready study material."
+
+# ✅ NEW: Function to generate answers for question paper
+def build_answers_prompt(chapter, topic, subject, audience):
+    """Build prompt to generate answers for question paper"""
+    return f"""
+You are an expert educator. Generate detailed ANSWERS ONLY for a question paper on:
+Subject: {subject} | Topic: {topic} | Chapter: {chapter}
+Audience: {audience}
+
+Provide complete answers with:
+- For MCQs: Show correct option and brief explanation
+- For Short Answer Questions: 3-5 line answers with examples
+- For Long Answer Questions: Detailed 250-400 word answers with explanations, examples, and key points
+- For Case Studies: Comprehensive analysis with solutions
+
+Structure answers in clear sections matching the question paper format.
+"""
 
 # ═════════════════════════════════════════════════════════════════════════════
 # STEP 5: AI GENERATION ENGINE
@@ -580,7 +659,6 @@ def generate_pdf(title, subtitle, content):
     styles = getSampleStyleSheet()
     story = []
 
-    # Title
     story.append(Paragraph(
         title,
         ParagraphStyle(
@@ -594,7 +672,6 @@ def generate_pdf(title, subtitle, content):
         )
     ))
 
-    # Subtitle
     story.append(Paragraph(
         subtitle,
         ParagraphStyle(
@@ -720,7 +797,6 @@ def main_app():
         )
         st.divider()
 
-        # 📜 Study History
         with st.expander("📜 Recent History"):
             history = st.session_state.get("history", [])
             if not history:
@@ -763,7 +839,6 @@ def main_app():
     # ── Selection Card ───────────────────────────────────────────────────────
     st.markdown('<div class="sf-card">', unsafe_allow_html=True)
 
-    # ✅ REMOVED: st.info("📌 Select your options below") — was inside col2
     if not STUDY_DATA:
         st.error("No study data found.")
         st.stop()
@@ -773,7 +848,6 @@ def main_app():
     stream   = st.selectbox("📖 Stream", get_streams(category, course))
     subject  = st.selectbox("🧾 Subject", get_subjects(category, course, stream))
 
-    # ✅ REMOVED: st.info(f"📌 Syllabus: {board}") — was shown for non K-12 categories
     if category == "K-12th":
         board = st.selectbox("🏫 Board", BOARDS)
     else:
@@ -791,10 +865,9 @@ def main_app():
     st.markdown('</div>', unsafe_allow_html=True)
 
     # ── Output Style ─────────────────────────────────────────────────────────
-    # ✅ REMOVED: col2 with the 💡 Output Styles info banner — now full-width radio
     output_style = st.radio(
         "⚙️ Output Style",
-        ["📄 Detailed", "⚡ Short & Quick", "📋 Notes Format"],
+        ["📄 Detailed", "⚡ Short & Quick", "📋 Notes Format", "🧪 Question Paper"],
         horizontal=True
     )
 
@@ -815,7 +888,6 @@ def main_app():
         st.markdown("---")
 
         if model_used != "None":
-            # Stats bar
             word_count = count_words(result)
             col_a, col_b = st.columns(2)
             col_a.metric("🤖 Model Used", model_used.split("/")[-1] if "/" in model_used else model_used)
@@ -826,8 +898,43 @@ def main_app():
             st.markdown(result)
             st.markdown('</div>', unsafe_allow_html=True)
 
-            # Save to history
             add_to_history(tool, chapter, subject, result)
+
+            # ✅ NEW: "Get Answers" button for Question Paper output style
+            if output_style == "🧪 Question Paper":
+                st.markdown('<br>', unsafe_allow_html=True)
+                if st.button("📋 Get Answers", key="get_answers_btn"):
+                    with st.spinner("📚 Generating detailed answers... please wait ⏳"):
+                        answers_prompt = build_answers_prompt(chapter, topic, subject, audience)
+                        answers_result, answers_model = generate_with_fallback(answers_prompt)
+                    
+                    if answers_model != "None":
+                        st.markdown('<div class="sf-answers">', unsafe_allow_html=True)
+                        st.markdown(f"### 📚 Answer Key — {chapter}")
+                        st.markdown(answers_result)
+                        st.markdown('</div>', unsafe_allow_html=True)
+
+                        # Download answers as PDF
+                        try:
+                            answers_pdf_buffer = generate_pdf(
+                                f"Answer Key — {chapter}",
+                                f"{subject} | {topic} | {course}",
+                                answers_result
+                            )
+                            safe_ans_name = chapter.replace(" ", "_").replace(":", "").replace("/", "-") + "_Answers.pdf"
+                            st.download_button(
+                                label="⬇️ Download Answers as PDF",
+                                data=answers_pdf_buffer,
+                                file_name=safe_ans_name,
+                                mime="application/pdf",
+                                use_container_width=True,
+                            )
+                            st.info("✅ Answer PDF ready — click above to download.")
+                        except Exception as pdf_err:
+                            st.warning(f"⚠️ Answer PDF generation failed: {str(pdf_err)}")
+                    else:
+                        st.error("❌ Failed to generate answers")
+                        st.markdown(answers_result)
 
             st.markdown("---")
 
