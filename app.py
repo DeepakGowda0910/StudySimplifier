@@ -603,17 +603,35 @@ def get_chapters(cat, course, stream, subject, topic):
 # ─────────────────────────────────────────────────────────────────────────────
 # AUTH
 # ─────────────────────────────────────────────────────────────────────────────
-def hash_p(pw): return hashlib.sha256(pw.encode()).hexdigest()
+def hash_p(pw):
+    return hashlib.sha256(pw.encode()).hexdigest()
 
 def do_login(username, password):
     u = username.strip()
+
     # ONLY allow your specific username
-    ALLOWED_USERS = ["Deepak"] 
-    
+    ALLOWED_USERS = ["Deepak"]
+
+    if not u or not password.strip():
+        return False, "⚠️ Please fill in both fields."
+
     if u not in ALLOWED_USERS:
         return False, "❌ Access Denied: You are not authorized to use this app."
-    
-    # ... rest of the existing login code ...
+
+    conn = sqlite3.connect("users.db")
+    c = conn.cursor()
+    c.execute(
+        "SELECT * FROM users WHERE username=? AND password=?",
+        (u, hash_p(password))
+    )
+    user = c.fetchone()
+    conn.close()
+
+    if user:
+        return True, u
+    else:
+        return False, "❌ Invalid username or password."
+
 
 # ─────────────────────────────────────────────────────────────────────────────
 # HISTORY
