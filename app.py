@@ -1187,37 +1187,117 @@ def render_back_button():
     st.markdown("<div style='height:4px'></div>", unsafe_allow_html=True)
 
 def render_step_indicator(current_step):
-    labels  = ["Category", "Course", "Stream", "Confirm"]
-    cols    = st.columns(len(labels) * 2 - 1)
-    col_idx = 0
-    for i, label in enumerate(labels, start=1):
-        with cols[col_idx]:
-            if i < current_step:
-                cls  = "ob-step-done";   icon = "✓"
-            elif i == current_step:
-                cls  = "ob-step-active"; icon = str(i)
-            else:
-                cls  = "ob-step-lock";   icon = str(i)
-            st.markdown(f"""
-            <div style="display:flex;flex-direction:column;
-                align-items:center;gap:4px;">
-                <div class="ob-step {cls}">{icon}</div>
-                <div style="font-size:.68rem;font-weight:600;
-                    color:{'#2563eb' if i==current_step else
-                           '#10b981' if i<current_step else '#94a3b8'};">
-                    {label}
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
-        col_idx += 1
-        if col_idx < len(cols):
-            with cols[col_idx]:
-                line_cls = "ob-line-done" if i < current_step else "ob-line"
-                st.markdown(
-                    f'<div class="ob-line {line_cls}" style="margin-top:18px;"></div>',
-                    unsafe_allow_html=True
-                )
-            col_idx += 1
+  def _safe_state_key(text):
+    return "".join(ch if ch.isalnum() else "_" for ch in str(text)).strip("_").lower()
+
+
+def category_skips_course(selected_category):
+    """
+    If the selected category is already effectively the course
+    (example: 8th Standard, 10th Standard, Class 12, Semester 1),
+    skip the separate course step.
+    """
+    if not selected_category:
+        return False
+
+    cat = str(selected_category).strip().lower()
+
+    direct_course_markers = [
+        "standard", "class ", "grade ", "semester", "year"
+    ]
+    if any(marker in cat for marker in direct_course_markers):
+        return True
+
+    try:
+        courses = get_courses(selected_category) or []
+        cleaned = [str(c).strip().lower() for c in courses if str(c).strip()]
+        if not cleaned:
+            return True
+        if len(cleaned) == 1 and cleaned[0] == cat:
+            return True
+    except Exception:
+        pass
+
+    return False
+
+
+def needs_board_selection(selected_category, selected_course=""):
+    """
+    Decide whether to show school board selection.
+    """
+    text = f"{selected_category} {selected_course}".strip().lower()
+    school_markers = [
+        "k-12", "school", "class ", "grade ", "standard",
+        "cbse", "icse", "state board", "isc", "ib", "cambridge"
+    ]
+    return any(marker in text for marker in school_markers)
+
+
+def clear_checkbox_group(prefix):
+    for key in list(st.session_state.keys()):
+        if key.startswith(f"{prefix}_chk_"):
+            st.session_state[key] = False
+
+
+def handle_single_select_checkbox(group_prefix, option_value, all_options, target_key,
+                                  clear_keys=None, clear_groups=None):
+    current_key = f"{group_prefix}_chk_{_safe_state_key(option_value)}"
+    checked = st.session_state.get(current_key, False)
+
+    if checked:
+        for opt in all_options:
+            opt_key = f"{group_prefix}_chk_{_safe_state_key(opt)}"
+            st.session_state[opt_key] = (opt == option_value)
+
+        st.session_state[target_key] = option_value
+
+        for key in (clear_keys or []):
+            st.session_state[key] = ""
+
+        for grp in (clear_groups or []):
+            clear_checkbox_group(grp)
+
+    else:
+        if st.session_state.get(target_key) == option_value:
+            st.session_state[target_key] = ""
+
+
+def sync_checkbox_group(group_prefix, all_options, target_key):
+    selected_value = st.session_state.get(target_key, "")
+    for opt in all_options:
+        opt_key = f"{group_prefix}_chk_{_safe_state_key(opt)}"
+        st.session_state[opt_key] = (selected_value == opt)
+
+
+def render_checkbox_card(title, subtitle, icon, is_selected):
+    border = "3px solid #2563eb" if is_selected else "2px solid #e2e8f0"
+    bg = "linear-gradient(135deg,#eff6ff,#dbeafe)" if is_selected else "white"
+    shadow = "0 4px 18px rgba(37,99,235,.18)" if is_selected else "0 2px 12px rgba(15,23,42,.06)"
+
+    st.markdown(f"""
+    <div style="
+        background:{bg};
+        border:{border};
+        border-radius:16px;
+        padding:18px 12px;
+        text-align:center;
+        box-shadow:{shadow};
+        margin-bottom:8px;
+        min-height:150px;
+        display:flex;
+        flex-direction:column;
+        justify-content:center;
+        align-items:center;">
+        <div style="font-size:2.2rem;">{icon}</div>
+        <div style="font-weight:800;font-size:.92rem;color:#0f172a;margin-top:8px;">
+            {title}
+        </div>
+        <div style="font-size:.76rem;color:#64748b;margin-top:4px;">
+            {subtitle}
+        </div>
+        {"<div style='font-size:.72rem;color:#2563eb;font-weight:700;margin-top:7px;'>✓ Selected</div>" if is_selected else ""}
+    </div>
+    """, unsafe_allow_html=True)
 
 # ─────────────────────────────────────────────────────────────────────────────
 # ★  ONBOARDING WIZARD
@@ -1229,22 +1309,25 @@ def show_onboarding(username):
         st.markdown("""
             <div class="sf-header" style="padding-top:24px;">
                 <div class="sf-header-title">StudySmart AI</div>
-                <div class="sf-header-subtitle">Let's personalise your experience 🎯</div>
+                <div class="sf-header-subtitle">
+                    Let's personalise your experience 🎯
+                </div>
             </div>
         """, unsafe_allow_html=True)
 
     st.markdown("<div style='height:10px'></div>", unsafe_allow_html=True)
+
     _, sc, _ = st.columns([0.5, 4, 0.5])
     with sc:
         render_step_indicator(st.session_state.ob_step)
-    st.markdown("<div style='height:18px'></div>", unsafe_allow_html=True)
 
+    st.markdown("<div style='height:18px'></div>", unsafe_allow_html=True)
     _, mc, _ = st.columns([0.5, 4, 0.5])
 
-    # ══════════════════════════════════════════════════════════════════════
-    # STEP 1 — CATEGORY  (entire card is the button — no separate button)
-    # ══════════════════════════════════════════════════════════════════════
     with mc:
+        # ══════════════════════════════════════════════════════════════════
+        # STEP 1 — CATEGORY
+        # ══════════════════════════════════════════════════════════════════
         if st.session_state.ob_step == 1:
             st.markdown("""
                 <div style="text-align:center;margin-bottom:18px;">
@@ -1252,63 +1335,50 @@ def show_onboarding(username):
                         📚 What are you studying?
                     </div>
                     <div style="font-size:.88rem;color:#64748b;margin-top:5px;">
-                        Tap a card to select your education level.
+                        Tick one option and continue.
                     </div>
                 </div>
             """, unsafe_allow_html=True)
 
-            available_cats = (
-                list(STUDY_DATA.keys()) if STUDY_DATA
-                else list(CATEGORY_META.keys())
-            )
+            available_cats = list(STUDY_DATA.keys()) if STUDY_DATA else list(CATEGORY_META.keys())
+            sync_checkbox_group("ob_cat", available_cats, "ob_category")
 
             for row_start in range(0, len(available_cats), 3):
                 row_cats = available_cats[row_start: row_start + 3]
-                cols     = st.columns(len(row_cats))
+                cols = st.columns(len(row_cats))
+
                 for col, cat in zip(cols, row_cats):
-                    meta   = CATEGORY_META.get(
-                        cat, {"icon": "📘", "desc": cat, "color": "#3b82f6"}
-                    )
+                    meta = CATEGORY_META.get(cat, {"icon": "📘", "desc": cat, "color": "#3b82f6"})
                     is_sel = st.session_state.ob_category == cat
-                    border = "3px solid #2563eb" if is_sel else "2px solid #e2e8f0"
-                    bg     = "linear-gradient(135deg,#eff6ff,#dbeafe)" if is_sel else "white"
-                    shadow = "0 4px 18px rgba(37,99,235,.18)" if is_sel else "0 2px 12px rgba(15,23,42,.06)"
+
                     with col:
-                        # ★ FIX 3: the button IS the card — no separate button below
-                        clicked = st.button(
-                            f"{meta['icon']}\n\n**{cat}**\n\n_{meta['desc']}_"
-                            + ("\n\n✓ Selected" if is_sel else ""),
-                            key=f"ob_cat_{cat}",
-                            use_container_width=True,
+                        render_checkbox_card(cat, meta["desc"], meta["icon"], is_sel)
+
+                        st.checkbox(
+                            "Select",
+                            key=f"ob_cat_chk_{_safe_state_key(cat)}",
+                            on_change=handle_single_select_checkbox,
+                            args=(
+                                "ob_cat",
+                                cat,
+                                available_cats,
+                                "ob_category",
+                                ["ob_course", "ob_stream", "ob_board"],
+                                ["ob_course", "ob_stream", "ob_board"]
+                            )
                         )
-                        # Overlay a styled card on top for visual richness
-                        st.markdown(f"""
-                        <div style="background:{bg};border:{border};
-                            border-radius:16px;padding:18px 12px;
-                            text-align:center;margin-top:-58px;
-                            box-shadow:{shadow};
-                            pointer-events:none;">
-                            <div style="font-size:2.4rem;">{meta['icon']}</div>
-                            <div style="font-weight:800;font-size:.9rem;
-                                color:#0f172a;margin-top:8px;">{cat}</div>
-                            <div style="font-size:.75rem;color:#64748b;
-                                margin-top:4px;">{meta['desc']}</div>
-                            {'<div style="font-size:.72rem;color:#2563eb;font-weight:700;margin-top:6px;">✓ Selected</div>' if is_sel else ''}
-                        </div>
-                        """, unsafe_allow_html=True)
-                        if clicked:
-                            st.session_state.ob_category = cat
-                            st.session_state.ob_course   = ""
-                            st.session_state.ob_stream   = ""
-                            st.session_state.ob_board    = ""
-                            st.rerun()
 
             st.markdown("<div style='height:12px'></div>", unsafe_allow_html=True)
-            if st.session_state.ob_category:
-                meta = CATEGORY_META.get(
-                    st.session_state.ob_category,
-                    {"icon": "📘", "color": "#3b82f6"}
-                )
+
+            selected_cat = st.session_state.ob_category
+            if selected_cat:
+                meta = CATEGORY_META.get(selected_cat, {"icon": "📘", "color": "#3b82f6"})
+                skip_course = category_skips_course(selected_cat)
+
+                # If category itself is effectively the course, set it
+                if skip_course:
+                    st.session_state.ob_course = selected_cat
+
                 st.markdown(f"""
                 <div style="background:linear-gradient(135deg,#eff6ff,#dbeafe);
                     border:2px solid #bfdbfe;border-radius:14px;
@@ -1316,23 +1386,31 @@ def show_onboarding(username):
                     <span style="font-size:1.3rem;">{meta['icon']}</span>
                     <span style="font-weight:700;font-size:.95rem;
                         color:#1d4ed8;margin-left:8px;">
-                        {st.session_state.ob_category} selected ✓
+                        {selected_cat} selected ✓
                     </span>
                 </div>
                 """, unsafe_allow_html=True)
-                if st.button("Continue → Choose Course",
-                             key="ob_next_1", use_container_width=True):
-                    st.session_state.ob_step = 2
+
+                next_label = "Continue → Stream & Board" if skip_course else "Continue → Choose Course"
+
+                if st.button(next_label, key="ob_next_1", use_container_width=True):
+                    st.session_state.ob_step = 3 if skip_course else 2
                     st.rerun()
             else:
-                st.info("👆 Tap a card above to select your category.")
+                st.info("👆 Please tick one option to continue.")
 
         # ══════════════════════════════════════════════════════════════════
-        # STEP 2 — COURSE  (entire card is the button)
+        # STEP 2 — COURSE
         # ══════════════════════════════════════════════════════════════════
         elif st.session_state.ob_step == 2:
-            cat     = st.session_state.ob_category
-            meta    = CATEGORY_META.get(cat, {"icon": "📘", "color": "#3b82f6"})
+            cat = st.session_state.ob_category
+
+            if category_skips_course(cat):
+                st.session_state.ob_course = cat
+                st.session_state.ob_step = 3
+                st.rerun()
+
+            meta = CATEGORY_META.get(cat, {"icon": "📘", "color": "#3b82f6"})
             courses = get_courses(cat)
 
             st.markdown(f"""
@@ -1341,7 +1419,7 @@ def show_onboarding(username):
                         {meta['icon']} Choose Your Course
                     </div>
                     <div style="font-size:.88rem;color:#64748b;margin-top:5px;">
-                        Category: <b>{cat}</b> — Tap a card to select your course.
+                        Category: <b>{cat}</b> — Tick one course and continue.
                     </div>
                 </div>
             """, unsafe_allow_html=True)
@@ -1349,67 +1427,55 @@ def show_onboarding(username):
             if not courses:
                 st.warning("⚠️ No courses found for this category.")
             else:
+                sync_checkbox_group("ob_course", courses, "ob_course")
+
                 for row_start in range(0, len(courses), 3):
                     row_courses = courses[row_start: row_start + 3]
-                    cols        = st.columns(len(row_courses))
+                    cols = st.columns(len(row_courses))
+
                     for col, course in zip(cols, row_courses):
                         is_sel = st.session_state.ob_course == course
-                        border = "3px solid #2563eb" if is_sel else "2px solid #e2e8f0"
-                        bg     = "linear-gradient(135deg,#eff6ff,#dbeafe)" if is_sel else "white"
-                        shadow = "0 4px 18px rgba(37,99,235,.18)" if is_sel else "0 2px 10px rgba(15,23,42,.05)"
+
                         with col:
-                            # ★ FIX 3: card IS the button
-                            clicked = st.button(
-                                f"📖\n\n**{course}**"
-                                + ("\n\n✓ Selected" if is_sel else ""),
-                                key=f"ob_course_{course}",
-                                use_container_width=True,
+                            render_checkbox_card(course, "Program / Class", "📖", is_sel)
+
+                            st.checkbox(
+                                "Select",
+                                key=f"ob_course_chk_{_safe_state_key(course)}",
+                                on_change=handle_single_select_checkbox,
+                                args=(
+                                    "ob_course",
+                                    course,
+                                    courses,
+                                    "ob_course",
+                                    ["ob_stream", "ob_board"],
+                                    ["ob_stream", "ob_board"]
+                                )
                             )
-                            st.markdown(f"""
-                            <div style="background:{bg};border:{border};
-                                border-radius:14px;padding:16px 10px;
-                                text-align:center;margin-top:-58px;
-                                box-shadow:{shadow};pointer-events:none;">
-                                <div style="font-size:1.6rem;">📖</div>
-                                <div style="font-weight:700;font-size:.85rem;
-                                    color:#0f172a;margin-top:6px;">{course}</div>
-                                {'<div style="font-size:.68rem;color:#2563eb;font-weight:700;margin-top:4px;">✓ Selected</div>' if is_sel else ''}
-                            </div>
-                            """, unsafe_allow_html=True)
-                            if clicked:
-                                st.session_state.ob_course = course
-                                st.session_state.ob_stream = ""
-                                st.session_state.ob_board  = ""
-                                st.rerun()
 
             st.markdown("<div style='height:12px'></div>", unsafe_allow_html=True)
             col_back, col_next = st.columns(2)
+
             with col_back:
                 if st.button("← Back", key="ob_back_2", use_container_width=True):
                     st.session_state.ob_step = 1
                     st.rerun()
+
             with col_next:
                 if st.session_state.ob_course:
-                    if st.button("Continue → Stream & Board",
-                                 key="ob_next_2", use_container_width=True):
+                    if st.button("Continue → Stream & Board", key="ob_next_2", use_container_width=True):
                         st.session_state.ob_step = 3
                         st.rerun()
                 else:
-                    st.info("👆 Tap a course card to continue.")
+                    st.info("👆 Please tick one course to continue.")
 
         # ══════════════════════════════════════════════════════════════════
-        # STEP 3 — STREAM + BOARD  (cards are buttons)
+        # STEP 3 — STREAM + BOARD
         # ══════════════════════════════════════════════════════════════════
         elif st.session_state.ob_step == 3:
-            cat     = st.session_state.ob_category
-            course  = st.session_state.ob_course
+            cat = st.session_state.ob_category
+            course = st.session_state.ob_course or st.session_state.ob_category
             streams = get_streams(cat, course)
-
-            stream_icons = {
-                "Science": "🔬", "Commerce": "💹", "Arts": "🎨",
-                "Humanities": "📜", "Engineering": "⚙️", "Medical": "🏥",
-                "General": "📚", "Mathematics": "📐", "Biology": "🧬",
-            }
 
             st.markdown(f"""
                 <div style="text-align:center;margin-bottom:18px;">
@@ -1417,102 +1483,119 @@ def show_onboarding(username):
                         🔀 Choose Your Stream
                     </div>
                     <div style="font-size:.88rem;color:#64748b;margin-top:5px;">
-                        Course: <b>{course}</b> — Tap a card to select your stream.
+                        Course: <b>{course}</b> — Tick one stream and continue.
                     </div>
                 </div>
             """, unsafe_allow_html=True)
 
+            stream_icons = {
+                "Science": "🔬",
+                "Commerce": "💹",
+                "Arts": "🎨",
+                "Humanities": "📜",
+                "Engineering": "⚙️",
+                "Medical": "🏥",
+                "General": "📚",
+                "Mathematics": "📐",
+                "Biology": "🧬",
+            }
+
             if not streams:
-                st.warning("⚠️ No streams found for this course.")
+                st.warning("⚠️ No streams found for this selection.")
             else:
+                sync_checkbox_group("ob_stream", streams, "ob_stream")
+
                 for row_start in range(0, len(streams), 3):
                     row_streams = streams[row_start: row_start + 3]
-                    cols        = st.columns(len(row_streams))
-                    for col, stream in zip(cols, row_streams):
-                        is_sel = st.session_state.ob_stream == stream
-                        border = "3px solid #2563eb" if is_sel else "2px solid #e2e8f0"
-                        bg     = "linear-gradient(135deg,#eff6ff,#dbeafe)" if is_sel else "white"
-                        shadow = "0 4px 18px rgba(37,99,235,.18)" if is_sel else "0 2px 10px rgba(15,23,42,.05)"
-                        icon   = stream_icons.get(stream, "📂")
-                        with col:
-                            # ★ FIX 3: card IS the button
-                            clicked = st.button(
-                                f"{icon}\n\n**{stream}**"
-                                + ("\n\n✓ Selected" if is_sel else ""),
-                                key=f"ob_stream_{stream}",
-                                use_container_width=True,
-                            )
-                            st.markdown(f"""
-                            <div style="background:{bg};border:{border};
-                                border-radius:14px;padding:16px 10px;
-                                text-align:center;margin-top:-58px;
-                                box-shadow:{shadow};pointer-events:none;">
-                                <div style="font-size:1.8rem;">{icon}</div>
-                                <div style="font-weight:700;font-size:.88rem;
-                                    color:#0f172a;margin-top:7px;">{stream}</div>
-                                {'<div style="font-size:.68rem;color:#2563eb;font-weight:700;margin-top:4px;">✓ Selected</div>' if is_sel else ''}
-                            </div>
-                            """, unsafe_allow_html=True)
-                            if clicked:
-                                st.session_state.ob_stream = stream
-                                st.session_state.ob_board  = ""
-                                st.rerun()
+                    cols = st.columns(len(row_streams))
 
-            # Board selector
+                    for col, stream in zip(cols, row_streams):
+                        icon = stream_icons.get(stream, "📂")
+                        is_sel = st.session_state.ob_stream == stream
+
+                        with col:
+                            render_checkbox_card(stream, "Specialisation / Stream", icon, is_sel)
+
+                            st.checkbox(
+                                "Select",
+                                key=f"ob_stream_chk_{_safe_state_key(stream)}",
+                                on_change=handle_single_select_checkbox,
+                                args=(
+                                    "ob_stream",
+                                    stream,
+                                    streams,
+                                    "ob_stream",
+                                    ["ob_board"],
+                                    ["ob_board"]
+                                )
+                            )
+
+            # Board selection
             if st.session_state.ob_stream:
-                st.markdown("<div style='height:10px'></div>", unsafe_allow_html=True)
-                if cat == "K-12th":
+                st.markdown("<div style='height:14px'></div>", unsafe_allow_html=True)
+
+                if needs_board_selection(cat, course):
                     st.markdown("""
                         <div style="font-weight:700;font-size:.95rem;
-                            color:#0f172a;margin-bottom:6px;">
+                            color:#0f172a;margin-bottom:8px;">
                             🏫 Select Your Board
                         </div>
                     """, unsafe_allow_html=True)
+
+                    sync_checkbox_group("ob_board", BOARDS, "ob_board")
                     board_cols = st.columns(len(BOARDS))
+
                     for bcol, board in zip(board_cols, BOARDS):
                         is_sel = st.session_state.ob_board == board
-                        border = "3px solid #2563eb" if is_sel else "2px solid #e2e8f0"
-                        bg     = "linear-gradient(135deg,#eff6ff,#dbeafe)" if is_sel else "white"
                         with bcol:
-                            if st.button(
-                                board + (" ✓" if is_sel else ""),
-                                key=f"ob_board_{board}",
-                                use_container_width=True
-                            ):
-                                st.session_state.ob_board = board
-                                st.rerun()
+                            render_checkbox_card(board, "School Board", "🏫", is_sel)
+
+                            st.checkbox(
+                                "Select",
+                                key=f"ob_board_chk_{_safe_state_key(board)}",
+                                on_change=handle_single_select_checkbox,
+                                args=(
+                                    "ob_board",
+                                    board,
+                                    BOARDS,
+                                    "ob_board",
+                                    [],
+                                    []
+                                )
+                            )
                 else:
                     st.session_state.ob_board = "University / National Syllabus"
+                    st.info("📌 Syllabus: University / National Syllabus")
 
             st.markdown("<div style='height:12px'></div>", unsafe_allow_html=True)
             col_back, col_next = st.columns(2)
+
             with col_back:
                 if st.button("← Back", key="ob_back_3", use_container_width=True):
-                    st.session_state.ob_step = 2
+                    previous_step = 1 if category_skips_course(cat) else 2
+                    st.session_state.ob_step = previous_step
                     st.rerun()
+
             with col_next:
                 stream_ok = bool(st.session_state.ob_stream)
-                board_ok  = (bool(st.session_state.ob_board)
-                             if cat == "K-12th" else True)
+                board_ok = bool(st.session_state.ob_board)
+
                 if stream_ok and board_ok:
-                    if st.button("Continue → Confirm Profile",
-                                 key="ob_next_3", use_container_width=True):
+                    if st.button("Continue → Confirm Profile", key="ob_next_3", use_container_width=True):
                         st.session_state.ob_step = 4
                         st.rerun()
                 else:
-                    st.info("👆 Select your stream"
-                            + (" and board" if cat == "K-12th" else "")
-                            + " to continue.")
+                    st.info("👆 Please complete stream and board selection to continue.")
 
         # ══════════════════════════════════════════════════════════════════
         # STEP 4 — CONFIRM & SAVE
         # ══════════════════════════════════════════════════════════════════
         elif st.session_state.ob_step == 4:
-            cat    = st.session_state.ob_category
-            course = st.session_state.ob_course
+            cat = st.session_state.ob_category
+            course = st.session_state.ob_course or st.session_state.ob_category
             stream = st.session_state.ob_stream
-            board  = st.session_state.ob_board or "University / National Syllabus"
-            meta   = CATEGORY_META.get(cat, {"icon": "📘", "color": "#3b82f6"})
+            board = st.session_state.ob_board or "University / National Syllabus"
+            meta = CATEGORY_META.get(cat, {"icon": "📘", "color": "#3b82f6"})
 
             st.markdown("""
                 <div style="text-align:center;margin-bottom:18px;">
@@ -1520,8 +1603,7 @@ def show_onboarding(username):
                         🎉 Almost There! Confirm Your Profile
                     </div>
                     <div style="font-size:.88rem;color:#64748b;margin-top:5px;">
-                        Review your choices. You can switch categories
-                        from the Dashboard at any time.
+                        Review your choices and launch your dashboard.
                     </div>
                 </div>
             """, unsafe_allow_html=True)
@@ -1555,22 +1637,29 @@ def show_onboarding(username):
             """, unsafe_allow_html=True)
 
             col_back, col_confirm = st.columns(2)
+
             with col_back:
-                if st.button("← Edit Profile", key="ob_back_4",
-                             use_container_width=True):
+                if st.button("← Edit Profile", key="ob_back_4", use_container_width=True):
                     st.session_state.ob_step = 3
                     st.rerun()
+
             with col_confirm:
-                if st.button("🚀 Launch My Dashboard",
-                             key="ob_confirm", use_container_width=True):
+                if st.button("🚀 Launch My Dashboard", key="ob_confirm", use_container_width=True):
                     save_user_profile(username, cat, course, stream, board)
                     award_badge(username, "onboarded")
                     award_xp(username, 50)
-                    st.session_state.ob_step     = 1
+
+                    st.session_state.ob_step = 1
                     st.session_state.ob_category = ""
-                    st.session_state.ob_course   = ""
-                    st.session_state.ob_stream   = ""
-                    st.session_state.ob_board    = ""
+                    st.session_state.ob_course = ""
+                    st.session_state.ob_stream = ""
+                    st.session_state.ob_board = ""
+
+                    clear_checkbox_group("ob_cat")
+                    clear_checkbox_group("ob_course")
+                    clear_checkbox_group("ob_stream")
+                    clear_checkbox_group("ob_board")
+
                     st.success("✅ Profile saved! Welcome to StudySmart AI 🎓")
                     time.sleep(0.8)
                     st.rerun()
