@@ -34,35 +34,72 @@ st.set_page_config(
 # ─────────────────────────────────────────────────────────────────────────────
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
 html, body, [class*="css"], [class*="st-"] {
-    font-family: 'Inter', 'Poppins', sans-serif !important;
-    letter-spacing: 0.3px;
+    font-family: 'Inter', sans-serif !important;
+    box-sizing: border-box;
 }
-/* Fix Streamlit icons turning into text */
-.material-symbols-rounded, 
-span[class*="material-icons"], 
-span[class*="material-symbols"] {
+
+/* ── FIX: Prevent Streamlit icons from rendering as overlapping text ── */
+span.stIconMaterial, 
+span[class*="stIconMaterial"], 
+.material-symbols-rounded {
     font-family: 'Material Symbols Rounded', 'Material Icons' !important;
 }
 
-/* Hide the expander arrow entirely for a cleaner look (Optional but recommended) */
-[data-testid="stExpander"] summary span.material-symbols-rounded {
+/* ── FIX: Completely hide the expander arrow to keep the banner clean ── */
+[data-testid="stExpander"] summary span.stIconMaterial,
+[data-testid="stExpander"] summary [data-testid="stIconMaterial"],
+[data-testid="stExpander"] summary svg {
     display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    width: 0 !important;
+    height: 0 !important;
+}
+
+/* ── Hide ALL Streamlit chrome ── */
+#MainMenu, footer, header,
+[data-testid="stToolbar"],
+[data-testid="stDecoration"],
+[data-testid="stStatusWidget"],
+.stDeployButton,
+[data-testid="baseButton-header"],
+div[class*="viewerBadge"],
+.st-emotion-cache-zq5wmm,
+.st-emotion-cache-1dp5vir,
+[data-testid="manage-app-button"] {
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    overflow: hidden !important;
+}
+
+.block-container {
+    max-width: 1180px !important;
+    padding-top: 0.6rem !important;
+    padding-bottom: 2.5rem !important;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
 }
 
 .stApp {
-    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #e8f0f7 100%);
-    min-height: 100vh;
+    background: linear-gradient(160deg,#f8fbff 0%,#eef3fb 60%,#e8f0fa 100%) !important;
+    color: #0f172a !important;
 }
-.block-container {
-    padding-top: 1.5rem !important;
-    padding-bottom: 2rem !important;
-    padding-left: 1.2rem !important;
-    padding-right: 1.2rem !important;
-    max-width: 1300px;
-}
+
+.stApp p,.stApp span,.stApp li,.stApp label,
+.stApp div,.stApp strong,.stApp small,
+.stApp h1,.stApp h2,.stApp h3,.stApp h4 { color: #0f172a; }
+
+[data-testid="stMarkdownContainer"],
+[data-testid="stMarkdownContainer"] *,
+[data-testid="stCaptionContainer"],
+[data-testid="stCaptionContainer"] * { color: #0f172a !important; }
+
+/* ── Hero ── */
+
 #MainMenu { visibility: hidden; }
 footer     { visibility: hidden; }
 header     { visibility: hidden; }
