@@ -2787,58 +2787,94 @@ def main_app():
 init_db()
 init_session_state()
 
-# ═══════════════════════════════════════════════════════════════════════════════
+# ─────────────────────────────────────────────────────────────────────────────
 # MAINTENANCE MODE
-# ═══════════════════════════════════════════════════════════════════════════════
-
+# ─────────────────────────────────────────────────────────────────────────────
 MAINTENANCE_MODE = True
-ALLOWED_USERS_MAINTENANCE = ["Deepak"]  # ← Change this!
+ALLOWED_USERS_MAINTENANCE = ["Deepak"]   # <- replace with your real username
 
+def show_maintenance_screen():
+    _, col, _ = st.columns([1, 2, 1])
+    with col:
+        st.markdown("""
+        <div style="text-align:center;padding:60px 20px;">
+            <div style="font-size:5rem;margin-bottom:20px;">🛠️</div>
+            <div style="font-size:2.2rem;font-weight:900;
+                background:linear-gradient(135deg,#ef4444,#f97316);
+                -webkit-background-clip:text;
+                -webkit-text-fill-color:transparent;
+                background-clip:text;">
+                Under Maintenance
+            </div>
+            <div style="font-size:1.05rem;color:#64748b;margin-top:12px;line-height:1.7;">
+                StudySmart AI is currently under maintenance.<br><br>
+                We are improving the platform and will be back shortly.
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+# If maintenance mode is ON:
 if MAINTENANCE_MODE:
-    if st.session_state.logged_in:
-        if st.session_state.username not in ALLOWED_USERS_MAINTENANCE:
-            st.error("""
-            ❌ **StudySmart AI is Currently Under Maintenance**
-            
-            We're upgrading our platform to bring you better features.
-            
-            🔧 **Expected Duration:** 2-3 hours
-            
-            Thank you for your patience! We'll be back soon. 💪
-            """)
-            st.stop()
+    logged_in_user = st.session_state.get("username", "")
+    is_logged_in = st.session_state.get("logged_in", False)
+
+    # If already logged in and whitelisted -> allow access
+    if is_logged_in and logged_in_user in ALLOWED_USERS_MAINTENANCE:
+        main_app()
+
+    # If already logged in but NOT whitelisted -> block
+    elif is_logged_in and logged_in_user not in ALLOWED_USERS_MAINTENANCE:
+        show_maintenance_screen()
+
+    # If not logged in -> show login screen, but disable public registration
     else:
         _, col, _ = st.columns([1, 2, 1])
         with col:
             st.markdown("""
-            <div style="text-align:center;padding:60px 20px;">
-                <div style="font-size:5rem;margin-bottom:20px;">🛠️</div>
-                <div style="font-size:2.2rem;font-weight:900;
-                    background:linear-gradient(135deg,#ef4444,#f97316);
-                    -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-                    background-clip:text;">
-                    Under Maintenance
+                <div class="sf-header">
+                    <div class="sf-header-title">StudySmart</div>
+                    <div class="sf-header-subtitle">
+                        Maintenance Access
+                    </div>
                 </div>
-                <div style="font-size:1.1rem;color:#64748b;margin-top:12px;
-                    line-height:1.6;">
-                    StudySmart AI is currently undergoing scheduled maintenance.
-                    <br><br>
-                    <b>We'll be back shortly!</b>
-                    <br><br>
-                    <span style="font-size:0.95rem;">
-                    ⏱️ Expected return: In a few hours<br>
-                    📧 Questions? Contact support@studysmart.ai
-                    </span>
-                </div>
-            </div>
             """, unsafe_allow_html=True)
-            st.stop()
 
-init_db()
-init_session_state()
+            st.markdown('<div class="sf-card">', unsafe_allow_html=True)
+            st.info("🛠️ App is in maintenance mode. Only authorised users can log in.")
 
-if st.session_state.logged_in:
-    main_app()
+            u = st.text_input("👤 Username", key="maint_login_u")
+            p = st.text_input("🔑 Password", type="password", key="maint_login_p")
+
+            if st.button("Sign In", use_container_width=True, key="maint_login_btn"):
+                if not u.strip() or not p.strip():
+                    st.warning("⚠️ Please fill in both fields.")
+                elif u.strip() not in ALLOWED_USERS_MAINTENANCE:
+                    st.error("❌ You are not authorised during maintenance mode.")
+                else:
+                    conn = sqlite3.connect("users.db")
+                    c = conn.cursor()
+                    c.execute(
+                        "SELECT * FROM users WHERE username=? AND password=?",
+                        (u.strip(), hash_p(p))
+                    )
+                    user = c.fetchone()
+                    conn.close()
+
+                    if user:
+                        st.session_state.logged_in = True
+                        st.session_state.username = u.strip()
+                        st.success("✅ Login successful!")
+                        time.sleep(0.6)
+                        st.rerun()
+                    else:
+                        st.error("❌ Invalid username or password.")
+
+            st.markdown('</div>', unsafe_allow_html=True)
+
+# If maintenance mode is OFF:
 else:
-    auth_ui()
+    if st.session_state.get("logged_in", False):
+        main_app()
+    else:
+        auth_ui()
 
