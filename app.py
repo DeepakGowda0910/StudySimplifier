@@ -40,6 +40,18 @@ html, body, [class*="css"], [class*="st-"] {
     font-family: 'Inter', 'Poppins', sans-serif !important;
     letter-spacing: 0.3px;
 }
+/* Fix Streamlit icons turning into text */
+.material-symbols-rounded, 
+span[class*="material-icons"], 
+span[class*="material-symbols"] {
+    font-family: 'Material Symbols Rounded', 'Material Icons' !important;
+}
+
+/* Hide the expander arrow entirely for a cleaner look (Optional but recommended) */
+[data-testid="stExpander"] summary span.material-symbols-rounded {
+    display: none !important;
+}
+
 .stApp {
     background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #e8f0f7 100%);
     min-height: 100vh;
