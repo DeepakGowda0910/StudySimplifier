@@ -1129,58 +1129,39 @@ def render_sidebar(username):
 # ─────────────────────────────────────────────────────────────────────────────
 # Part 5 LOGIN PAGE
 # ─────────────────────────────────────────────────────────────────────────────
-def show_login():
-    st.markdown("""
-        <div style="text-align:center;padding:30px 0 10px 0;">
-            <div style="font-size:3.2rem;">🎓</div>
-            <div style="font-size:2.8rem;font-weight:800;background:linear-gradient(135deg,#2563eb,#1d4ed8);
-                -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">
-                StudySmart AI
-            </div>
-            <div style="font-size:.95rem;color:#64748b;margin-top:8px;">
-                AI-powered exam preparation for students
-            </div>
-        </div>
-    """, unsafe_allow_html=True)
+# ❌ BEFORE (Registration Disabled)
+st.info("👆 Please tick one option to continue.")
 
-    _, col, _ = st.columns([1, 2, 1])
-    with col:
-        st.markdown("<div style='height:20px'></div>", unsafe_allow_html=True)
-        st.markdown('<div class="sf-card">', unsafe_allow_html=True)
-        st.markdown("### 🔐 Login to Continue")
-
-        username = st.text_input("👤 Username", placeholder="Enter your username")
-        password = st.text_input("🔑 Password", type="password", placeholder="Enter your password")
-
-        if st.button("🚀 Login", use_container_width=True, key="login_btn"):
-            if not username or not password:
-                st.error("Please enter both username and password.")
-            elif verify_user(username, password):
-                st.session_state.username = username
-                st.session_state.page = "dashboard"
-                update_streak(username)
-                st.rerun()
-            else:
-                st.error("Invalid username or password.")
-
-        st.markdown("<div style='height:12px'></div>", unsafe_allow_html=True)
-        st.markdown("---")
-        st.markdown("""
-            <div style="font-size:.82rem;color:#64748b;text-align:center;">
-                <b>Demo Accounts:</b><br>
-                👤 <b>admin</b> / admin123 &nbsp;|&nbsp;
-                👤 <b>student1</b> / pass123 &nbsp;|&nbsp;
-                👤 <b>demo</b> / demo123
-            </div>
-        """, unsafe_allow_html=True)
-
-        st.markdown("""
-            <div style="font-size:.75rem;color:#94a3b8;text-align:center;margin-top:14px;">
-                ⚠️ Registration is disabled. Use a whitelisted account above.
-            </div>
-        """, unsafe_allow_html=True)
-
-        st.markdown('</div>', unsafe_allow_html=True)
+# ✅ AFTER (Enable Registration)
+with tab2:
+    st.markdown("### 📝 Create New Account")
+    new_username = st.text_input("Choose a username", key="reg_user")
+    new_password = st.text_input("Create password", type="password", key="reg_pass")
+    new_password_confirm = st.text_input("Confirm password", type="password", key="reg_pass_confirm")
+    
+    if st.button("✅ Create Account", use_container_width=True, key="register_btn"):
+        if not new_username or not new_password:
+            st.error("Please fill in all fields.")
+        elif new_password != new_password_confirm:
+            st.error("Passwords don't match.")
+        elif len(new_password) < 6:
+            st.error("Password must be at least 6 characters.")
+        else:
+            conn = sqlite3.connect("users.db")
+            c = conn.cursor()
+            try:
+                c.execute(
+                    "INSERT INTO users (username, password) VALUES (?, ?)",
+                    (new_username, hash_p(new_password))
+                )
+                # Auto-create user stats
+                c.execute("INSERT INTO user_stats (username) VALUES (?)", (new_username,))
+                conn.commit()
+                st.success(f"✅ Account created! You can now login.")
+                conn.close()
+            except sqlite3.IntegrityError:
+                st.error("❌ Username already exists.")
+                conn.close()
 
 # ─────────────────────────────────────────────────────────────────────────────
 # ONBOARDING WIZARD
