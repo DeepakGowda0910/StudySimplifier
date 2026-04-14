@@ -2894,7 +2894,7 @@ init_session_state()
 # ─────────────────────────────────────────────────────────────────────────────
 # MAINTENANCE MODE
 # ─────────────────────────────────────────────────────────────────────────────
-MAINTENANCE_MODE = True
+MAINTENANCE_MODE = false
 ALLOWED_USERS_MAINTENANCE = ["Deepak"]   # <- replace with your real username
 
 def show_maintenance_screen():
