@@ -1559,7 +1559,6 @@ def show_onboarding(username):
                             )
                 else:
                     st.session_state.ob_board = "University / National Syllabus"
-                    st.info("📌 Syllabus: University / National Syllabus")
 
             st.markdown("<div style='height:12px'></div>", unsafe_allow_html=True)
             col_back, col_next = st.columns(2)
