@@ -1085,73 +1085,49 @@ def generate_pdf(title, subtitle, content):
     buffer.seek(0)
     return buffer
 # ─────────────────────────────────────────────────────────────────────────────
-# SESSION STATE + NAVIGATION
+# SESSION STATE
 # ─────────────────────────────────────────────────────────────────────────────
 def init_session_state():
     defaults = {
-        "logged_in":                 False,
-        "username":                  "",
-        "active_page":               "dashboard",
-        "ob_step":                   1,
-        "ob_category":               "",
-        "ob_course":                 "",
-        "ob_stream":                 "",
-        "ob_board":                  "",
-        "history":                   [],
-        "current_chapters":          [],
-        "last_chapter_key":          "",
-        "generated_result":          None,
-        "generated_model":           None,
-        "generated_label":           None,
-        "generated_tool":            None,
-        "generated_chapter":         None,
-        "generated_subject":         None,
-        "generated_topic":           None,
-        "generated_course":          None,
-        "generated_stream":          None,
-        "generated_board":           None,
-        "generated_audience":        None,
-        "generated_output_style":    None,
-        "answers_result":            None,
-        "answers_model":             None,
-        "show_answers":              False,
-        "fullpaper_result":          None,
-        "fullpaper_model":           None,
-        "show_fullpaper":            False,
-        # ★ NEW — full paper answers
-        "fullpaper_answers_result":  None,
-        "fullpaper_answers_model":   None,
-        "show_fullpaper_answers":    False,
-        "daily_checkin_done":        False,
-        "study_timer_active":        False,
-        "study_timer_start":         None,
+        "logged_in": False, "username": "", "active_page": "dashboard",
+        "ob_step": 1, "ob_category": "", "ob_course": "",
+        "ob_stream": "", "ob_board": "",
+        "history": [], "current_chapters": [], "last_chapter_key": "",
+        "generated_result": None, "generated_model": None,
+        "generated_label": None,  "generated_tool": None,
+        "generated_chapter": None,"generated_subject": None,
+        "generated_topic": None,  "generated_course": None,
+        "generated_stream": None, "generated_board": None,
+        "generated_audience": None,"generated_output_style": None,
+        "answers_result": None,   "answers_model": None, "show_answers": False,
+        "fullpaper_result": None, "fullpaper_model": None,"show_fullpaper": False,
+        "fullpaper_answers_result": None, "fullpaper_answers_model": None,
+        "show_fullpaper_answers": False,
+        "daily_checkin_done": False,
+        "study_timer_active": False,"study_timer_start": None,
         "current_subject_for_timer": "General",
-        "review_idx":                0,
-        "review_show_ans":           False,
+        "review_idx": 0,"review_show_ans": False,
     }
     for k, v in defaults.items():
         if k not in st.session_state:
             st.session_state[k] = v
 
+# ─────────────────────────────────────────────────────────────────────────────
+# NAVIGATION
+# ─────────────────────────────────────────────────────────────────────────────
 def go_to(page):
     st.session_state.active_page = page
     st.rerun()
 
 def reset_generation_state():
-    for k in [
-        "generated_result",          "generated_model",
-        "generated_label",           "generated_tool",
-        "generated_chapter",         "generated_subject",
-        "generated_topic",           "generated_course",
-        "generated_stream",          "generated_board",
-        "generated_audience",        "generated_output_style",
-        "answers_result",            "answers_model",
-        "fullpaper_result",          "fullpaper_model",
-        "fullpaper_answers_result",  "fullpaper_answers_model",
-    ]:
+    for k in ["generated_result","generated_model","generated_label","generated_tool",
+              "generated_chapter","generated_subject","generated_topic","generated_course",
+              "generated_stream","generated_board","generated_audience","generated_output_style",
+              "answers_result","answers_model","fullpaper_result","fullpaper_model",
+              "fullpaper_answers_result","fullpaper_answers_model"]:
         st.session_state[k] = None
-    st.session_state.show_answers          = False
-    st.session_state.show_fullpaper        = False
+    st.session_state.show_answers           = False
+    st.session_state.show_fullpaper         = False
     st.session_state.show_fullpaper_answers = False
 
 def add_to_history(tool, chapter, subject, result):
@@ -1164,6 +1140,107 @@ def add_to_history(tool, chapter, subject, result):
     }
     st.session_state.history.insert(0, entry)
     st.session_state.history = st.session_state.history[:10]
+
+# ─────────────────────────────────────────────────────────────────────────────
+# ONBOARDING CHECKBOX HELPERS  ← must live here, BEFORE show_onboarding
+# ─────────────────────────────────────────────────────────────────────────────
+def _safe_state_key(text):
+    """Convert any string into a safe session_state key."""
+    return "".join(ch if ch.isalnum() else "_" for ch in str(text)).strip("_").lower()
+
+def category_skips_course(selected_category):
+    """
+    Returns True when the selected category IS already the course
+    (e.g. '10th Standard', 'Class 12', 'Grade 8', 'Semester 1').
+    In that case the Course step is skipped entirely.
+    """
+    if not selected_category:
+        return False
+    cat = str(selected_category).strip().lower()
+    direct_markers = ["standard", "class ", "grade ", "semester", "year"]
+    if any(m in cat for m in direct_markers):
+        return True
+    try:
+        courses = get_courses(selected_category) or []
+        cleaned = [str(c).strip().lower() for c in courses if str(c).strip()]
+        if not cleaned:
+            return True
+        if len(cleaned) == 1 and cleaned[0] == cat:
+            return True
+    except Exception:
+        pass
+    return False
+
+def needs_board_selection(selected_category, selected_course=""):
+    """Returns True when the school-board picker should be shown."""
+    text = f"{selected_category} {selected_course}".strip().lower()
+    school_markers = [
+        "k-12","school","class ","grade ","standard",
+        "cbse","icse","state board","isc","ib","cambridge"
+    ]
+    return any(m in text for m in school_markers)
+
+def clear_checkbox_group(prefix):
+    """Uncheck every checkbox whose key starts with  prefix_chk_  """
+    for key in list(st.session_state.keys()):
+        if key.startswith(f"{prefix}_chk_"):
+            st.session_state[key] = False
+
+def sync_checkbox_group(group_prefix, all_options, target_key):
+    """
+    Keep checkboxes in sync with the current session_state value.
+    Called at the TOP of each step so the UI reflects the stored selection.
+    """
+    selected_value = st.session_state.get(target_key, "")
+    for opt in all_options:
+        opt_key = f"{group_prefix}_chk_{_safe_state_key(opt)}"
+        st.session_state[opt_key] = (selected_value == opt)
+
+def handle_single_select_checkbox(group_prefix, option_value, all_options,
+                                  target_key, clear_keys=None, clear_groups=None):
+    """
+    on_change handler for every selection checkbox.
+    Ensures only ONE option is ever ticked at a time.
+    """
+    current_key = f"{group_prefix}_chk_{_safe_state_key(option_value)}"
+    checked = st.session_state.get(current_key, False)
+
+    if checked:
+        # Uncheck all siblings
+        for opt in all_options:
+            opt_key = f"{group_prefix}_chk_{_safe_state_key(opt)}"
+            st.session_state[opt_key] = (opt == option_value)
+        # Save the selection
+        st.session_state[target_key] = option_value
+        # Clear downstream state
+        for key in (clear_keys or []):
+            st.session_state[key] = ""
+        for grp in (clear_groups or []):
+            clear_checkbox_group(grp)
+    else:
+        # User unticked — deselect
+        if st.session_state.get(target_key) == option_value:
+            st.session_state[target_key] = ""
+
+def render_checkbox_card(title, subtitle, icon, is_selected):
+    """Renders a styled info card. The actual interaction is a checkbox below it."""
+    border = "3px solid #2563eb" if is_selected else "2px solid #e2e8f0"
+    bg     = "linear-gradient(135deg,#eff6ff,#dbeafe)" if is_selected else "white"
+    shadow = "0 4px 18px rgba(37,99,235,.18)" if is_selected else "0 2px 12px rgba(15,23,42,.06)"
+    tick   = "<div style='font-size:.72rem;color:#2563eb;font-weight:700;margin-top:7px;'>✓ Selected</div>" if is_selected else ""
+    st.markdown(f"""
+    <div style="
+        background:{bg};border:{border};border-radius:16px;
+        padding:16px 10px;text-align:center;box-shadow:{shadow};
+        margin-bottom:4px;min-height:130px;
+        display:flex;flex-direction:column;
+        justify-content:center;align-items:center;">
+        <div style="font-size:2.1rem;">{icon}</div>
+        <div style="font-weight:800;font-size:.9rem;color:#0f172a;margin-top:7px;">{title}</div>
+        <div style="font-size:.74rem;color:#64748b;margin-top:3px;">{subtitle}</div>
+        {tick}
+    </div>
+    """, unsafe_allow_html=True)
 
 # ─────────────────────────────────────────────────────────────────────────────
 # UI HELPERS
@@ -1187,117 +1264,37 @@ def render_back_button():
     st.markdown("<div style='height:4px'></div>", unsafe_allow_html=True)
 
 def render_step_indicator(current_step):
-  def _safe_state_key(text):
-    return "".join(ch if ch.isalnum() else "_" for ch in str(text)).strip("_").lower()
-
-
-def category_skips_course(selected_category):
-    """
-    If the selected category is already effectively the course
-    (example: 8th Standard, 10th Standard, Class 12, Semester 1),
-    skip the separate course step.
-    """
-    if not selected_category:
-        return False
-
-    cat = str(selected_category).strip().lower()
-
-    direct_course_markers = [
-        "standard", "class ", "grade ", "semester", "year"
-    ]
-    if any(marker in cat for marker in direct_course_markers):
-        return True
-
-    try:
-        courses = get_courses(selected_category) or []
-        cleaned = [str(c).strip().lower() for c in courses if str(c).strip()]
-        if not cleaned:
-            return True
-        if len(cleaned) == 1 and cleaned[0] == cat:
-            return True
-    except Exception:
-        pass
-
-    return False
-
-
-def needs_board_selection(selected_category, selected_course=""):
-    """
-    Decide whether to show school board selection.
-    """
-    text = f"{selected_category} {selected_course}".strip().lower()
-    school_markers = [
-        "k-12", "school", "class ", "grade ", "standard",
-        "cbse", "icse", "state board", "isc", "ib", "cambridge"
-    ]
-    return any(marker in text for marker in school_markers)
-
-
-def clear_checkbox_group(prefix):
-    for key in list(st.session_state.keys()):
-        if key.startswith(f"{prefix}_chk_"):
-            st.session_state[key] = False
-
-
-def handle_single_select_checkbox(group_prefix, option_value, all_options, target_key,
-                                  clear_keys=None, clear_groups=None):
-    current_key = f"{group_prefix}_chk_{_safe_state_key(option_value)}"
-    checked = st.session_state.get(current_key, False)
-
-    if checked:
-        for opt in all_options:
-            opt_key = f"{group_prefix}_chk_{_safe_state_key(opt)}"
-            st.session_state[opt_key] = (opt == option_value)
-
-        st.session_state[target_key] = option_value
-
-        for key in (clear_keys or []):
-            st.session_state[key] = ""
-
-        for grp in (clear_groups or []):
-            clear_checkbox_group(grp)
-
-    else:
-        if st.session_state.get(target_key) == option_value:
-            st.session_state[target_key] = ""
-
-
-def sync_checkbox_group(group_prefix, all_options, target_key):
-    selected_value = st.session_state.get(target_key, "")
-    for opt in all_options:
-        opt_key = f"{group_prefix}_chk_{_safe_state_key(opt)}"
-        st.session_state[opt_key] = (selected_value == opt)
-
-
-def render_checkbox_card(title, subtitle, icon, is_selected):
-    border = "3px solid #2563eb" if is_selected else "2px solid #e2e8f0"
-    bg = "linear-gradient(135deg,#eff6ff,#dbeafe)" if is_selected else "white"
-    shadow = "0 4px 18px rgba(37,99,235,.18)" if is_selected else "0 2px 12px rgba(15,23,42,.06)"
-
-    st.markdown(f"""
-    <div style="
-        background:{bg};
-        border:{border};
-        border-radius:16px;
-        padding:18px 12px;
-        text-align:center;
-        box-shadow:{shadow};
-        margin-bottom:8px;
-        min-height:150px;
-        display:flex;
-        flex-direction:column;
-        justify-content:center;
-        align-items:center;">
-        <div style="font-size:2.2rem;">{icon}</div>
-        <div style="font-weight:800;font-size:.92rem;color:#0f172a;margin-top:8px;">
-            {title}
-        </div>
-        <div style="font-size:.76rem;color:#64748b;margin-top:4px;">
-            {subtitle}
-        </div>
-        {"<div style='font-size:.72rem;color:#2563eb;font-weight:700;margin-top:7px;'>✓ Selected</div>" if is_selected else ""}
-    </div>
-    """, unsafe_allow_html=True)
+    labels  = ["Category", "Course", "Stream", "Confirm"]
+    cols    = st.columns(len(labels) * 2 - 1)
+    col_idx = 0
+    for i, label in enumerate(labels, start=1):
+        with cols[col_idx]:
+            if i < current_step:
+                cls  = "ob-step-done";   icon = "✓"
+            elif i == current_step:
+                cls  = "ob-step-active"; icon = str(i)
+            else:
+                cls  = "ob-step-lock";   icon = str(i)
+            st.markdown(f"""
+            <div style="display:flex;flex-direction:column;
+                align-items:center;gap:4px;">
+                <div class="ob-step {cls}">{icon}</div>
+                <div style="font-size:.68rem;font-weight:600;
+                    color:{'#2563eb' if i==current_step else
+                           '#10b981' if i<current_step else '#94a3b8'};">
+                    {label}
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+        col_idx += 1
+        if col_idx < len(cols):
+            with cols[col_idx]:
+                line_cls = "ob-line-done" if i < current_step else "ob-line"
+                st.markdown(
+                    f'<div class="ob-line {line_cls}" style="margin-top:18px;"></div>',
+                    unsafe_allow_html=True
+                )
+            col_idx += 1
 
 # ─────────────────────────────────────────────────────────────────────────────
 # ★  ONBOARDING WIZARD
@@ -1309,22 +1306,19 @@ def show_onboarding(username):
         st.markdown("""
             <div class="sf-header" style="padding-top:24px;">
                 <div class="sf-header-title">StudySmart AI</div>
-                <div class="sf-header-subtitle">
-                    Let's personalise your experience 🎯
-                </div>
+                <div class="sf-header-subtitle">Let's personalise your experience 🎯</div>
             </div>
         """, unsafe_allow_html=True)
 
     st.markdown("<div style='height:10px'></div>", unsafe_allow_html=True)
-
     _, sc, _ = st.columns([0.5, 4, 0.5])
     with sc:
         render_step_indicator(st.session_state.ob_step)
-
     st.markdown("<div style='height:18px'></div>", unsafe_allow_html=True)
     _, mc, _ = st.columns([0.5, 4, 0.5])
 
     with mc:
+
         # ══════════════════════════════════════════════════════════════════
         # STEP 1 — CATEGORY
         # ══════════════════════════════════════════════════════════════════
@@ -1335,7 +1329,7 @@ def show_onboarding(username):
                         📚 What are you studying?
                     </div>
                     <div style="font-size:.88rem;color:#64748b;margin-top:5px;">
-                        Tick one option and continue.
+                        Tick one card to select your education level.
                     </div>
                 </div>
             """, unsafe_allow_html=True)
@@ -1346,36 +1340,26 @@ def show_onboarding(username):
             for row_start in range(0, len(available_cats), 3):
                 row_cats = available_cats[row_start: row_start + 3]
                 cols = st.columns(len(row_cats))
-
                 for col, cat in zip(cols, row_cats):
-                    meta = CATEGORY_META.get(cat, {"icon": "📘", "desc": cat, "color": "#3b82f6"})
-                    is_sel = st.session_state.ob_category == cat
-
+                    meta   = CATEGORY_META.get(cat, {"icon": "📘", "desc": cat, "color": "#3b82f6"})
+                    is_sel = (st.session_state.ob_category == cat)
                     with col:
                         render_checkbox_card(cat, meta["desc"], meta["icon"], is_sel)
-
                         st.checkbox(
                             "Select",
                             key=f"ob_cat_chk_{_safe_state_key(cat)}",
                             on_change=handle_single_select_checkbox,
-                            args=(
-                                "ob_cat",
-                                cat,
-                                available_cats,
-                                "ob_category",
-                                ["ob_course", "ob_stream", "ob_board"],
-                                ["ob_course", "ob_stream", "ob_board"]
-                            )
+                            args=("ob_cat", cat, available_cats, "ob_category",
+                                  ["ob_course","ob_stream","ob_board"],
+                                  ["ob_course","ob_stream","ob_board"])
                         )
 
             st.markdown("<div style='height:12px'></div>", unsafe_allow_html=True)
-
             selected_cat = st.session_state.ob_category
-            if selected_cat:
-                meta = CATEGORY_META.get(selected_cat, {"icon": "📘", "color": "#3b82f6"})
-                skip_course = category_skips_course(selected_cat)
 
-                # If category itself is effectively the course, set it
+            if selected_cat:
+                meta        = CATEGORY_META.get(selected_cat, {"icon": "📘"})
+                skip_course = category_skips_course(selected_cat)
                 if skip_course:
                     st.session_state.ob_course = selected_cat
 
@@ -1384,33 +1368,31 @@ def show_onboarding(username):
                     border:2px solid #bfdbfe;border-radius:14px;
                     padding:14px 18px;margin-bottom:12px;text-align:center;">
                     <span style="font-size:1.3rem;">{meta['icon']}</span>
-                    <span style="font-weight:700;font-size:.95rem;
-                        color:#1d4ed8;margin-left:8px;">
+                    <span style="font-weight:700;font-size:.95rem;color:#1d4ed8;margin-left:8px;">
                         {selected_cat} selected ✓
                     </span>
                 </div>
                 """, unsafe_allow_html=True)
 
-                next_label = "Continue → Stream & Board" if skip_course else "Continue → Choose Course"
-
-                if st.button(next_label, key="ob_next_1", use_container_width=True):
+                btn_label = "Continue → Stream & Board" if skip_course else "Continue → Choose Course"
+                if st.button(btn_label, key="ob_next_1", use_container_width=True):
                     st.session_state.ob_step = 3 if skip_course else 2
                     st.rerun()
             else:
                 st.info("👆 Please tick one option to continue.")
 
         # ══════════════════════════════════════════════════════════════════
-        # STEP 2 — COURSE
+        # STEP 2 — COURSE  (only shown for category-level selections)
         # ══════════════════════════════════════════════════════════════════
         elif st.session_state.ob_step == 2:
             cat = st.session_state.ob_category
-
+            # Safety: auto-skip if not needed
             if category_skips_course(cat):
                 st.session_state.ob_course = cat
-                st.session_state.ob_step = 3
+                st.session_state.ob_step   = 3
                 st.rerun()
 
-            meta = CATEGORY_META.get(cat, {"icon": "📘", "color": "#3b82f6"})
+            meta    = CATEGORY_META.get(cat, {"icon": "📘", "color": "#3b82f6"})
             courses = get_courses(cat)
 
             st.markdown(f"""
@@ -1428,42 +1410,32 @@ def show_onboarding(username):
                 st.warning("⚠️ No courses found for this category.")
             else:
                 sync_checkbox_group("ob_course", courses, "ob_course")
-
                 for row_start in range(0, len(courses), 3):
                     row_courses = courses[row_start: row_start + 3]
-                    cols = st.columns(len(row_courses))
-
+                    cols        = st.columns(len(row_courses))
                     for col, course in zip(cols, row_courses):
-                        is_sel = st.session_state.ob_course == course
-
+                        is_sel = (st.session_state.ob_course == course)
                         with col:
                             render_checkbox_card(course, "Program / Class", "📖", is_sel)
-
                             st.checkbox(
                                 "Select",
                                 key=f"ob_course_chk_{_safe_state_key(course)}",
                                 on_change=handle_single_select_checkbox,
-                                args=(
-                                    "ob_course",
-                                    course,
-                                    courses,
-                                    "ob_course",
-                                    ["ob_stream", "ob_board"],
-                                    ["ob_stream", "ob_board"]
-                                )
+                                args=("ob_course", course, courses, "ob_course",
+                                      ["ob_stream","ob_board"],
+                                      ["ob_stream","ob_board"])
                             )
 
             st.markdown("<div style='height:12px'></div>", unsafe_allow_html=True)
             col_back, col_next = st.columns(2)
-
             with col_back:
                 if st.button("← Back", key="ob_back_2", use_container_width=True):
                     st.session_state.ob_step = 1
                     st.rerun()
-
             with col_next:
                 if st.session_state.ob_course:
-                    if st.button("Continue → Stream & Board", key="ob_next_2", use_container_width=True):
+                    if st.button("Continue → Stream & Board", key="ob_next_2",
+                                 use_container_width=True):
                         st.session_state.ob_step = 3
                         st.rerun()
                 else:
@@ -1473,9 +1445,15 @@ def show_onboarding(username):
         # STEP 3 — STREAM + BOARD
         # ══════════════════════════════════════════════════════════════════
         elif st.session_state.ob_step == 3:
-            cat = st.session_state.ob_category
-            course = st.session_state.ob_course or st.session_state.ob_category
+            cat     = st.session_state.ob_category
+            course  = st.session_state.ob_course or st.session_state.ob_category
             streams = get_streams(cat, course)
+
+            stream_icons = {
+                "Science":"🔬","Commerce":"💹","Arts":"🎨","Humanities":"📜",
+                "Engineering":"⚙️","Medical":"🏥","General":"📚",
+                "Mathematics":"📐","Biology":"🧬",
+            }
 
             st.markdown(f"""
                 <div style="text-align:center;margin-bottom:18px;">
@@ -1488,52 +1466,29 @@ def show_onboarding(username):
                 </div>
             """, unsafe_allow_html=True)
 
-            stream_icons = {
-                "Science": "🔬",
-                "Commerce": "💹",
-                "Arts": "🎨",
-                "Humanities": "📜",
-                "Engineering": "⚙️",
-                "Medical": "🏥",
-                "General": "📚",
-                "Mathematics": "📐",
-                "Biology": "🧬",
-            }
-
             if not streams:
                 st.warning("⚠️ No streams found for this selection.")
             else:
                 sync_checkbox_group("ob_stream", streams, "ob_stream")
-
                 for row_start in range(0, len(streams), 3):
                     row_streams = streams[row_start: row_start + 3]
-                    cols = st.columns(len(row_streams))
-
+                    cols        = st.columns(len(row_streams))
                     for col, stream in zip(cols, row_streams):
-                        icon = stream_icons.get(stream, "📂")
-                        is_sel = st.session_state.ob_stream == stream
-
+                        icon   = stream_icons.get(stream, "📂")
+                        is_sel = (st.session_state.ob_stream == stream)
                         with col:
                             render_checkbox_card(stream, "Specialisation / Stream", icon, is_sel)
-
                             st.checkbox(
                                 "Select",
                                 key=f"ob_stream_chk_{_safe_state_key(stream)}",
                                 on_change=handle_single_select_checkbox,
-                                args=(
-                                    "ob_stream",
-                                    stream,
-                                    streams,
-                                    "ob_stream",
-                                    ["ob_board"],
-                                    ["ob_board"]
-                                )
+                                args=("ob_stream", stream, streams, "ob_stream",
+                                      ["ob_board"], ["ob_board"])
                             )
 
-            # Board selection
+            # Board selector
             if st.session_state.ob_stream:
                 st.markdown("<div style='height:14px'></div>", unsafe_allow_html=True)
-
                 if needs_board_selection(cat, course):
                     st.markdown("""
                         <div style="font-weight:700;font-size:.95rem;
@@ -1541,27 +1496,17 @@ def show_onboarding(username):
                             🏫 Select Your Board
                         </div>
                     """, unsafe_allow_html=True)
-
                     sync_checkbox_group("ob_board", BOARDS, "ob_board")
                     board_cols = st.columns(len(BOARDS))
-
                     for bcol, board in zip(board_cols, BOARDS):
-                        is_sel = st.session_state.ob_board == board
+                        is_sel = (st.session_state.ob_board == board)
                         with bcol:
                             render_checkbox_card(board, "School Board", "🏫", is_sel)
-
                             st.checkbox(
                                 "Select",
                                 key=f"ob_board_chk_{_safe_state_key(board)}",
                                 on_change=handle_single_select_checkbox,
-                                args=(
-                                    "ob_board",
-                                    board,
-                                    BOARDS,
-                                    "ob_board",
-                                    [],
-                                    []
-                                )
+                                args=("ob_board", board, BOARDS, "ob_board", [], [])
                             )
                 else:
                     st.session_state.ob_board = "University / National Syllabus"
@@ -1569,19 +1514,16 @@ def show_onboarding(username):
 
             st.markdown("<div style='height:12px'></div>", unsafe_allow_html=True)
             col_back, col_next = st.columns(2)
-
             with col_back:
                 if st.button("← Back", key="ob_back_3", use_container_width=True):
-                    previous_step = 1 if category_skips_course(cat) else 2
-                    st.session_state.ob_step = previous_step
+                    st.session_state.ob_step = 1 if category_skips_course(cat) else 2
                     st.rerun()
-
             with col_next:
                 stream_ok = bool(st.session_state.ob_stream)
-                board_ok = bool(st.session_state.ob_board)
-
+                board_ok  = bool(st.session_state.ob_board)
                 if stream_ok and board_ok:
-                    if st.button("Continue → Confirm Profile", key="ob_next_3", use_container_width=True):
+                    if st.button("Continue → Confirm Profile", key="ob_next_3",
+                                 use_container_width=True):
                         st.session_state.ob_step = 4
                         st.rerun()
                 else:
@@ -1591,11 +1533,11 @@ def show_onboarding(username):
         # STEP 4 — CONFIRM & SAVE
         # ══════════════════════════════════════════════════════════════════
         elif st.session_state.ob_step == 4:
-            cat = st.session_state.ob_category
+            cat    = st.session_state.ob_category
             course = st.session_state.ob_course or st.session_state.ob_category
             stream = st.session_state.ob_stream
-            board = st.session_state.ob_board or "University / National Syllabus"
-            meta = CATEGORY_META.get(cat, {"icon": "📘", "color": "#3b82f6"})
+            board  = st.session_state.ob_board or "University / National Syllabus"
+            meta   = CATEGORY_META.get(cat, {"icon": "📘", "color": "#3b82f6"})
 
             st.markdown("""
                 <div style="text-align:center;margin-bottom:18px;">
@@ -1637,32 +1579,29 @@ def show_onboarding(username):
             """, unsafe_allow_html=True)
 
             col_back, col_confirm = st.columns(2)
-
             with col_back:
                 if st.button("← Edit Profile", key="ob_back_4", use_container_width=True):
                     st.session_state.ob_step = 3
                     st.rerun()
-
             with col_confirm:
                 if st.button("🚀 Launch My Dashboard", key="ob_confirm", use_container_width=True):
                     save_user_profile(username, cat, course, stream, board)
                     award_badge(username, "onboarded")
                     award_xp(username, 50)
-
-                    st.session_state.ob_step = 1
+                    # Reset all onboarding state
+                    st.session_state.ob_step     = 1
                     st.session_state.ob_category = ""
-                    st.session_state.ob_course = ""
-                    st.session_state.ob_stream = ""
-                    st.session_state.ob_board = ""
-
+                    st.session_state.ob_course   = ""
+                    st.session_state.ob_stream   = ""
+                    st.session_state.ob_board    = ""
                     clear_checkbox_group("ob_cat")
                     clear_checkbox_group("ob_course")
                     clear_checkbox_group("ob_stream")
                     clear_checkbox_group("ob_board")
-
                     st.success("✅ Profile saved! Welcome to StudySmart AI 🎓")
                     time.sleep(0.8)
                     st.rerun()
+
 
 # ─────────────────────────────────────────────────────────────────────────────
 # SIDEBAR
