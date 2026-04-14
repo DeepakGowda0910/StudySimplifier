@@ -2510,23 +2510,21 @@ def show_study_tools(username):
                     except Exception as e:
                         st.warning(f"⚠️ PDF error: {e}")
 
-            # ── Full Subject Paper ─────────────────────────────────────────
-            if st.button(
-                f"🗂️ Generate Full {g_subject} Paper",
-                use_container_width=True, key="full_qp_btn"
-            ):
+                      # ── FULL COURSE QUESTION PAPER ────────────────────────────────
+            if st.button(f"🗂️ Generate Full {g_subject} Paper",
+                         use_container_width=True, key="full_qp_btn"):
                 with st.spinner("Generating full subject paper..."):
                     full_r, full_m = generate_with_fallback(
-                        build_prompt(
-                            "🧪 Question Paper",
-                            g_chapter, g_topic, g_subject,
-                            g_audience, "📄 Detailed",
-                            g_board, g_course
-                        )
+                        build_full_qp_prompt(g_board, g_course, g_stream,
+                                             g_subject, g_audience)
                     )
-                st.session_state.fullpaper_result = full_r
-                st.session_state.fullpaper_model  = full_m
-                st.session_state.show_fullpaper   = True
+                st.session_state.fullpaper_result          = full_r
+                st.session_state.fullpaper_model           = full_m
+                st.session_state.show_fullpaper            = True
+                # reset answers when a new paper is generated
+                st.session_state.fullpaper_answers_result  = None
+                st.session_state.fullpaper_answers_model   = None
+                st.session_state.show_fullpaper_answers    = False
 
             if st.session_state.show_fullpaper and st.session_state.fullpaper_result:
                 if st.session_state.fullpaper_model != "None":
@@ -2538,21 +2536,59 @@ def show_study_tools(username):
                         full_pdf = generate_pdf(
                             f"Full Paper — {g_subject}",
                             f"{g_board} | {g_course} | {g_stream}",
-                            st.session_state.fullpaper_result
+                            st.session_state.fullpaper_result, "#7c3aed"
                         )
-                        safe_f = (
-                            f"{g_subject}_{g_board}_FullPaper.pdf"
-                            .replace(" ", "_")
-                        )
+                        safe_f = f"{g_subject}_{g_board}_FullPaper.pdf".replace(" ", "_")
                         st.download_button(
                             "⬇️ Download Full Paper PDF",
                             data=full_pdf, file_name=safe_f,
                             mime="application/pdf",
-                            use_container_width=True,
-                            key="dl_full_pdf"
+                            use_container_width=True, key="dl_full_pdf"
                         )
                     except Exception as e:
                         st.warning(f"⚠️ PDF error: {e}")
+
+                    # ★ FIX 4: Get Answers for Full Paper
+                    if st.button("📋 Get Answers for this Full Paper",
+                                 use_container_width=True,
+                                 key="get_fullpaper_ans_btn"):
+                        with st.spinner("Generating answer key for full paper..."):
+                            fp_ans_r, fp_ans_m = generate_with_fallback(
+                                build_answers_prompt(
+                                    st.session_state.fullpaper_result,
+                                    g_board, g_course, g_subject,
+                                    f"Full {g_subject} Paper"
+                                )
+                            )
+                        st.session_state.fullpaper_answers_result = fp_ans_r
+                        st.session_state.fullpaper_answers_model  = fp_ans_m
+                        st.session_state.show_fullpaper_answers   = True
+
+                    if (st.session_state.show_fullpaper_answers
+                            and st.session_state.fullpaper_answers_result):
+                        if st.session_state.fullpaper_answers_model != "None":
+                            st.markdown('<div class="sf-answers">', unsafe_allow_html=True)
+                            st.markdown(f"### 📚 Answer Key — Full {g_subject} Paper")
+                            st.markdown(st.session_state.fullpaper_answers_result)
+                            st.markdown('</div>', unsafe_allow_html=True)
+                            try:
+                                fp_ans_pdf = generate_pdf(
+                                    f"Answer Key — Full {g_subject} Paper",
+                                    f"{g_board} | {g_course} | {g_stream}",
+                                    st.session_state.fullpaper_answers_result, "#15803d"
+                                )
+                                safe_fa = f"{g_subject}_{g_board}_FullPaper_Answers.pdf".replace(" ", "_")
+                                st.download_button(
+                                    "⬇️ Download Full Paper Answer Key PDF",
+                                    data=fp_ans_pdf, file_name=safe_fa,
+                                    mime="application/pdf",
+                                    use_container_width=True,
+                                    key="dl_full_ans_pdf"
+                                )
+                            except Exception as e:
+                                st.warning(f"⚠️ PDF error: {e}")
+                        else:
+                            st.error("❌ Answer generation failed.")
 
 
 # ─────────────────────────────────────────────────────────────────────────────
