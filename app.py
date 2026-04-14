@@ -460,51 +460,90 @@ def init_db():
     conn = sqlite3.connect("users.db")
     c = conn.cursor()
 
-    c.execute("""CREATE TABLE IF NOT EXISTS users (
-        username TEXT PRIMARY KEY, password TEXT NOT NULL)""")
+    # Core tables
+    c.execute("""
+        CREATE TABLE IF NOT EXISTS users (
+            username TEXT PRIMARY KEY,
+            password TEXT NOT NULL
+        )
+    """)
 
-    # ── Streak & XP ──────────────────────────────────────────────────────────
-    c.execute("""CREATE TABLE IF NOT EXISTS user_stats (
-        username      TEXT PRIMARY KEY,
-        total_xp      INTEGER DEFAULT 0,
-        streak_days   INTEGER DEFAULT 0,
-        last_login    TEXT    DEFAULT '',
-        total_minutes INTEGER DEFAULT 0
-    )""")
+    c.execute("""
+        CREATE TABLE IF NOT EXISTS user_stats (
+            username TEXT PRIMARY KEY,
+            total_xp INTEGER DEFAULT 0,
+            streak_days INTEGER DEFAULT 0,
+            last_login TEXT DEFAULT '',
+            total_minutes INTEGER DEFAULT 0
+        )
+    """)
 
-    # ── Study sessions (for "This Week" minutes) ──────────────────────────────
-    c.execute("""CREATE TABLE IF NOT EXISTS study_sessions (
-        id        INTEGER PRIMARY KEY AUTOINCREMENT,
-        username  TEXT,
-        subject   TEXT,
-        minutes   INTEGER,
-        sess_date TEXT
-    )""")
+    c.execute("""
+        CREATE TABLE IF NOT EXISTS achievements (
+            username TEXT,
+            badge_id TEXT,
+            earned_at TEXT,
+            PRIMARY KEY (username, badge_id)
+        )
+    """)
 
-    # ── Achievements ─────────────────────────────────────────────────────────
-    c.execute("""CREATE TABLE IF NOT EXISTS achievements (
-        username  TEXT,
-        badge_id  TEXT,
-        earned_at TEXT,
-        PRIMARY KEY (username, badge_id)
-    )""")
+    c.execute("""
+        CREATE TABLE IF NOT EXISTS flashcards (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT,
+            front_text TEXT,
+            back_text TEXT,
+            subject TEXT DEFAULT '',
+            chapter TEXT DEFAULT '',
+            ease_factor REAL DEFAULT 2.5,
+            interval_days INTEGER DEFAULT 1,
+            next_review_date TEXT,
+            review_count INTEGER DEFAULT 0,
+            created_date TEXT
+        )
+    """)
 
-    # ── Flashcards ────────────────────────────────────────────────────────────
-    c.execute("""CREATE TABLE IF NOT EXISTS flashcards (
-        id              INTEGER PRIMARY KEY AUTOINCREMENT,
-        username        TEXT,
-        front_text      TEXT,
-        back_text       TEXT,
-        subject         TEXT DEFAULT '',
-        chapter         TEXT DEFAULT '',
-        ease_factor     REAL    DEFAULT 2.5,
-        interval_days   INTEGER DEFAULT 1,
-        next_review_date TEXT,
-        review_count    INTEGER DEFAULT 0,
-        created_date    TEXT
-    )""")
+    c.execute("""
+        CREATE TABLE IF NOT EXISTS study_sessions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT,
+            subject TEXT,
+            minutes INTEGER,
+            sess_date TEXT
+        )
+    """)
 
-    conn.commit(); conn.close()
+    conn.commit()
+
+    def get_columns(table_name):
+        c.execute(f"PRAGMA table_info({table_name})")
+        return [row[1] for row in c.fetchall()]
+
+    def add_column_if_missing(table_name, column_name, column_def):
+        cols = get_columns(table_name)
+        if column_name not in cols:
+            c.execute(f"ALTER TABLE {table_name} ADD COLUMN {column_name} {column_def}")
+
+    # Migration-safe column additions
+    add_column_if_missing("user_stats", "total_xp", "INTEGER DEFAULT 0")
+    add_column_if_missing("user_stats", "streak_days", "INTEGER DEFAULT 0")
+    add_column_if_missing("user_stats", "last_login", "TEXT DEFAULT ''")
+    add_column_if_missing("user_stats", "total_minutes", "INTEGER DEFAULT 0")
+
+    add_column_if_missing("flashcards", "subject", "TEXT DEFAULT ''")
+    add_column_if_missing("flashcards", "chapter", "TEXT DEFAULT ''")
+    add_column_if_missing("flashcards", "ease_factor", "REAL DEFAULT 2.5")
+    add_column_if_missing("flashcards", "interval_days", "INTEGER DEFAULT 1")
+    add_column_if_missing("flashcards", "next_review_date", "TEXT")
+    add_column_if_missing("flashcards", "review_count", "INTEGER DEFAULT 0")
+    add_column_if_missing("flashcards", "created_date", "TEXT")
+
+    add_column_if_missing("study_sessions", "subject", "TEXT")
+    add_column_if_missing("study_sessions", "minutes", "INTEGER DEFAULT 0")
+    add_column_if_missing("study_sessions", "sess_date", "TEXT")
+
+    conn.commit()
+    conn.close()
 
 # ─────────────────────────────────────────────────────────────────────────────
 # STREAK + XP HELPERS  (all read/write directly from SQLite)
@@ -513,41 +552,44 @@ def _ensure_stats(username, c):
     c.execute("INSERT OR IGNORE INTO user_stats (username) VALUES (?)", (username,))
 
 def check_daily_login(username):
-    """
-    Call once per login session.
-    Returns dict with message and new streak.
-    Streak increases by 1 each calendar day the user logs in.
-    If they miss a day, streak resets to 1.
-    """
-    conn = sqlite3.connect("users.db"); c = conn.cursor()
-    _ensure_stats(username, c)
+    conn = sqlite3.connect("users.db")
+    c = conn.cursor()
+
     today = datetime.date.today().isoformat()
-    c.execute("SELECT streak_days, last_login, total_xp FROM user_stats WHERE username=?", (username,))
+    yesterday = (datetime.date.today() - datetime.timedelta(days=1)).isoformat()
+
+    c.execute(
+        "INSERT OR IGNORE INTO user_stats (username) VALUES (?)",
+        (username,)
+    )
+
+    c.execute(
+        "SELECT COALESCE(streak_days, 0), COALESCE(last_login, ''), COALESCE(total_xp, 0) "
+        "FROM user_stats WHERE username=?",
+        (username,)
+    )
     row = c.fetchone()
-    streak, last_login, xp = row if row else (0, "", 0)
+    streak_days, last_login, total_xp = row if row else (0, "", 0)
 
     if last_login == today:
         conn.close()
-        return {"message": f"✅ Already checked in today! 🔥 {streak} day streak", "streak": streak}
+        return f"🔥 {streak_days} Day Streak!"
 
-    yesterday = (datetime.date.today() - datetime.timedelta(days=1)).isoformat()
     if last_login == yesterday:
-        streak += 1
-        msg = f"🔥 Day {streak} streak! +20 XP"
-    elif last_login == "":
-        streak = 1
-        msg = "👋 Welcome! Streak started! +20 XP"
+        streak_days += 1
     else:
-        streak = 1
-        msg = "😅 Streak reset — but you're back! +20 XP"
+        streak_days = 1
 
-    xp += 20
-    c.execute(
-        "UPDATE user_stats SET streak_days=?, last_login=?, total_xp=? WHERE username=?",
-        (streak, today, xp, username)
-    )
-    conn.commit(); conn.close()
-    return {"message": msg, "streak": streak}
+    c.execute("""
+        UPDATE user_stats
+        SET streak_days=?, last_login=?, total_xp=total_xp+20
+        WHERE username=?
+    """, (streak_days, today, username))
+
+    conn.commit()
+    conn.close()
+
+    return f"🔥 Streak Updated! Day {streak_days} (+20 XP)"
 
 def award_xp(username, amount):
     conn = sqlite3.connect("users.db"); c = conn.cursor()
@@ -556,64 +598,109 @@ def award_xp(username, amount):
     conn.commit(); conn.close()
 
 def get_user_stats(username):
-    """
-    Returns: streak_days, total_xp, level, level_progress,
-             total_study_minutes, weekly_study_minutes, flashcards_due
-    """
-    conn = sqlite3.connect("users.db"); c = conn.cursor()
-    _ensure_stats(username, c)
-    conn.commit()
+    conn = sqlite3.connect("users.db")
+    c = conn.cursor()
 
-    c.execute("SELECT total_xp, streak_days, total_minutes FROM user_stats WHERE username=?", (username,))
+    # Ensure row exists
+    c.execute(
+        "INSERT OR IGNORE INTO user_stats (username) VALUES (?)",
+        (username,)
+    )
+
+    c.execute(
+        "SELECT COALESCE(total_xp, 0), COALESCE(streak_days, 0), COALESCE(total_minutes, 0) "
+        "FROM user_stats WHERE username=?",
+        (username,)
+    )
     row = c.fetchone()
-    total_xp, streak, total_min = row if row else (0, 0, 0)
+    total_xp, streak_days, total_minutes = row if row else (0, 0, 0)
 
-    level         = max(1, total_xp // 500 + 1)
-    level_progress= total_xp % 500
+    # Fallback total minutes from sessions if needed
+    if total_minutes == 0:
+        try:
+            c.execute(
+                "SELECT COALESCE(SUM(minutes), 0) FROM study_sessions WHERE username=?",
+                (username,)
+            )
+            total_minutes = c.fetchone()[0] or 0
+            c.execute(
+                "UPDATE user_stats SET total_minutes=? WHERE username=?",
+                (total_minutes, username)
+            )
+            conn.commit()
+        except sqlite3.OperationalError:
+            total_minutes = 0
 
-    # Weekly minutes — sum from study_sessions in last 7 days
-    week_ago = (datetime.date.today() - datetime.timedelta(days=7)).isoformat()
-    c.execute(
-        "SELECT COALESCE(SUM(minutes),0) FROM study_sessions WHERE username=? AND sess_date>=?",
-        (username, week_ago)
-    )
-    weekly_min = c.fetchone()[0]
+    # Weekly minutes
+    weekly_minutes = 0
+    try:
+        week_ago = (datetime.date.today() - datetime.timedelta(days=7)).isoformat()
+        c.execute(
+            "SELECT COALESCE(SUM(minutes), 0) "
+            "FROM study_sessions WHERE username=? AND sess_date>=?",
+            (username, week_ago)
+        )
+        weekly_minutes = c.fetchone()[0] or 0
+    except sqlite3.OperationalError:
+        weekly_minutes = 0
 
-    # Flashcards due today
-    today = datetime.date.today().isoformat()
-    c.execute(
-        "SELECT COUNT(*) FROM flashcards WHERE username=? AND next_review_date<=?",
-        (username, today)
-    )
-    fc_due = c.fetchone()[0]
+    # Flashcards due
+    flashcards_due = 0
+    try:
+        today = datetime.date.today().isoformat()
+        c.execute(
+            "SELECT COUNT(*) FROM flashcards WHERE username=? AND next_review_date<=?",
+            (username, today)
+        )
+        flashcards_due = c.fetchone()[0] or 0
+    except sqlite3.OperationalError:
+        flashcards_due = 0
 
     conn.close()
+
+    level = (total_xp // 500) + 1
+    level_progress = total_xp % 500
+
     return {
-        "total_xp":              total_xp,
-        "streak_days":           streak,
-        "level":                 level,
-        "level_progress":        level_progress,
-        "total_study_minutes":   total_min,
-        "weekly_study_minutes":  weekly_min,
-        "flashcards_due":        fc_due,
+        "total_xp": total_xp,
+        "streak_days": streak_days,
+        "total_minutes": total_minutes,
+        "weekly_minutes": weekly_minutes,
+        "flashcards_due": flashcards_due,
+        "level": level,
+        "level_progress": level_progress,
     }
 
 def record_study_session(username, subject, minutes):
-    """
-    Saves a study session AND updates total_minutes in user_stats.
-    """
-    conn = sqlite3.connect("users.db"); c = conn.cursor()
-    _ensure_stats(username, c)
+    conn = sqlite3.connect("users.db")
+    c = conn.cursor()
+
     today = datetime.date.today().isoformat()
-    c.execute(
-        "INSERT INTO study_sessions (username, subject, minutes, sess_date) VALUES (?,?,?,?)",
-        (username, subject, minutes, today)
-    )
-    c.execute(
-        "UPDATE user_stats SET total_minutes = total_minutes + ? WHERE username=?",
-        (minutes, username)
-    )
-    conn.commit(); conn.close()
+
+    c.execute("""
+        INSERT INTO study_sessions (username, subject, minutes, sess_date)
+        VALUES (?, ?, ?, ?)
+    """, (username, subject, minutes, today))
+
+    c.execute("""
+        INSERT OR IGNORE INTO user_stats (username)
+        VALUES (?)
+    """, (username,))
+
+    c.execute("""
+        UPDATE user_stats
+        SET total_minutes = COALESCE(total_minutes, 0) + ?
+        WHERE username=?
+    """, (minutes, username))
+
+    conn.commit()
+    conn.close()
+
+    # Optional: auto-check badges after logging study time
+    try:
+        auto_check_badges(username)
+    except Exception:
+        pass
 
 # ─────────────────────────────────────────────────────────────────────────────
 # BADGES — definition + auto-award logic
@@ -651,32 +738,28 @@ def get_earned_badges(username):
     conn.close(); return ids
 
 def auto_check_badges(username):
-    """
-    Called on every login + after every major action.
-    Automatically awards badges based on current stats.
-    """
-    stats  = get_user_stats(username)
-    earned = get_earned_badges(username)
-    conn   = sqlite3.connect("users.db"); c = conn.cursor()
+    stats = get_user_stats(username)
 
-    def maybe(badge_id, condition):
-        if condition and badge_id not in earned:
-            _award_badge_raw(username, badge_id, c)
+    conn = sqlite3.connect("users.db")
+    c = conn.cursor()
 
-    maybe("first_login",  True)
-    maybe("streak_3",     stats["streak_days"] >= 3)
-    maybe("streak_7",     stats["streak_days"] >= 7)
-    maybe("streak_14",    stats["streak_days"] >= 14)
-    maybe("streak_30",    stats["streak_days"] >= 30)
-    maybe("study_60",     stats["total_study_minutes"] >= 60)
-    maybe("study_300",    stats["total_study_minutes"] >= 300)
+    def award(badge_id):
+        c.execute("""
+            INSERT OR IGNORE INTO achievements (username, badge_id, earned_at)
+            VALUES (?, ?, ?)
+        """, (username, badge_id, datetime.datetime.now().isoformat()))
 
-    # Flashcard count
-    c.execute("SELECT COUNT(*) FROM flashcards WHERE username=?", (username,))
-    fc_total = c.fetchone()[0]
-    maybe("fc_10", fc_total >= 10)
+    if stats["streak_days"] >= 3:
+        award("strk_3")
+    if stats["streak_days"] >= 7:
+        award("strk_7")
+    if stats["total_minutes"] >= 60:
+        award("study_60")
+    if stats["total_minutes"] >= 300:
+        award("study_300")
 
-    conn.commit(); conn.close()
+    conn.commit()
+    conn.close()
 
 # ─────────────────────────────────────────────────────────────────────────────
 # SESSION STATE
