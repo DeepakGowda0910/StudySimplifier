@@ -1085,21 +1085,18 @@ def generate_pdf(title, subtitle, content):
     buffer.seek(0)
     return buffer
 # ─────────────────────────────────────────────────────────────────────────────
-# Part 3 - SESSION STATE + NAVIGATION
+# SESSION STATE + NAVIGATION
 # ─────────────────────────────────────────────────────────────────────────────
 def init_session_state():
     defaults = {
-        # auth
         "logged_in":                 False,
         "username":                  "",
         "active_page":               "dashboard",
-        # onboarding temp state
         "ob_step":                   1,
         "ob_category":               "",
         "ob_course":                 "",
         "ob_stream":                 "",
         "ob_board":                  "",
-        # generation state
         "history":                   [],
         "current_chapters":          [],
         "last_chapter_key":          "",
@@ -1121,12 +1118,14 @@ def init_session_state():
         "fullpaper_result":          None,
         "fullpaper_model":           None,
         "show_fullpaper":            False,
-        # gamification
+        # ★ NEW — full paper answers
+        "fullpaper_answers_result":  None,
+        "fullpaper_answers_model":   None,
+        "show_fullpaper_answers":    False,
         "daily_checkin_done":        False,
         "study_timer_active":        False,
         "study_timer_start":         None,
         "current_subject_for_timer": "General",
-        # flashcard review
         "review_idx":                0,
         "review_show_ans":           False,
     }
@@ -1140,16 +1139,20 @@ def go_to(page):
 
 def reset_generation_state():
     for k in [
-        "generated_result",     "generated_model",    "generated_label",
-        "generated_tool",       "generated_chapter",  "generated_subject",
-        "generated_topic",      "generated_course",   "generated_stream",
-        "generated_board",      "generated_audience", "generated_output_style",
-        "answers_result",       "answers_model",
-        "fullpaper_result",     "fullpaper_model",
+        "generated_result",          "generated_model",
+        "generated_label",           "generated_tool",
+        "generated_chapter",         "generated_subject",
+        "generated_topic",           "generated_course",
+        "generated_stream",          "generated_board",
+        "generated_audience",        "generated_output_style",
+        "answers_result",            "answers_model",
+        "fullpaper_result",          "fullpaper_model",
+        "fullpaper_answers_result",  "fullpaper_answers_model",
     ]:
         st.session_state[k] = None
-    st.session_state.show_answers   = False
-    st.session_state.show_fullpaper = False
+    st.session_state.show_answers          = False
+    st.session_state.show_fullpaper        = False
+    st.session_state.show_fullpaper_answers = False
 
 def add_to_history(tool, chapter, subject, result):
     entry = {
@@ -1211,8 +1214,7 @@ def render_step_indicator(current_step):
             with cols[col_idx]:
                 line_cls = "ob-line-done" if i < current_step else "ob-line"
                 st.markdown(
-                    f'<div class="ob-line {line_cls}"'
-                    f' style="margin-top:18px;"></div>',
+                    f'<div class="ob-line {line_cls}" style="margin-top:18px;"></div>',
                     unsafe_allow_html=True
                 )
             col_idx += 1
@@ -1222,29 +1224,25 @@ def render_step_indicator(current_step):
 # ─────────────────────────────────────────────────────────────────────────────
 def show_onboarding(username):
 
-    # ── Header ────────────────────────────────────────────────────────────
     _, hc, _ = st.columns([1, 3, 1])
     with hc:
         st.markdown("""
             <div class="sf-header" style="padding-top:24px;">
                 <div class="sf-header-title">StudySmart AI</div>
-                <div class="sf-header-subtitle">
-                    Let's personalise your experience 🎯
-                </div>
+                <div class="sf-header-subtitle">Let's personalise your experience 🎯</div>
             </div>
         """, unsafe_allow_html=True)
 
     st.markdown("<div style='height:10px'></div>", unsafe_allow_html=True)
-
     _, sc, _ = st.columns([0.5, 4, 0.5])
     with sc:
         render_step_indicator(st.session_state.ob_step)
-
     st.markdown("<div style='height:18px'></div>", unsafe_allow_html=True)
+
     _, mc, _ = st.columns([0.5, 4, 0.5])
 
     # ══════════════════════════════════════════════════════════════════════
-    # STEP 1 — CATEGORY
+    # STEP 1 — CATEGORY  (entire card is the button — no separate button)
     # ══════════════════════════════════════════════════════════════════════
     with mc:
         if st.session_state.ob_step == 1:
@@ -1254,7 +1252,7 @@ def show_onboarding(username):
                         📚 What are you studying?
                     </div>
                     <div style="font-size:.88rem;color:#64748b;margin-top:5px;">
-                        Choose the category that best describes your education level.
+                        Tap a card to select your education level.
                     </div>
                 </div>
             """, unsafe_allow_html=True)
@@ -1273,28 +1271,32 @@ def show_onboarding(username):
                     )
                     is_sel = st.session_state.ob_category == cat
                     border = "3px solid #2563eb" if is_sel else "2px solid #e2e8f0"
-                    bg     = ("linear-gradient(135deg,#eff6ff,#dbeafe)"
-                              if is_sel else "white")
+                    bg     = "linear-gradient(135deg,#eff6ff,#dbeafe)" if is_sel else "white"
+                    shadow = "0 4px 18px rgba(37,99,235,.18)" if is_sel else "0 2px 12px rgba(15,23,42,.06)"
                     with col:
+                        # ★ FIX 3: the button IS the card — no separate button below
+                        clicked = st.button(
+                            f"{meta['icon']}\n\n**{cat}**\n\n_{meta['desc']}_"
+                            + ("\n\n✓ Selected" if is_sel else ""),
+                            key=f"ob_cat_{cat}",
+                            use_container_width=True,
+                        )
+                        # Overlay a styled card on top for visual richness
                         st.markdown(f"""
                         <div style="background:{bg};border:{border};
-                            border-radius:16px;padding:20px 12px;
-                            text-align:center;
-                            box-shadow:0 2px 12px rgba(15,23,42,.06);
-                            margin-bottom:8px;">
+                            border-radius:16px;padding:18px 12px;
+                            text-align:center;margin-top:-58px;
+                            box-shadow:{shadow};
+                            pointer-events:none;">
                             <div style="font-size:2.4rem;">{meta['icon']}</div>
                             <div style="font-weight:800;font-size:.9rem;
                                 color:#0f172a;margin-top:8px;">{cat}</div>
                             <div style="font-size:.75rem;color:#64748b;
                                 margin-top:4px;">{meta['desc']}</div>
-                            {'<div style="font-size:.7rem;color:#2563eb;'
-                             'font-weight:700;margin-top:6px;">✓ Selected</div>'
-                             if is_sel else ''}
+                            {'<div style="font-size:.72rem;color:#2563eb;font-weight:700;margin-top:6px;">✓ Selected</div>' if is_sel else ''}
                         </div>
                         """, unsafe_allow_html=True)
-                        if st.button(f"Select {cat}",
-                                     key=f"ob_cat_{cat}",
-                                     use_container_width=True):
+                        if clicked:
                             st.session_state.ob_category = cat
                             st.session_state.ob_course   = ""
                             st.session_state.ob_stream   = ""
@@ -1302,7 +1304,6 @@ def show_onboarding(username):
                             st.rerun()
 
             st.markdown("<div style='height:12px'></div>", unsafe_allow_html=True)
-
             if st.session_state.ob_category:
                 meta = CATEGORY_META.get(
                     st.session_state.ob_category,
@@ -1320,15 +1321,14 @@ def show_onboarding(username):
                 </div>
                 """, unsafe_allow_html=True)
                 if st.button("Continue → Choose Course",
-                             key="ob_next_1",
-                             use_container_width=True):
+                             key="ob_next_1", use_container_width=True):
                     st.session_state.ob_step = 2
                     st.rerun()
             else:
-                st.info("👆 Please select a category to continue.")
+                st.info("👆 Tap a card above to select your category.")
 
         # ══════════════════════════════════════════════════════════════════
-        # STEP 2 — COURSE
+        # STEP 2 — COURSE  (entire card is the button)
         # ══════════════════════════════════════════════════════════════════
         elif st.session_state.ob_step == 2:
             cat     = st.session_state.ob_category
@@ -1341,43 +1341,42 @@ def show_onboarding(username):
                         {meta['icon']} Choose Your Course
                     </div>
                     <div style="font-size:.88rem;color:#64748b;margin-top:5px;">
-                        Category: <b>{cat}</b> — Select the specific course
-                        or class you're enrolled in.
+                        Category: <b>{cat}</b> — Tap a card to select your course.
                     </div>
                 </div>
             """, unsafe_allow_html=True)
 
             if not courses:
-                st.warning(
-                    "⚠️ No courses found for this category in study_data.json"
-                )
+                st.warning("⚠️ No courses found for this category.")
             else:
                 for row_start in range(0, len(courses), 3):
                     row_courses = courses[row_start: row_start + 3]
                     cols        = st.columns(len(row_courses))
                     for col, course in zip(cols, row_courses):
                         is_sel = st.session_state.ob_course == course
-                        border = ("3px solid #2563eb" if is_sel
-                                  else "2px solid #e2e8f0")
-                        bg     = ("linear-gradient(135deg,#eff6ff,#dbeafe)"
-                                  if is_sel else "white")
+                        border = "3px solid #2563eb" if is_sel else "2px solid #e2e8f0"
+                        bg     = "linear-gradient(135deg,#eff6ff,#dbeafe)" if is_sel else "white"
+                        shadow = "0 4px 18px rgba(37,99,235,.18)" if is_sel else "0 2px 10px rgba(15,23,42,.05)"
                         with col:
+                            # ★ FIX 3: card IS the button
+                            clicked = st.button(
+                                f"📖\n\n**{course}**"
+                                + ("\n\n✓ Selected" if is_sel else ""),
+                                key=f"ob_course_{course}",
+                                use_container_width=True,
+                            )
                             st.markdown(f"""
                             <div style="background:{bg};border:{border};
                                 border-radius:14px;padding:16px 10px;
-                                text-align:center;margin-bottom:8px;
-                                box-shadow:0 2px 10px rgba(15,23,42,.05);">
+                                text-align:center;margin-top:-58px;
+                                box-shadow:{shadow};pointer-events:none;">
                                 <div style="font-size:1.6rem;">📖</div>
                                 <div style="font-weight:700;font-size:.85rem;
                                     color:#0f172a;margin-top:6px;">{course}</div>
-                                {'<div style="font-size:.68rem;color:#2563eb;'
-                                 'font-weight:700;margin-top:4px;">✓ Selected</div>'
-                                 if is_sel else ''}
+                                {'<div style="font-size:.68rem;color:#2563eb;font-weight:700;margin-top:4px;">✓ Selected</div>' if is_sel else ''}
                             </div>
                             """, unsafe_allow_html=True)
-                            if st.button("Select",
-                                         key=f"ob_course_{course}",
-                                         use_container_width=True):
+                            if clicked:
                                 st.session_state.ob_course = course
                                 st.session_state.ob_stream = ""
                                 st.session_state.ob_board  = ""
@@ -1386,27 +1385,31 @@ def show_onboarding(username):
             st.markdown("<div style='height:12px'></div>", unsafe_allow_html=True)
             col_back, col_next = st.columns(2)
             with col_back:
-                if st.button("← Back", key="ob_back_2",
-                             use_container_width=True):
+                if st.button("← Back", key="ob_back_2", use_container_width=True):
                     st.session_state.ob_step = 1
                     st.rerun()
             with col_next:
                 if st.session_state.ob_course:
                     if st.button("Continue → Stream & Board",
-                                 key="ob_next_2",
-                                 use_container_width=True):
+                                 key="ob_next_2", use_container_width=True):
                         st.session_state.ob_step = 3
                         st.rerun()
                 else:
-                    st.info("👆 Select a course to continue.")
+                    st.info("👆 Tap a course card to continue.")
 
         # ══════════════════════════════════════════════════════════════════
-        # STEP 3 — STREAM + BOARD
+        # STEP 3 — STREAM + BOARD  (cards are buttons)
         # ══════════════════════════════════════════════════════════════════
         elif st.session_state.ob_step == 3:
             cat     = st.session_state.ob_category
             course  = st.session_state.ob_course
             streams = get_streams(cat, course)
+
+            stream_icons = {
+                "Science": "🔬", "Commerce": "💹", "Arts": "🎨",
+                "Humanities": "📜", "Engineering": "⚙️", "Medical": "🏥",
+                "General": "📚", "Mathematics": "📐", "Biology": "🧬",
+            }
 
             st.markdown(f"""
                 <div style="text-align:center;margin-bottom:18px;">
@@ -1414,19 +1417,10 @@ def show_onboarding(username):
                         🔀 Choose Your Stream
                     </div>
                     <div style="font-size:.88rem;color:#64748b;margin-top:5px;">
-                        Course: <b>{course}</b> — Pick your stream
-                        or specialisation.
+                        Course: <b>{course}</b> — Tap a card to select your stream.
                     </div>
                 </div>
             """, unsafe_allow_html=True)
-
-            stream_icons = {
-                "Science":     "🔬", "Commerce":    "💹",
-                "Arts":        "🎨", "Humanities":  "📜",
-                "Engineering": "⚙️", "Medical":     "🏥",
-                "General":     "📚", "Mathematics": "📐",
-                "Biology":     "🧬",
-            }
 
             if not streams:
                 st.warning("⚠️ No streams found for this course.")
@@ -1436,36 +1430,37 @@ def show_onboarding(username):
                     cols        = st.columns(len(row_streams))
                     for col, stream in zip(cols, row_streams):
                         is_sel = st.session_state.ob_stream == stream
-                        border = ("3px solid #2563eb" if is_sel
-                                  else "2px solid #e2e8f0")
-                        bg     = ("linear-gradient(135deg,#eff6ff,#dbeafe)"
-                                  if is_sel else "white")
+                        border = "3px solid #2563eb" if is_sel else "2px solid #e2e8f0"
+                        bg     = "linear-gradient(135deg,#eff6ff,#dbeafe)" if is_sel else "white"
+                        shadow = "0 4px 18px rgba(37,99,235,.18)" if is_sel else "0 2px 10px rgba(15,23,42,.05)"
                         icon   = stream_icons.get(stream, "📂")
                         with col:
+                            # ★ FIX 3: card IS the button
+                            clicked = st.button(
+                                f"{icon}\n\n**{stream}**"
+                                + ("\n\n✓ Selected" if is_sel else ""),
+                                key=f"ob_stream_{stream}",
+                                use_container_width=True,
+                            )
                             st.markdown(f"""
                             <div style="background:{bg};border:{border};
                                 border-radius:14px;padding:16px 10px;
-                                text-align:center;margin-bottom:8px;
-                                box-shadow:0 2px 10px rgba(15,23,42,.05);">
+                                text-align:center;margin-top:-58px;
+                                box-shadow:{shadow};pointer-events:none;">
                                 <div style="font-size:1.8rem;">{icon}</div>
                                 <div style="font-weight:700;font-size:.88rem;
                                     color:#0f172a;margin-top:7px;">{stream}</div>
-                                {'<div style="font-size:.68rem;color:#2563eb;'
-                                 'font-weight:700;margin-top:4px;">✓ Selected</div>'
-                                 if is_sel else ''}
+                                {'<div style="font-size:.68rem;color:#2563eb;font-weight:700;margin-top:4px;">✓ Selected</div>' if is_sel else ''}
                             </div>
                             """, unsafe_allow_html=True)
-                            if st.button("Select",
-                                         key=f"ob_stream_{stream}",
-                                         use_container_width=True):
+                            if clicked:
                                 st.session_state.ob_stream = stream
                                 st.session_state.ob_board  = ""
                                 st.rerun()
 
-            # Board selector (only K-12th)
+            # Board selector
             if st.session_state.ob_stream:
-                st.markdown("<div style='height:10px'></div>",
-                            unsafe_allow_html=True)
+                st.markdown("<div style='height:10px'></div>", unsafe_allow_html=True)
                 if cat == "K-12th":
                     st.markdown("""
                         <div style="font-weight:700;font-size:.95rem;
@@ -1476,24 +1471,14 @@ def show_onboarding(username):
                     board_cols = st.columns(len(BOARDS))
                     for bcol, board in zip(board_cols, BOARDS):
                         is_sel = st.session_state.ob_board == board
-                        border = ("3px solid #2563eb" if is_sel
-                                  else "2px solid #e2e8f0")
-                        bg     = ("linear-gradient(135deg,#eff6ff,#dbeafe)"
-                                  if is_sel else "white")
+                        border = "3px solid #2563eb" if is_sel else "2px solid #e2e8f0"
+                        bg     = "linear-gradient(135deg,#eff6ff,#dbeafe)" if is_sel else "white"
                         with bcol:
-                            st.markdown(f"""
-                            <div style="background:{bg};border:{border};
-                                border-radius:12px;padding:10px 6px;
-                                text-align:center;margin-bottom:6px;
-                                font-size:.82rem;font-weight:700;color:#0f172a;">
-                                {board}
-                                {'<br><span style="font-size:.65rem;'
-                                 'color:#2563eb;">✓</span>' if is_sel else ''}
-                            </div>
-                            """, unsafe_allow_html=True)
-                            if st.button(board,
-                                         key=f"ob_board_{board}",
-                                         use_container_width=True):
+                            if st.button(
+                                board + (" ✓" if is_sel else ""),
+                                key=f"ob_board_{board}",
+                                use_container_width=True
+                            ):
                                 st.session_state.ob_board = board
                                 st.rerun()
                 else:
@@ -1503,28 +1488,22 @@ def show_onboarding(username):
             st.markdown("<div style='height:12px'></div>", unsafe_allow_html=True)
             col_back, col_next = st.columns(2)
             with col_back:
-                if st.button("← Back", key="ob_back_3",
-                             use_container_width=True):
+                if st.button("← Back", key="ob_back_3", use_container_width=True):
                     st.session_state.ob_step = 2
                     st.rerun()
             with col_next:
                 stream_ok = bool(st.session_state.ob_stream)
-                board_ok  = (
-                    bool(st.session_state.ob_board)
-                    if cat == "K-12th" else True
-                )
+                board_ok  = (bool(st.session_state.ob_board)
+                             if cat == "K-12th" else True)
                 if stream_ok and board_ok:
                     if st.button("Continue → Confirm Profile",
-                                 key="ob_next_3",
-                                 use_container_width=True):
+                                 key="ob_next_3", use_container_width=True):
                         st.session_state.ob_step = 4
                         st.rerun()
                 else:
-                    st.info(
-                        "👆 Select your stream"
-                        + (" and board" if cat == "K-12th" else "")
-                        + " to continue."
-                    )
+                    st.info("👆 Select your stream"
+                            + (" and board" if cat == "K-12th" else "")
+                            + " to continue.")
 
         # ══════════════════════════════════════════════════════════════════
         # STEP 4 — CONFIRM & SAVE
@@ -1557,51 +1536,22 @@ def show_onboarding(username):
                 </div>
                 <table style="width:100%;border-collapse:collapse;">
                     <tr>
-                        <td style="padding:8px 12px;font-weight:600;
-                            color:#475569;font-size:.85rem;width:40%;">
-                            📚 Category
-                        </td>
-                        <td style="padding:8px 12px;font-weight:800;
-                            color:#1d4ed8;font-size:.9rem;">{cat}</td>
+                        <td style="padding:8px 12px;font-weight:600;color:#475569;font-size:.85rem;width:40%;">📚 Category</td>
+                        <td style="padding:8px 12px;font-weight:800;color:#1d4ed8;font-size:.9rem;">{cat}</td>
                     </tr>
                     <tr style="background:rgba(255,255,255,0.5);">
-                        <td style="padding:8px 12px;font-weight:600;
-                            color:#475569;font-size:.85rem;">
-                            🎓 Course
-                        </td>
-                        <td style="padding:8px 12px;font-weight:800;
-                            color:#1d4ed8;font-size:.9rem;">{course}</td>
+                        <td style="padding:8px 12px;font-weight:600;color:#475569;font-size:.85rem;">🎓 Course</td>
+                        <td style="padding:8px 12px;font-weight:800;color:#1d4ed8;font-size:.9rem;">{course}</td>
                     </tr>
                     <tr>
-                        <td style="padding:8px 12px;font-weight:600;
-                            color:#475569;font-size:.85rem;">
-                            🔀 Stream
-                        </td>
-                        <td style="padding:8px 12px;font-weight:800;
-                            color:#1d4ed8;font-size:.9rem;">{stream}</td>
+                        <td style="padding:8px 12px;font-weight:600;color:#475569;font-size:.85rem;">🔀 Stream</td>
+                        <td style="padding:8px 12px;font-weight:800;color:#1d4ed8;font-size:.9rem;">{stream}</td>
                     </tr>
                     <tr style="background:rgba(255,255,255,0.5);">
-                        <td style="padding:8px 12px;font-weight:600;
-                            color:#475569;font-size:.85rem;">
-                            🏫 Board / Syllabus
-                        </td>
-                        <td style="padding:8px 12px;font-weight:800;
-                            color:#1d4ed8;font-size:.9rem;">{board}</td>
+                        <td style="padding:8px 12px;font-weight:600;color:#475569;font-size:.85rem;">🏫 Board / Syllabus</td>
+                        <td style="padding:8px 12px;font-weight:800;color:#1d4ed8;font-size:.9rem;">{board}</td>
                     </tr>
                 </table>
-            </div>
-            """, unsafe_allow_html=True)
-
-            st.markdown("""
-            <div style="background:linear-gradient(135deg,#fefce8,#fef9c3);
-                border:1.5px solid #fde68a;border-radius:14px;
-                padding:12px 16px;margin-bottom:14px;text-align:center;">
-                <span style="font-size:1.1rem;">💡</span>
-                <span style="font-weight:700;color:#92400e;
-                    font-size:.85rem;margin-left:6px;">
-                    You can switch your category/board from the
-                    Dashboard at any time during testing.
-                </span>
             </div>
             """, unsafe_allow_html=True)
 
@@ -1613,12 +1563,10 @@ def show_onboarding(username):
                     st.rerun()
             with col_confirm:
                 if st.button("🚀 Launch My Dashboard",
-                             key="ob_confirm",
-                             use_container_width=True):
+                             key="ob_confirm", use_container_width=True):
                     save_user_profile(username, cat, course, stream, board)
                     award_badge(username, "onboarded")
                     award_xp(username, 50)
-                    # reset ob state
                     st.session_state.ob_step     = 1
                     st.session_state.ob_category = ""
                     st.session_state.ob_course   = ""
@@ -1636,7 +1584,6 @@ def render_sidebar(username):
     profile = get_user_profile(username) or {}
 
     with st.sidebar:
-        # ── Profile Badge ─────────────────────────────────────────────────
         cat  = profile.get("category", "—")
         crs  = profile.get("course",   "—")
         strm = profile.get("stream",   "—")
@@ -1646,12 +1593,8 @@ def render_sidebar(username):
         st.markdown(f"""
             <div class="profile-badge">
                 <div style="font-size:1.8rem;">{meta['icon']}</div>
-                <div style="font-size:1rem;font-weight:800;margin-top:4px;">
-                    StudySmart AI
-                </div>
-                <div style="font-size:.75rem;margin-top:2px;opacity:.9;">
-                    Hi, {username} 👋
-                </div>
+                <div style="font-size:1rem;font-weight:800;margin-top:4px;">StudySmart AI</div>
+                <div style="font-size:.75rem;margin-top:2px;opacity:.9;">Hi, {username} 👋</div>
                 <div style="margin-top:8px;background:rgba(255,255,255,.15);
                     border-radius:10px;padding:7px 10px;
                     font-size:.73rem;line-height:1.7;">
@@ -1660,7 +1603,6 @@ def render_sidebar(username):
             </div>
         """, unsafe_allow_html=True)
 
-        # ── XP + Streak ───────────────────────────────────────────────────
         c1, c2 = st.columns(2)
         with c1:
             st.markdown(f"""
@@ -1683,7 +1625,6 @@ def render_sidebar(username):
 
         st.markdown("<div style='height:8px'></div>", unsafe_allow_html=True)
 
-        # ── Daily Check-in ────────────────────────────────────────────────
         if not st.session_state.daily_checkin_done:
             if st.button("✅ Daily Check-in (+20 XP)",
                          use_container_width=True, key="sb_checkin"):
@@ -1693,30 +1634,21 @@ def render_sidebar(username):
                 st.success(result.get("message", "Checked in!"))
                 st.rerun()
         else:
-            st.success(
-                f"✅ Checked in · 🔥 {stats.get('streak_days', 0)} days"
-            )
+            st.success(f"✅ Checked in · 🔥 {stats.get('streak_days', 0)} days")
 
         st.divider()
 
-        # ── Study Timer ───────────────────────────────────────────────────
         st.markdown("**⏱️ Study Timer**")
         if st.session_state.study_timer_active and st.session_state.study_timer_start:
             elapsed = int(
                 (datetime.datetime.now() - st.session_state.study_timer_start)
                 .total_seconds() // 60
             )
-            st.info(
-                f"🟢 Running: {elapsed} min — "
-                f"{st.session_state.current_subject_for_timer}"
-            )
-            if st.button("⏹️ Stop & Save",
-                         use_container_width=True, key="sb_stop"):
+            st.info(f"🟢 Running: {elapsed} min — {st.session_state.current_subject_for_timer}")
+            if st.button("⏹️ Stop & Save", use_container_width=True, key="sb_stop"):
                 st.session_state.study_timer_active = False
                 dur  = max(1, elapsed)
-                subj = st.session_state.get(
-                    "current_subject_for_timer", "General"
-                )
+                subj = st.session_state.get("current_subject_for_timer", "General")
                 record_study_session(username, subj, dur)
                 xp_earned = max(5, (dur // 10) * 10)
                 award_xp(username, xp_earned)
@@ -1725,15 +1657,13 @@ def render_sidebar(username):
                 st.success(f"✅ {dur} min saved! +{xp_earned} XP")
                 st.rerun()
         else:
-            if st.button("▶️ Start Timer",
-                         use_container_width=True, key="sb_start"):
+            if st.button("▶️ Start Timer", use_container_width=True, key="sb_start"):
                 st.session_state.study_timer_active = True
                 st.session_state.study_timer_start  = datetime.datetime.now()
                 st.rerun()
 
         st.divider()
 
-        # ── Navigation ────────────────────────────────────────────────────
         st.markdown("**🧭 Navigate**")
         cur = st.session_state.active_page
         for key, label in [
@@ -1751,13 +1681,11 @@ def render_sidebar(username):
         fc_due = stats.get("flashcards_due", 0)
         if fc_due > 0:
             st.markdown("<div style='height:4px'></div>", unsafe_allow_html=True)
-            st.warning(
-                f"📚 {fc_due} card{'s' if fc_due > 1 else ''} due for review!"
-            )
+            st.warning(f"📚 {fc_due} card{'s' if fc_due > 1 else ''} due for review!")
 
         st.divider()
 
-        # ── Settings & Testing ────────────────────────────────────────────
+        # ★ FIX 2: no arrow/banner conflict — clean section label only
         st.markdown("**⚙️ Settings & Testing**")
         if st.button(
             "🔄 Switch Category / Profile",
@@ -1770,7 +1698,6 @@ def render_sidebar(username):
             time.sleep(0.6)
             st.rerun()
 
-        # ── Recent Activity ───────────────────────────────────────────────
         st.divider()
         with st.expander("📜 Recent History"):
             if not st.session_state.history:
@@ -1783,18 +1710,15 @@ def render_sidebar(username):
                         <small>{h['preview']}</small>
                     </div>""", unsafe_allow_html=True)
 
-        # ── AI Status ─────────────────────────────────────────────────────
         with st.expander("🤖 AI Status"):
-            if st.button("Check Models",
-                         use_container_width=True, key="sb_models"):
+            if st.button("Check Models", use_container_width=True, key="sb_models"):
                 with st.spinner("Checking..."):
                     mdls = get_available_models()
                 for m in mdls:
                     st.write(f"✅ {m}")
 
         st.divider()
-        if st.button("🚪 Logout",
-                     use_container_width=True, key="sb_logout"):
+        if st.button("🚪 Logout", use_container_width=True, key="sb_logout"):
             for k in list(st.session_state.keys()):
                 del st.session_state[k]
             st.rerun()
@@ -1810,12 +1734,11 @@ def show_dashboard(username):
     board   = profile.get("board",    "")
     meta    = CATEGORY_META.get(cat, {"icon": "🎓", "color": "#3b82f6"})
 
-    render_header(
-        "StudySmart",
-        f"{meta['icon']} {course} · {stream} · {board}"
-    )
+    # ★ FIX 2: NO render_back_button() here — dashboard is the home page.
+    # The Testing Tools expander sits cleanly below the hero with no arrow overlap.
+    render_header("StudySmart", f"{meta['icon']} {course} · {stream} · {board}")
 
-    # ── 🧪 TESTING MODE: CATEGORY SWITCHER ───────────────────────────────
+    # ── 🧪 TESTING TOOLS — clean expander, no banner conflict ─────────────
     with st.expander("🛠️ Testing Tools — Switch Category / Board", expanded=False):
         st.markdown(f"""
         <div style="background:linear-gradient(135deg,#fefce8,#fef9c3);
@@ -1823,20 +1746,16 @@ def show_dashboard(username):
             padding:12px 16px;margin-bottom:10px;">
             <b style="color:#92400e;">🧪 Testing Mode Active</b><br>
             <span style="font-size:.83rem;color:#78350f;">
-                Current profile: <b>{cat}</b> → <b>{course}</b>
+                Current: <b>{cat}</b> → <b>{course}</b>
                 → <b>{stream}</b> → <b>{board}</b><br>
-                Click the button below to reset your profile and
-                pick a different category, class, or board instantly.
-                Your XP, streaks, and flashcards will be preserved.
+                Click below to reset your profile and pick a different
+                category, class, or board. XP and streaks are preserved.
             </span>
         </div>
         """, unsafe_allow_html=True)
-        if st.button(
-            "🔄 Reset Profile & Switch Category",
-            use_container_width=True,
-            type="primary",
-            key="dash_switch_cat"
-        ):
+        if st.button("🔄 Reset Profile & Switch Category",
+                     use_container_width=True, type="primary",
+                     key="dash_switch_cat"):
             reset_profile(username)
             st.toast("Profile reset! Loading onboarding...", icon="🔄")
             time.sleep(0.8)
@@ -1847,17 +1766,15 @@ def show_dashboard(username):
     # ── Metric Cards ──────────────────────────────────────────────────────
     c1, c2, c3, c4 = st.columns(4)
     for col, cls, icon, val, lbl in [
-        (c1, "mc-blue",   "🔥", stats.get("streak_days", 0),                "Day Streak"),
-        (c2, "mc-green",  "⭐", f"Level {stats.get('level', 1)}",            "Your Level"),
-        (c3, "mc-purple", "📚", stats.get("flashcards_due", 0),              "Cards Due"),
+        (c1, "mc-blue",   "🔥", stats.get("streak_days", 0),                 "Day Streak"),
+        (c2, "mc-green",  "⭐", f"Level {stats.get('level', 1)}",             "Your Level"),
+        (c3, "mc-purple", "📚", stats.get("flashcards_due", 0),               "Cards Due"),
         (c4, "mc-amber",  "⏱️", f"{stats.get('weekly_study_minutes', 0)} min","This Week"),
     ]:
         with col:
             st.markdown(
-                f'<div class="mc {cls}">'
-                f'<div class="icon">{icon}</div>'
-                f'<div class="val">{val}</div>'
-                f'<div class="lbl">{lbl}</div></div>',
+                f'<div class="mc {cls}"><div class="icon">{icon}</div>'
+                f'<div class="val">{val}</div><div class="lbl">{lbl}</div></div>',
                 unsafe_allow_html=True
             )
 
@@ -1874,59 +1791,39 @@ def show_dashboard(username):
         <span>⭐ Level {lvl}</span>
         <span>{total_xp} XP &nbsp;·&nbsp; {500 - lp} XP to next level</span>
     </div>
-    <div class="xp-wrap">
-        <div class="xp-fill" style="width:{pct}%;"></div>
-    </div>
+    <div class="xp-wrap"><div class="xp-fill" style="width:{pct}%;"></div></div>
     """, unsafe_allow_html=True)
     st.markdown('</div>', unsafe_allow_html=True)
 
     left, right = st.columns([1.1, 1])
 
     with left:
-        # ── Profile Summary ───────────────────────────────────────────────
         st.markdown('<div class="sf-card">', unsafe_allow_html=True)
         st.markdown("**🎯 Your Profile**")
         st.markdown(f"""
         <div class="sf-soft-card">
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
                 <div>
-                    <div style="font-size:.7rem;color:#64748b;font-weight:600;">
-                        CATEGORY
-                    </div>
-                    <div style="font-weight:700;font-size:.88rem;">
-                        {meta['icon']} {cat}
-                    </div>
+                    <div style="font-size:.7rem;color:#64748b;font-weight:600;">CATEGORY</div>
+                    <div style="font-weight:700;font-size:.88rem;">{meta['icon']} {cat}</div>
                 </div>
                 <div>
-                    <div style="font-size:.7rem;color:#64748b;font-weight:600;">
-                        COURSE
-                    </div>
-                    <div style="font-weight:700;font-size:.88rem;">
-                        📖 {course}
-                    </div>
+                    <div style="font-size:.7rem;color:#64748b;font-weight:600;">COURSE</div>
+                    <div style="font-weight:700;font-size:.88rem;">📖 {course}</div>
                 </div>
                 <div>
-                    <div style="font-size:.7rem;color:#64748b;font-weight:600;">
-                        STREAM
-                    </div>
-                    <div style="font-weight:700;font-size:.88rem;">
-                        🔀 {stream}
-                    </div>
+                    <div style="font-size:.7rem;color:#64748b;font-weight:600;">STREAM</div>
+                    <div style="font-weight:700;font-size:.88rem;">🔀 {stream}</div>
                 </div>
                 <div>
-                    <div style="font-size:.7rem;color:#64748b;font-weight:600;">
-                        BOARD
-                    </div>
-                    <div style="font-weight:700;font-size:.88rem;">
-                        🏫 {board}
-                    </div>
+                    <div style="font-size:.7rem;color:#64748b;font-weight:600;">BOARD</div>
+                    <div style="font-weight:700;font-size:.88rem;">🏫 {board}</div>
                 </div>
             </div>
         </div>
         """, unsafe_allow_html=True)
         st.markdown('</div>', unsafe_allow_html=True)
 
-        # ── Study Momentum ────────────────────────────────────────────────
         st.markdown('<div class="sf-card">', unsafe_allow_html=True)
         st.markdown("**🌱 Study Momentum**")
         mins   = stats.get("total_study_minutes", 0)
@@ -1942,28 +1839,21 @@ def show_dashboard(username):
         <div class="sf-soft-card" style="text-align:center;margin-bottom:10px;">
             <div style="font-size:2.6rem;">{plant[0]}</div>
             <div style="font-weight:800;font-size:.93rem;">{plant[1]}</div>
-            <div style="font-size:.8rem;margin-top:3px;">
-                {mins} min total studied
-            </div>
+            <div style="font-size:.8rem;margin-top:3px;">{mins} min total studied</div>
         </div>""", unsafe_allow_html=True)
         st.markdown('</div>', unsafe_allow_html=True)
 
-        # ── Quick Actions ─────────────────────────────────────────────────
         st.markdown('<div class="sf-card">', unsafe_allow_html=True)
         st.markdown("**⚡ Quick Actions**")
-        if st.button("📚 Open Study Tools",
-                     use_container_width=True, key="d_study"):
+        if st.button("📚 Open Study Tools",  use_container_width=True, key="d_study"):
             go_to("study")
-        if st.button("🗂️ Review Flashcards",
-                     use_container_width=True, key="d_fc"):
+        if st.button("🗂️ Review Flashcards", use_container_width=True, key="d_fc"):
             go_to("flashcards")
-        if st.button("🏅 View Achievements",
-                     use_container_width=True, key="d_ach"):
+        if st.button("🏅 View Achievements", use_container_width=True, key="d_ach"):
             go_to("achievements")
         st.markdown('</div>', unsafe_allow_html=True)
 
     with right:
-        # ── Recent Activity ───────────────────────────────────────────────
         st.markdown('<div class="sf-card">', unsafe_allow_html=True)
         st.markdown("**📜 Recent Activity**")
         if not st.session_state.history:
@@ -1977,7 +1867,6 @@ def show_dashboard(username):
                 </div>""", unsafe_allow_html=True)
         st.markdown('</div>', unsafe_allow_html=True)
 
-        # ── Badge Snapshot ────────────────────────────────────────────────
         st.markdown('<div class="sf-card">', unsafe_allow_html=True)
         st.markdown("**🏅 Badge Snapshot**")
         earned      = get_earned_badges(username)
@@ -2008,12 +1897,9 @@ def show_achievements(username):
     earned_list = [b for b in ALL_BADGES if b["id"] in earned]
     locked_list = [b for b in ALL_BADGES if b["id"] not in earned]
 
-    # ── Summary ───────────────────────────────────────────────────────────
     st.markdown('<div class="sf-card">', unsafe_allow_html=True)
     st.markdown(f"**✅ {len(earned_list)} / {len(ALL_BADGES)} badges earned**")
-    st.progress(
-        len(earned_list) / len(ALL_BADGES) if ALL_BADGES else 0
-    )
+    st.progress(len(earned_list) / len(ALL_BADGES) if ALL_BADGES else 0)
     st.markdown("""
     <div style="font-size:.82rem;color:#475569;margin-top:8px;">
         🔥 Streaks — log in every day &nbsp;|&nbsp;
@@ -2025,7 +1911,6 @@ def show_achievements(username):
     """, unsafe_allow_html=True)
     st.markdown('</div>', unsafe_allow_html=True)
 
-    # ── Earned ────────────────────────────────────────────────────────────
     if earned_list:
         st.markdown("## ✅ Earned Badges")
         cols = st.columns(min(4, len(earned_list)))
@@ -2039,22 +1924,21 @@ def show_achievements(username):
     else:
         st.info("No badges yet — start studying to earn them!")
 
-    # ── Locked ────────────────────────────────────────────────────────────
     if locked_list:
         st.markdown("---")
         st.markdown("## 🔒 Locked Badges")
         hints = {
-            "streak_3":     "Log in 3 days in a row",
-            "streak_7":     "Log in 7 days in a row",
-            "streak_14":    "Log in 14 days in a row",
-            "streak_30":    "Log in 30 days in a row",
-            "first_gen":    "Generate any AI content",
+            "streak_3": "Log in 3 days in a row",
+            "streak_7": "Log in 7 days in a row",
+            "streak_14": "Log in 14 days in a row",
+            "streak_30": "Log in 30 days in a row",
+            "first_gen": "Generate any AI content",
             "qp_generated": "Generate a Question Paper",
-            "quiz_done":    "Generate a Quiz",
-            "fc_10":        "Create 10 flashcards",
-            "study_60":     "Study 60 min total",
-            "study_300":    "Study 300 min total",
-            "onboarded":    "Complete personalised onboarding",
+            "quiz_done": "Generate a Quiz",
+            "fc_10": "Create 10 flashcards",
+            "study_60": "Study 60 min total",
+            "study_300": "Study 300 min total",
+            "onboarded": "Complete personalised onboarding",
         }
         cols = st.columns(min(4, len(locked_list)))
         for i, b in enumerate(locked_list):
@@ -2065,49 +1949,33 @@ def show_achievements(username):
                     <div class="bs">{hints.get(b['id'], b['desc'])}</div>
                 </div>""", unsafe_allow_html=True)
 
-    # ── Progress Nudges ───────────────────────────────────────────────────
     streak    = stats.get("streak_days", 0)
     total_min = stats.get("total_study_minutes", 0)
-    st.markdown('<div class="sf-card" style="margin-top:14px;">',
-                unsafe_allow_html=True)
+    st.markdown('<div class="sf-card" style="margin-top:14px;">', unsafe_allow_html=True)
     st.markdown("**📈 Progress Towards Next Badge**")
     shown = False
     for b in locked_list:
         bid = b["id"]
-        if bid == "streak_3" and streak < 3:
-            st.caption(f"🔥 Streak: {streak}/3 days")
-            st.progress(streak / 3); shown = True
-        elif bid == "streak_7" and streak < 7:
-            st.caption(f"🔥 Streak: {streak}/7 days")
-            st.progress(streak / 7); shown = True
+        if   bid == "streak_3"  and streak < 3:
+            st.caption(f"🔥 Streak: {streak}/3 days");   st.progress(streak / 3);    shown = True
+        elif bid == "streak_7"  and streak < 7:
+            st.caption(f"🔥 Streak: {streak}/7 days");   st.progress(streak / 7);    shown = True
         elif bid == "streak_14" and streak < 14:
-            st.caption(f"🔥 Streak: {streak}/14 days")
-            st.progress(streak / 14); shown = True
+            st.caption(f"🔥 Streak: {streak}/14 days");  st.progress(streak / 14);   shown = True
         elif bid == "streak_30" and streak < 30:
-            st.caption(f"🔥 Streak: {streak}/30 days")
-            st.progress(streak / 30); shown = True
-        elif bid == "study_60" and total_min < 60:
-            st.caption(f"⏱️ Study: {total_min}/60 min")
-            st.progress(total_min / 60); shown = True
+            st.caption(f"🔥 Streak: {streak}/30 days");  st.progress(streak / 30);   shown = True
+        elif bid == "study_60"  and total_min < 60:
+            st.caption(f"⏱️ Study: {total_min}/60 min"); st.progress(total_min / 60); shown = True
         elif bid == "study_300" and total_min < 300:
-            st.caption(f"⏱️ Study: {total_min}/300 min")
-            st.progress(total_min / 300); shown = True
+            st.caption(f"⏱️ Study: {total_min}/300 min");st.progress(total_min/300);  shown = True
         elif bid == "fc_10":
-            conn = sqlite3.connect("users.db")
-            cc   = conn.cursor()
-            cc.execute(
-                "SELECT COUNT(*) FROM flashcards WHERE username=?",
-                (username,)
-            )
-            fc = cc.fetchone()[0]
-            conn.close()
+            conn = sqlite3.connect("users.db"); cc = conn.cursor()
+            cc.execute("SELECT COUNT(*) FROM flashcards WHERE username=?", (username,))
+            fc = cc.fetchone()[0]; conn.close()
             if fc < 10:
-                st.caption(f"🗂️ Flashcards: {fc}/10")
-                st.progress(fc / 10); shown = True
+                st.caption(f"🗂️ Flashcards: {fc}/10");  st.progress(fc / 10);        shown = True
     if not shown:
-        st.success(
-            "🎉 Great work — keep studying to unlock more badges!"
-        )
+        st.success("🎉 Great work — keep studying to unlock more badges!")
     st.markdown('</div>', unsafe_allow_html=True)
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -2688,7 +2556,7 @@ def show_study_tools(username):
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# AUTH UI  — Login + Registration
+# AUTH UI
 # ─────────────────────────────────────────────────────────────────────────────
 def auth_ui():
     _, col_c, _ = st.columns([1, 2, 1])
@@ -2696,170 +2564,111 @@ def auth_ui():
         st.markdown("""
             <div class="sf-header">
                 <div class="sf-header-title">StudySmart</div>
-                <div class="sf-header-subtitle">
-                    Your Personalised AI Exam Preparation Platform
-                </div>
+                <div class="sf-header-subtitle">Your Smart Exam Preparation Platform</div>
             </div>
             <div class="sf-watermark">POWERED BY AI</div>
-        """, unsafe_allow_html=True)
-
-        # ── Feature highlights ─────────────────────────────────────────────
-        st.markdown("""
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;
-            gap:10px;margin-bottom:18px;">
-            <div style="background:white;border-radius:14px;padding:14px 10px;
-                text-align:center;border:1.5px solid #e2e8f0;
-                box-shadow:0 2px 10px rgba(15,23,42,.05);">
-                <div style="font-size:1.6rem;">🎯</div>
-                <div style="font-weight:700;font-size:.8rem;
-                    color:#0f172a;margin-top:5px;">Personalised</div>
-                <div style="font-size:.72rem;color:#64748b;margin-top:2px;">
-                    Content matched to your class
-                </div>
-            </div>
-            <div style="background:white;border-radius:14px;padding:14px 10px;
-                text-align:center;border:1.5px solid #e2e8f0;
-                box-shadow:0 2px 10px rgba(15,23,42,.05);">
-                <div style="font-size:1.6rem;">🤖</div>
-                <div style="font-weight:700;font-size:.8rem;
-                    color:#0f172a;margin-top:5px;">AI Powered</div>
-                <div style="font-size:.72rem;color:#64748b;margin-top:2px;">
-                    Gemini AI for smart study
-                </div>
-            </div>
-            <div style="background:white;border-radius:14px;padding:14px 10px;
-                text-align:center;border:1.5px solid #e2e8f0;
-                box-shadow:0 2px 10px rgba(15,23,42,.05);">
-                <div style="font-size:1.6rem;">🏆</div>
-                <div style="font-weight:700;font-size:.8rem;
-                    color:#0f172a;margin-top:5px;">Gamified</div>
-                <div style="font-size:.72rem;color:#64748b;margin-top:2px;">
-                    XP, badges & streaks
-                </div>
-            </div>
-        </div>
         """, unsafe_allow_html=True)
 
         st.markdown('<div class="sf-card">', unsafe_allow_html=True)
         tab1, tab2 = st.tabs(["🔐 Login", "📝 Register"])
 
-        # ── LOGIN ──────────────────────────────────────────────────────────
+        # ── LOGIN TAB ─────────────────────────────────────────────────────
         with tab1:
-            u = st.text_input(
-                "👤 Username", key="login_u",
-                placeholder="Enter your username"
-            )
-            p = st.text_input(
-                "🔑 Password", type="password", key="login_p",
-                placeholder="Enter your password"
-            )
-            if st.button("Sign In 🚀", use_container_width=True, key="login_btn"):
-                if u.strip() and p.strip():
+            # st.form allows pressing Enter to submit ✅
+            with st.form("login_form", clear_on_submit=False):
+                u = st.text_input(
+                    "👤 Username",
+                    key="login_u",
+                    placeholder="Enter your username"
+                )
+                p = st.text_input(
+                    "🔑 Password",
+                    type="password",
+                    key="login_p",
+                    placeholder="Enter your password — press Enter or click Sign In"
+                )
+                login_submit = st.form_submit_button(
+                    "Sign In 🚀",
+                    use_container_width=True
+                )
+
+            if login_submit:
+                if not u.strip() or not p.strip():
+                    st.warning("⚠️ Please fill in both fields.")
+                else:
                     conn = sqlite3.connect("users.db")
                     c    = conn.cursor()
                     c.execute(
                         "SELECT * FROM users WHERE username=? AND password=?",
                         (u.strip(), hash_p(p))
                     )
-                    user = c.fetchone()
+                    user_row = c.fetchone()
                     conn.close()
-                    if user:
-                        # ensure stats row exists
-                        conn2 = sqlite3.connect("users.db")
-                        c2    = conn2.cursor()
-                        c2.execute(
+
+                    if user_row:
+                        # Ensure stats row exists
+                        conn = sqlite3.connect("users.db")
+                        c    = conn.cursor()
+                        c.execute(
                             "INSERT OR IGNORE INTO user_stats (username) VALUES (?)",
                             (u.strip(),)
                         )
-                        c2.execute(
-                            "INSERT OR IGNORE INTO user_profile (username) VALUES (?)",
-                            (u.strip(),)
-                        )
-                        conn2.commit()
-                        conn2.close()
-
+                        conn.commit()
+                        conn.close()
                         st.session_state.logged_in = True
                         st.session_state.username  = u.strip()
-
-                        try:
-                            update_streak(u.strip())
-                            award_badge(u.strip(), "first_login")
-                            auto_check_badges(u.strip())
-                        except Exception:
-                            pass
-
-                        st.success("✅ Login successful! Loading app...")
-                        time.sleep(0.7)
+                        st.success("✅ Login successful! Loading your dashboard...")
+                        time.sleep(0.8)
                         st.rerun()
                     else:
-                        st.error("❌ Invalid username or password.")
-                else:
-                    st.warning("⚠️ Please fill in both fields.")
+                        st.error("❌ Invalid username or password. Please try again.")
 
-        # ── REGISTER ───────────────────────────────────────────────────────
+        # ── REGISTER TAB ──────────────────────────────────────────────────
         with tab2:
-            st.markdown("#### 📝 Create Your Free Account")
-            nu = st.text_input(
-                "👤 New Username", key="reg_u",
-                placeholder="Min 3 characters"
-            )
-            np_val = st.text_input(
-                "🔑 New Password", type="password", key="reg_p",
-                placeholder="Min 6 characters"
-            )
-            np_confirm = st.text_input(
-                "🔑 Confirm Password", type="password", key="reg_p2",
-                placeholder="Re-enter your password"
-            )
+            with st.form("register_form", clear_on_submit=True):
+                nu = st.text_input(
+                    "👤 New Username",
+                    key="reg_u",
+                    placeholder="Min 3 characters"
+                )
+                np_ = st.text_input(
+                    "🔑 New Password",
+                    type="password",
+                    key="reg_p",
+                    placeholder="Min 6 characters"
+                )
+                reg_submit = st.form_submit_button(
+                    "Create Account ✨",
+                    use_container_width=True
+                )
 
-            if st.button("Create Account ✨",
-                         use_container_width=True, key="reg_btn"):
+            if reg_submit:
                 if not nu.strip():
                     st.error("❌ Username cannot be empty.")
                 elif len(nu.strip()) < 3:
                     st.error("❌ Username must be at least 3 characters.")
-                elif not np_val.strip():
+                elif not np_.strip():
                     st.error("❌ Password cannot be empty.")
-                elif len(np_val.strip()) < 6:
+                elif len(np_.strip()) < 6:
                     st.error("❌ Password must be at least 6 characters.")
-                elif np_val != np_confirm:
-                    st.error("❌ Passwords do not match.")
                 else:
                     try:
                         conn = sqlite3.connect("users.db")
                         c    = conn.cursor()
                         c.execute(
-                            "INSERT INTO users (username, password) VALUES (?,?)",
-                            (nu.strip(), hash_p(np_val))
-                        )
-                        c.execute(
-                            "INSERT OR IGNORE INTO user_stats (username) VALUES (?)",
-                            (nu.strip(),)
-                        )
-                        c.execute(
-                            "INSERT OR IGNORE INTO user_profile (username) VALUES (?)",
-                            (nu.strip(),)
+                            "INSERT INTO users (username, password) VALUES (?, ?)",
+                            (nu.strip(), hash_p(np_))
                         )
                         conn.commit()
                         conn.close()
-
-                        st.session_state.logged_in = True
-                        st.session_state.username  = nu.strip()
-
-                        try:
-                            award_badge(nu.strip(), "first_login")
-                        except Exception:
-                            pass
-
                         st.success(
-                            "✅ Account created! Let's personalise your experience 🎓"
+                            f"✅ Account created for **{nu.strip()}**! "
+                            "Please go to the Login tab."
                         )
-                        time.sleep(0.8)
-                        st.rerun()
                     except sqlite3.IntegrityError:
-                        st.error("❌ Username already taken. Please choose another.")
+                        st.error("❌ Username already exists. Please choose another.")
                     except Exception as e:
-                        st.error(f"❌ Registration error: {e}")
+                        st.error(f"❌ Registration failed: {e}")
 
         st.markdown('</div>', unsafe_allow_html=True)
 
