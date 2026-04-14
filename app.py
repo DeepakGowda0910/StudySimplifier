@@ -1129,39 +1129,86 @@ def render_sidebar(username):
 # ─────────────────────────────────────────────────────────────────────────────
 # Part 5 LOGIN PAGE
 # ─────────────────────────────────────────────────────────────────────────────
-# ❌ BEFORE (Registration Disabled)
-st.info("👆 Please tick one option to continue.")
+def auth_ui():
+    _, col_c, _ = st.columns([1, 2, 1])
 
-# ✅ AFTER (Enable Registration)
-with tab2:
-    st.markdown("### 📝 Create New Account")
-    new_username = st.text_input("Choose a username", key="reg_user")
-    new_password = st.text_input("Create password", type="password", key="reg_pass")
-    new_password_confirm = st.text_input("Confirm password", type="password", key="reg_pass_confirm")
-    
-    if st.button("✅ Create Account", use_container_width=True, key="register_btn"):
-        if not new_username or not new_password:
-            st.error("Please fill in all fields.")
-        elif new_password != new_password_confirm:
-            st.error("Passwords don't match.")
-        elif len(new_password) < 6:
-            st.error("Password must be at least 6 characters.")
-        else:
-            conn = sqlite3.connect("users.db")
-            c = conn.cursor()
-            try:
-                c.execute(
-                    "INSERT INTO users (username, password) VALUES (?, ?)",
-                    (new_username, hash_p(new_password))
-                )
-                # Auto-create user stats
-                c.execute("INSERT INTO user_stats (username) VALUES (?)", (new_username,))
-                conn.commit()
-                st.success(f"✅ Account created! You can now login.")
-                conn.close()
-            except sqlite3.IntegrityError:
-                st.error("❌ Username already exists.")
-                conn.close()
+    with col_c:
+        st.markdown("## 🎓 StudySmart AI")
+        st.markdown("### Login / Register")
+
+        tab1, tab2 = st.tabs(["🔐 Login", "📝 Register"])
+
+        with tab1:
+            username = st.text_input("Username", key="login_user")
+            password = st.text_input("Password", type="password", key="login_pass")
+
+            if st.button("Sign In 🚀", use_container_width=True, key="login_btn"):
+                if not username.strip() or not password.strip():
+                    st.error("Please enter both username and password.")
+                else:
+                    conn = sqlite3.connect("users.db")
+                    c = conn.cursor()
+                    c.execute(
+                        "SELECT * FROM users WHERE username=? AND password=?",
+                        (username.strip(), hash_p(password))
+                    )
+                    user = c.fetchone()
+                    conn.close()
+
+                    if user:
+                        st.session_state.logged_in = True
+                        st.session_state.username = username.strip()
+                        st.success("✅ Login successful!")
+                        time.sleep(0.5)
+                        st.rerun()
+                    else:
+                        st.error("❌ Invalid username or password.")
+
+        with tab2:
+            st.markdown("### 📝 Create New Account")
+            new_username = st.text_input("Choose a username", key="reg_user")
+            new_password = st.text_input("Create password", type="password", key="reg_pass")
+            new_password_confirm = st.text_input("Confirm password", type="password", key="reg_pass_confirm")
+
+            if st.button("✅ Create Account", use_container_width=True, key="register_btn"):
+                new_username = new_username.strip()
+
+                if not new_username or not new_password or not new_password_confirm:
+                    st.error("Please fill in all fields.")
+                elif len(new_username) < 3:
+                    st.error("Username must be at least 3 characters.")
+                elif new_password != new_password_confirm:
+                    st.error("Passwords don't match.")
+                elif len(new_password) < 6:
+                    st.error("Password must be at least 6 characters.")
+                else:
+                    try:
+                        conn = sqlite3.connect("users.db")
+                        c = conn.cursor()
+
+                        c.execute(
+                            "INSERT INTO users (username, password) VALUES (?, ?)",
+                            (new_username, hash_p(new_password))
+                        )
+
+                        c.execute(
+                            "INSERT OR IGNORE INTO user_stats (username) VALUES (?)",
+                            (new_username,)
+                        )
+
+                        # Optional: only keep this if your app uses user_profile table
+                        c.execute(
+                            "INSERT OR IGNORE INTO user_profile (username) VALUES (?)",
+                            (new_username,)
+                        )
+
+                        conn.commit()
+                        st.success("✅ Account created! You can now login.")
+
+                    except sqlite3.IntegrityError:
+                        st.error("❌ Username already exists.")
+                    finally:
+                        conn.close()
 
 # ─────────────────────────────────────────────────────────────────────────────
 # ONBOARDING WIZARD
