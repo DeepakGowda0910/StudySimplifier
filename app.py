@@ -41,6 +41,29 @@ html, body, [class*="css"], [class*="st-"] {
     box-sizing: border-box;
 }
 
+/* ══ FIX: Expander arrow icon rendering as text ══ */
+/* Restore icon font for ALL Streamlit icon spans */
+[class*="stIconMaterial"],
+span[data-testid="stIconMaterial"],
+.st-emotion-cache-1gulkj5,
+.st-emotion-cache-j5r0tf {
+    font-family: 'Material Symbols Rounded', 'Material Icons', sans-serif !important;
+    font-size: 20px !important;
+}
+/* Completely hide the arrow icon inside expander summary */
+[data-testid="stExpander"] > details > summary span[class*="stIconMaterial"],
+[data-testid="stExpander"] > details > summary span[data-testid],
+[data-testid="stExpander"] > details > summary svg,
+[data-testid="stExpander"] summary > span:last-child {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    overflow: hidden !important;
+    font-size: 0 !important;
+    opacity: 0 !important;
+}
+
+
 /* ── FIX: Prevent Streamlit icons from rendering as overlapping text ── */
 span.stIconMaterial, 
 span[class*="stIconMaterial"], 
@@ -501,14 +524,15 @@ def init_db():
 
     # ── Study Sessions ────────────────────────────────────────────────────
     c.execute("""
-        CREATE TABLE IF NOT EXISTS study_sessions (
-            id        INTEGER PRIMARY KEY AUTOINCREMENT,
-            username  TEXT,
-            subject   TEXT,
-            minutes   INTEGER DEFAULT 0,
-            sess_date TEXT
-        )
-    """)
+ CREATE TABLE IF NOT EXISTS activity_log (
+    id       INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT,
+    tool     TEXT,
+    chapter  TEXT,
+    subject  TEXT,
+    preview  TEXT,
+    log_time TEXT
+);
 
     # ── Safe migration helper ─────────────────────────────────────────────
     def get_cols(table):
@@ -1179,16 +1203,21 @@ def reset_generation_state():
     st.session_state.show_fullpaper         = False
     st.session_state.show_fullpaper_answers = False
 
-def add_to_history(tool, chapter, subject, result):
+def add_to_history(g_tool, g_chapter, g_subject, result, username):
+    """Add to in-memory session history AND persist to DB."""
+    preview = result[:80] + "..." if len(result) > 80 else result
     entry = {
         "time":    datetime.datetime.now().strftime("%H:%M"),
         "tool":    tool,
         "chapter": chapter,
         "subject": subject,
-        "preview": result[:80] + "..." if len(result) > 80 else result,
+        "preview": preview,
     }
     st.session_state.history.insert(0, entry)
     st.session_state.history = st.session_state.history[:10]
+    # ✅ Also persist to database so it survives logout
+    if username:
+        save_activity_log(username, tool, chapter, subject, result)
 
 # ─────────────────────────────────────────────────────────────────────────────
 # ONBOARDING CHECKBOX HELPERS  ← must live here, BEFORE show_onboarding
@@ -1809,42 +1838,15 @@ def show_dashboard(username):
     board   = profile.get("board",    "")
     meta    = CATEGORY_META.get(cat, {"icon": "🎓", "color": "#3b82f6"})
 
-    # ★ FIX 2: NO render_back_button() here — dashboard is the home page.
-    # The Testing Tools expander sits cleanly below the hero with no arrow overlap.
-    render_header("StudySmart", f"{meta['icon']} {course} · {stream} · {board}")
-
-    # ── 🧪 TESTING TOOLS — clean expander, no banner conflict ─────────────
-    with st.expander("🛠️ Testing Tools — Switch Category / Board", expanded=False):
-        st.markdown(f"""
-        <div style="background:linear-gradient(135deg,#fefce8,#fef9c3);
-            border:1.5px solid #fde68a;border-radius:12px;
-            padding:12px 16px;margin-bottom:10px;">
-            <b style="color:#92400e;">🧪 Testing Mode Active</b><br>
-            <span style="font-size:.83rem;color:#78350f;">
-                Current: <b>{cat}</b> → <b>{course}</b>
-                → <b>{stream}</b> → <b>{board}</b><br>
-                Click below to reset your profile and pick a different
-                category, class, or board. XP and streaks are preserved.
-            </span>
-        </div>
-        """, unsafe_allow_html=True)
-        if st.button("🔄 Reset Profile & Switch Category",
-                     use_container_width=True, type="primary",
-                     key="dash_switch_cat"):
-            reset_profile(username)
-            st.toast("Profile reset! Loading onboarding...", icon="🔄")
-            time.sleep(0.8)
-            st.rerun()
-
+    render_header("StudySmart", "Your Daily Learning Companion")
     stats = get_user_stats(username) or {}
 
-    # ── Metric Cards ──────────────────────────────────────────────────────
     c1, c2, c3, c4 = st.columns(4)
     for col, cls, icon, val, lbl in [
-        (c1, "mc-blue",   "🔥", stats.get("streak_days", 0),                 "Day Streak"),
-        (c2, "mc-green",  "⭐", f"Level {stats.get('level', 1)}",             "Your Level"),
-        (c3, "mc-purple", "📚", stats.get("flashcards_due", 0),               "Cards Due"),
-        (c4, "mc-amber",  "⏱️", f"{stats.get('weekly_study_minutes', 0)} min","This Week"),
+        (c1, "mc-blue",   "🔥", stats.get("streak_days", 0),                  "Day Streak"),
+        (c2, "mc-green",  "⭐", f"Level {stats.get('level', 1)}",              "Your Level"),
+        (c3, "mc-purple", "📚", stats.get("flashcards_due", 0),                "Cards Due"),
+        (c4, "mc-amber",  "⏱️", f"{stats.get('weekly_minutes', 0)} min",       "This Week"),
     ]:
         with col:
             st.markdown(
@@ -1853,7 +1855,6 @@ def show_dashboard(username):
                 unsafe_allow_html=True
             )
 
-    # ── XP Progress Bar ───────────────────────────────────────────────────
     st.markdown("<div style='height:6px'></div>", unsafe_allow_html=True)
     st.markdown('<div class="sf-card">', unsafe_allow_html=True)
     total_xp = stats.get("total_xp", 0)
@@ -1873,41 +1874,56 @@ def show_dashboard(username):
     left, right = st.columns([1.1, 1])
 
     with left:
+        # ── 🔒 Locked Profile Icon ──────────────────────────────────────
         st.markdown('<div class="sf-card">', unsafe_allow_html=True)
         st.markdown("**🎯 Your Profile**")
-        st.markdown(f"""
-        <div class="sf-soft-card">
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-                <div>
-                    <div style="font-size:.7rem;color:#64748b;font-weight:600;">CATEGORY</div>
-                    <div style="font-weight:700;font-size:.88rem;">{meta['icon']} {cat}</div>
+
+        with st.popover("🔒 View Profile Details", use_container_width=True):
+            st.markdown(f"""
+            <div style="padding:4px 0;">
+                <div style="margin-bottom:10px;">
+                    <span style="font-size:.68rem;font-weight:800;color:#64748b;
+                        text-transform:uppercase;letter-spacing:.05em;">CATEGORY</span><br>
+                    <span style="font-size:.95rem;font-weight:400;color:#1d4ed8;">
+                        {meta['icon']} {cat}
+                    </span>
+                </div>
+                <div style="margin-bottom:10px;">
+                    <span style="font-size:.68rem;font-weight:800;color:#64748b;
+                        text-transform:uppercase;letter-spacing:.05em;">COURSE</span><br>
+                    <span style="font-size:.95rem;font-weight:400;color:#1d4ed8;">
+                        🎓 {course}
+                    </span>
+                </div>
+                <div style="margin-bottom:10px;">
+                    <span style="font-size:.68rem;font-weight:800;color:#64748b;
+                        text-transform:uppercase;letter-spacing:.05em;">STREAM</span><br>
+                    <span style="font-size:.95rem;font-weight:400;color:#1d4ed8;">
+                        🔀 {stream}
+                    </span>
                 </div>
                 <div>
-                    <div style="font-size:.7rem;color:#64748b;font-weight:600;">COURSE</div>
-                    <div style="font-weight:700;font-size:.88rem;">📖 {course}</div>
-                </div>
-                <div>
-                    <div style="font-size:.7rem;color:#64748b;font-weight:600;">STREAM</div>
-                    <div style="font-weight:700;font-size:.88rem;">🔀 {stream}</div>
-                </div>
-                <div>
-                    <div style="font-size:.7rem;color:#64748b;font-weight:600;">BOARD</div>
-                    <div style="font-weight:700;font-size:.88rem;">🏫 {board}</div>
+                    <span style="font-size:.68rem;font-weight:800;color:#64748b;
+                        text-transform:uppercase;letter-spacing:.05em;">BOARD / SYLLABUS</span><br>
+                    <span style="font-size:.95rem;font-weight:400;color:#1d4ed8;">
+                        🏫 {board}
+                    </span>
                 </div>
             </div>
-        </div>
-        """, unsafe_allow_html=True)
+            """, unsafe_allow_html=True)
+
         st.markdown('</div>', unsafe_allow_html=True)
 
+        # ── Study Momentum ────────────────────────────────────────────
         st.markdown('<div class="sf-card">', unsafe_allow_html=True)
         st.markdown("**🌱 Study Momentum**")
-        mins   = stats.get("total_study_minutes", 0)
+        mins   = stats.get("total_minutes", 0)
         growth = min(100, mins // 10)
         plant  = (
-            ("🌱", "Seedling")       if growth < 20 else
-            ("🌿", "Sprout")         if growth < 40 else
-            ("🪴", "Growing Plant")  if growth < 70 else
-            ("🌳", "Strong Tree")    if growth < 90 else
+            ("🌱", "Seedling")      if growth < 20 else
+            ("🌿", "Sprout")        if growth < 40 else
+            ("🪴", "Growing Plant") if growth < 70 else
+            ("🌳", "Strong Tree")   if growth < 90 else
             ("🌲", "Master Tree")
         )
         st.markdown(f"""
@@ -1920,21 +1936,20 @@ def show_dashboard(username):
 
         st.markdown('<div class="sf-card">', unsafe_allow_html=True)
         st.markdown("**⚡ Quick Actions**")
-        if st.button("📚 Open Study Tools",  use_container_width=True, key="d_study"):
-            go_to("study")
-        if st.button("🗂️ Review Flashcards", use_container_width=True, key="d_fc"):
-            go_to("flashcards")
-        if st.button("🏅 View Achievements", use_container_width=True, key="d_ach"):
-            go_to("achievements")
+        if st.button("📚 Open Study Tools",  use_container_width=True, key="d_study"): go_to("study")
+        if st.button("🗂️ Review Flashcards", use_container_width=True, key="d_fc"):    go_to("flashcards")
+        if st.button("🏅 View Achievements", use_container_width=True, key="d_ach"):   go_to("achievements")
         st.markdown('</div>', unsafe_allow_html=True)
 
     with right:
+        # ── Recent Activity (loaded from DB) ─────────────────────────
         st.markdown('<div class="sf-card">', unsafe_allow_html=True)
         st.markdown("**📜 Recent Activity**")
-        if not st.session_state.history:
+        db_history = get_activity_log(username)
+        if not db_history:
             st.info("No activity yet. Generate your first study content!")
         else:
-            for h in st.session_state.history:
+            for h in db_history:
                 st.markdown(f"""<div class="sf-hist">
                     🕐 {h['time']} | <b>{h['tool']}</b><br>
                     📖 {h['chapter']} — {h['subject']}<br>
@@ -2274,129 +2289,69 @@ def show_study_tools(username):
     </div>
     """, unsafe_allow_html=True)
 
-    if not STUDY_DATA:
-        st.error("❌ No study data loaded. Check data/study_data.json")
-        return
-
-    # ── Tool Selector ─────────────────────────────────────────────────────
-    tool = st.radio(
-        "🛠️ Select Tool",
-        ["📝 Summary", "🧠 Quiz", "📌 Revision Notes",
-         "🧪 Question Paper", "❓ Exam Q&A"],
-        horizontal=True,
-        key="study_tool_radio"
-    )
-
-    # ── PROFILE-LOCKED Selectors ──────────────────────────────────────────
     st.markdown('<div class="sf-card">', unsafe_allow_html=True)
 
-    # Row 1: locked category + course + stream info
-    i1, i2, i3 = st.columns(3)
-    with i1:
-        st.markdown(f"""
-        <div class="sf-soft-card" style="text-align:center;">
-            <div style="font-size:.68rem;color:#64748b;font-weight:700;
-                text-transform:uppercase;letter-spacing:.06em;">
-                📚 Category
-            </div>
-            <div style="font-weight:800;font-size:.92rem;
-                color:#1d4ed8;margin-top:4px;">
-                {meta['icon']} {p_cat}
-            </div>
-            <div style="font-size:.65rem;color:#94a3b8;margin-top:3px;">
-                🔒 Locked to profile
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
-    with i2:
-        st.markdown(f"""
-        <div class="sf-soft-card" style="text-align:center;">
-            <div style="font-size:.68rem;color:#64748b;font-weight:700;
-                text-transform:uppercase;letter-spacing:.06em;">
-                🎓 Course
-            </div>
-            <div style="font-weight:800;font-size:.92rem;
-                color:#1d4ed8;margin-top:4px;">
-                {p_course}
-            </div>
-            <div style="font-size:.65rem;color:#94a3b8;margin-top:3px;">
-                🔒 Locked to profile
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
-    with i3:
-        st.markdown(f"""
-        <div class="sf-soft-card" style="text-align:center;">
-            <div style="font-size:.68rem;color:#64748b;font-weight:700;
-                text-transform:uppercase;letter-spacing:.06em;">
-                🔀 Stream · 🏫 Board
-            </div>
-            <div style="font-weight:800;font-size:.92rem;
-                color:#1d4ed8;margin-top:4px;">
-                {p_stream}
-            </div>
-            <div style="font-size:.65rem;color:#94a3b8;margin-top:3px;">
-                {p_board}
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
+    profile = get_user_profile(username) or {}
 
-    st.markdown("<div style='height:10px'></div>", unsafe_allow_html=True)
+    category_options = list(STUDY_DATA.keys())
+    default_category = profile.get("category", category_options[0] if category_options else "")
+    category_index = category_options.index(default_category) if default_category in category_options else 0
 
-    # ── Only Subject + Topic + Chapter are selectable ─────────────────────
-    subjects = get_subjects(p_cat, p_course, p_stream)
-    if not subjects:
-        st.warning(
-            f"⚠️ No subjects found for "
-            f"{p_cat} → {p_course} → {p_stream}. "
-            f"Please check your study_data.json"
-        )
-        st.markdown('</div>', unsafe_allow_html=True)
-        return
+    category = st.selectbox(
+        "📚 Category",
+        category_options,
+        index=category_index,
+        key="sel_cat"
+    )
 
-    col_s, col_t = st.columns(2)
-    with col_s:
-        subject = st.selectbox(
-            "🧾 Subject",
-            subjects,
-            key="sel_subject"
-        )
-    with col_t:
-        topics = get_topics(p_cat, p_course, p_stream, subject)
-        topic  = st.selectbox(
-            "🗂️ Topic",
-            topics,
-            key="sel_topic"
-        )
+    course_options = get_courses(category)
+    default_course = profile.get("course", course_options[0] if course_options else "")
+    course_index = course_options.index(default_course) if default_course in course_options else 0
+    course = st.selectbox(
+        "🎓 Program / Class",
+        course_options,
+        index=course_index,
+        key="sel_course"
+    )
 
-    # ── Dynamic Chapter List ───────────────────────────────────────────────
-    chapter_key = f"{p_cat}||{p_course}||{p_stream}||{subject}||{topic}"
+    stream_options = get_streams(category, course)
+    default_stream = profile.get("stream", stream_options[0] if stream_options else "")
+    stream_index = stream_options.index(default_stream) if default_stream in stream_options else 0
+    stream = st.selectbox(
+        "📖 Stream",
+        stream_options,
+        index=stream_index,
+        key="sel_stream"
+    )
+
+    subject = st.selectbox(
+        "🧾 Subject",
+        get_subjects(category, course, stream),
+        key="sel_subject"
+    )
+
+    if category == "K-12th":
+        board = st.selectbox("🏫 Board", BOARDS, key="sel_board")
+    else:
+        board = "University / National Syllabus"
+        st.info(f"📌 {board}")
+
+    topic = st.selectbox(
+        "🗂️ Topic",
+        get_topics(category, course, stream, subject),
+        key="sel_topic"
+    )
+
+    chapter_key = f"{category}||{course}||{stream}||{subject}||{topic}"
     if st.session_state.last_chapter_key != chapter_key:
-        st.session_state.current_chapters = get_chapters(
-            p_cat, p_course, p_stream, subject, topic
-        )
+        st.session_state.current_chapters = get_chapters(category, course, stream, subject, topic)
         st.session_state.last_chapter_key = chapter_key
         reset_generation_state()
 
-    chapter = st.selectbox(
-        "📝 Chapter",
-        st.session_state.current_chapters,
-        key="sel_chapter"
-    )
+    chapter = st.selectbox("📝 Chapter", st.session_state.current_chapters, key="sel_chapter")
     st.session_state.current_subject_for_timer = subject
+
     st.markdown('</div>', unsafe_allow_html=True)
-
-    # ── Output Style ──────────────────────────────────────────────────────
-    style = st.radio(
-        "⚙️ Output Style",
-        ["📄 Detailed", "⚡ Short & Quick", "📋 Notes Format", "🧪 Question Paper"],
-        horizontal=True,
-        key="study_style_radio"
-    )
-
-    eff_label = get_effective_output_name(tool, style)
-    btn_label = get_button_label(tool, style)
-    st.markdown("<div style='height:4px'></div>", unsafe_allow_html=True)
 
     # ── Generate Button ───────────────────────────────────────────────────
     if st.button(btn_label, use_container_width=True, key="gen_btn"):
@@ -2438,7 +2393,7 @@ def show_study_tools(username):
         })
 
         if model_used != "None":
-            add_to_history(eff_label, chapter, subject, result)
+            add_to_history(g_tool, g_chapter, g_subject, result, username)
             award_xp(username, 25)
             award_badge(username, "first_gen")
             if eff_label == "Question Paper":
