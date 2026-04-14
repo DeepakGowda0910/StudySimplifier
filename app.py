@@ -1552,13 +1552,15 @@ def show_study_tools(username):
     with ca:
         category=st.selectbox("📚 Category",list(STUDY_DATA.keys()),key="sel_cat")
     with cb:
-    course =st.selectbox("🎓 Program / Class",get_courses(category),           key="sel_course")
-    stream =st.selectbox("📖 Stream",          get_streams(category,course),    key="sel_stream")
-    subject=st.selectbox("🧾 Subject",         get_subjects(category,course,stream),key="sel_subject")
+        course = st.selectbox("🎓 Program / Class", get_courses(category), key="sel_course")
+        stream = st.selectbox("📖 Stream", get_streams(category, course), key="sel_stream")
+        subject = st.selectbox("🧾 Subject", get_subjects(category, course, stream), key="sel_subject")
 
-    board="University / National Syllabus"
-    if category=="K-12th":
-        board=st.selectbox("🏫 Board",BOARDS,key="sel_board")
+        board = "University / National Syllabus"
+        if category == "K-12th":
+            board = st.selectbox("🏫 Board", BOARDS, key="sel_board")
+        else:
+            st.info(f"📌 Syllabus: {board}")
 
     topic=st.selectbox("🗂️ Topic",get_topics(category,course,stream,subject),key="sel_topic")
 
