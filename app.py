@@ -508,12 +508,49 @@ def init_db():
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             username TEXT,
             subject TEXT,
-            minutes INTEGER,
+            minutes INTEGER DEFAULT 0,
             sess_date TEXT
         )
     """)
 
     conn.commit()
+
+    def get_columns(table_name):
+        c.execute(f"PRAGMA table_info({table_name})")
+        return [row[1] for row in c.fetchall()]
+
+    def add_column_if_missing(table_name, column_name, column_def):
+        cols = get_columns(table_name)
+        if column_name not in cols:
+            c.execute(f"ALTER TABLE {table_name} ADD COLUMN {column_name} {column_def}")
+
+    # user_stats migrations
+    add_column_if_missing("user_stats", "total_xp", "INTEGER DEFAULT 0")
+    add_column_if_missing("user_stats", "streak_days", "INTEGER DEFAULT 0")
+    add_column_if_missing("user_stats", "last_login", "TEXT DEFAULT ''")
+    add_column_if_missing("user_stats", "total_minutes", "INTEGER DEFAULT 0")
+
+    # achievements migrations
+    add_column_if_missing("achievements", "username", "TEXT")
+    add_column_if_missing("achievements", "badge_id", "TEXT")
+    add_column_if_missing("achievements", "earned_at", "TEXT")
+
+    # flashcards migrations
+    add_column_if_missing("flashcards", "subject", "TEXT DEFAULT ''")
+    add_column_if_missing("flashcards", "chapter", "TEXT DEFAULT ''")
+    add_column_if_missing("flashcards", "ease_factor", "REAL DEFAULT 2.5")
+    add_column_if_missing("flashcards", "interval_days", "INTEGER DEFAULT 1")
+    add_column_if_missing("flashcards", "next_review_date", "TEXT")
+    add_column_if_missing("flashcards", "review_count", "INTEGER DEFAULT 0")
+    add_column_if_missing("flashcards", "created_date", "TEXT")
+
+    # study_sessions migrations
+    add_column_if_missing("study_sessions", "subject", "TEXT")
+    add_column_if_missing("study_sessions", "minutes", "INTEGER DEFAULT 0")
+    add_column_if_missing("study_sessions", "sess_date", "TEXT")
+
+    conn.commit()
+    conn.close()
 
     def get_columns(table_name):
         c.execute(f"PRAGMA table_info({table_name})")
@@ -558,18 +595,16 @@ def check_daily_login(username):
     today = datetime.date.today().isoformat()
     yesterday = (datetime.date.today() - datetime.timedelta(days=1)).isoformat()
 
-    c.execute(
-        "INSERT OR IGNORE INTO user_stats (username) VALUES (?)",
-        (username,)
-    )
+    c.execute("INSERT OR IGNORE INTO user_stats (username) VALUES (?)", (username,))
 
-    c.execute(
-        "SELECT COALESCE(streak_days, 0), COALESCE(last_login, ''), COALESCE(total_xp, 0) "
-        "FROM user_stats WHERE username=?",
-        (username,)
-    )
+    c.execute("""
+        SELECT COALESCE(streak_days, 0),
+               COALESCE(last_login, '')
+        FROM user_stats
+        WHERE username=?
+    """, (username,))
     row = c.fetchone()
-    streak_days, last_login, total_xp = row if row else (0, "", 0)
+    streak_days, last_login = row if row else (0, "")
 
     if last_login == today:
         conn.close()
@@ -582,7 +617,7 @@ def check_daily_login(username):
 
     c.execute("""
         UPDATE user_stats
-        SET streak_days=?, last_login=?, total_xp=total_xp+20
+        SET streak_days=?, last_login=?, total_xp=COALESCE(total_xp,0)+20
         WHERE username=?
     """, (streak_days, today, username))
 
@@ -590,6 +625,7 @@ def check_daily_login(username):
     conn.close()
 
     return f"🔥 Streak Updated! Day {streak_days} (+20 XP)"
+
 
 def award_xp(username, amount):
     conn = sqlite3.connect("users.db"); c = conn.cursor()
@@ -601,21 +637,19 @@ def get_user_stats(username):
     conn = sqlite3.connect("users.db")
     c = conn.cursor()
 
-    # Ensure row exists
-    c.execute(
-        "INSERT OR IGNORE INTO user_stats (username) VALUES (?)",
-        (username,)
-    )
+    c.execute("INSERT OR IGNORE INTO user_stats (username) VALUES (?)", (username,))
 
-    c.execute(
-        "SELECT COALESCE(total_xp, 0), COALESCE(streak_days, 0), COALESCE(total_minutes, 0) "
-        "FROM user_stats WHERE username=?",
-        (username,)
-    )
+    c.execute("""
+        SELECT COALESCE(total_xp, 0),
+               COALESCE(streak_days, 0),
+               COALESCE(total_minutes, 0)
+        FROM user_stats
+        WHERE username=?
+    """, (username,))
     row = c.fetchone()
     total_xp, streak_days, total_minutes = row if row else (0, 0, 0)
 
-    # Fallback total minutes from sessions if needed
+    # Recover total_minutes from sessions if needed
     if total_minutes == 0:
         try:
             c.execute(
@@ -631,20 +665,17 @@ def get_user_stats(username):
         except sqlite3.OperationalError:
             total_minutes = 0
 
-    # Weekly minutes
     weekly_minutes = 0
     try:
         week_ago = (datetime.date.today() - datetime.timedelta(days=7)).isoformat()
         c.execute(
-            "SELECT COALESCE(SUM(minutes), 0) "
-            "FROM study_sessions WHERE username=? AND sess_date>=?",
+            "SELECT COALESCE(SUM(minutes),0) FROM study_sessions WHERE username=? AND sess_date>=?",
             (username, week_ago)
         )
         weekly_minutes = c.fetchone()[0] or 0
     except sqlite3.OperationalError:
         weekly_minutes = 0
 
-    # Flashcards due
     flashcards_due = 0
     try:
         today = datetime.date.today().isoformat()
@@ -658,18 +689,16 @@ def get_user_stats(username):
 
     conn.close()
 
-    level = (total_xp // 500) + 1
-    level_progress = total_xp % 500
-
     return {
         "total_xp": total_xp,
         "streak_days": streak_days,
         "total_minutes": total_minutes,
         "weekly_minutes": weekly_minutes,
         "flashcards_due": flashcards_due,
-        "level": level,
-        "level_progress": level_progress,
+        "level": (total_xp // 500) + 1,
+        "level_progress": total_xp % 500,
     }
+
 
 def record_study_session(username, subject, minutes):
     conn = sqlite3.connect("users.db")
@@ -680,23 +709,18 @@ def record_study_session(username, subject, minutes):
     c.execute("""
         INSERT INTO study_sessions (username, subject, minutes, sess_date)
         VALUES (?, ?, ?, ?)
-    """, (username, subject, minutes, today))
+    """, (username, subject, int(minutes), today))
 
-    c.execute("""
-        INSERT OR IGNORE INTO user_stats (username)
-        VALUES (?)
-    """, (username,))
-
+    c.execute("INSERT OR IGNORE INTO user_stats (username) VALUES (?)", (username,))
     c.execute("""
         UPDATE user_stats
         SET total_minutes = COALESCE(total_minutes, 0) + ?
         WHERE username=?
-    """, (minutes, username))
+    """, (int(minutes), username))
 
     conn.commit()
     conn.close()
 
-    # Optional: auto-check badges after logging study time
     try:
         auto_check_badges(username)
     except Exception:
@@ -721,15 +745,32 @@ ALL_BADGES = [
 
 def _award_badge_raw(username, badge_id, c):
     earned_at = datetime.datetime.now().isoformat()
-    c.execute(
-        "INSERT OR IGNORE INTO achievements (username, badge_id, earned_at) VALUES (?,?,?)",
-        (username, badge_id, earned_at)
-    )
+    try:
+        c.execute(
+            "INSERT OR IGNORE INTO achievements (username, badge_id, earned_at) VALUES (?,?,?)",
+            (username, badge_id, earned_at)
+        )
+    except sqlite3.OperationalError:
+        # Try to repair missing column on older DBs
+        try:
+            c.execute("ALTER TABLE achievements ADD COLUMN earned_at TEXT")
+            c.execute(
+                "INSERT OR IGNORE INTO achievements (username, badge_id, earned_at) VALUES (?,?,?)",
+                (username, badge_id, earned_at)
+            )
+        except Exception:
+            pass
 
 def award_badge(username, badge_id):
-    conn = sqlite3.connect("users.db"); c = conn.cursor()
-    _award_badge_raw(username, badge_id, c)
-    conn.commit(); conn.close()
+    conn = sqlite3.connect("users.db")
+    c = conn.cursor()
+    try:
+        _award_badge_raw(username, badge_id, c)
+        conn.commit()
+    except Exception:
+        pass
+    finally:
+        conn.close()
 
 def get_earned_badges(username):
     conn = sqlite3.connect("users.db"); c = conn.cursor()
@@ -744,22 +785,23 @@ def auto_check_badges(username):
     c = conn.cursor()
 
     def award(badge_id):
-        c.execute("""
-            INSERT OR IGNORE INTO achievements (username, badge_id, earned_at)
-            VALUES (?, ?, ?)
-        """, (username, badge_id, datetime.datetime.now().isoformat()))
+        _award_badge_raw(username, badge_id, c)
 
-    if stats["streak_days"] >= 3:
-        award("strk_3")
-    if stats["streak_days"] >= 7:
-        award("strk_7")
-    if stats["total_minutes"] >= 60:
-        award("study_60")
-    if stats["total_minutes"] >= 300:
-        award("study_300")
+    try:
+        if stats["streak_days"] >= 3:
+            award("strk_3")
+        if stats["streak_days"] >= 7:
+            award("strk_7")
+        if stats["total_minutes"] >= 60:
+            award("study_60")
+        if stats["total_minutes"] >= 300:
+            award("study_300")
 
-    conn.commit()
-    conn.close()
+        conn.commit()
+    except Exception:
+        pass
+    finally:
+        conn.close()
 
 # ─────────────────────────────────────────────────────────────────────────────
 # SESSION STATE
@@ -1510,12 +1552,6 @@ def show_study_tools(username):
     with ca:
         category=st.selectbox("📚 Category",list(STUDY_DATA.keys()),key="sel_cat")
     with cb:
-        st.markdown("""<div class="sf-soft-card" style="height:100%;display:flex;
-            align-items:center;justify-content:center;flex-direction:column;">
-            <div style="font-weight:700;font-size:.87rem;">Quick Setup</div>
-            <div style="font-size:.79rem;margin-top:3px;text-align:center;">Select below and generate instantly.</div>
-        </div>""", unsafe_allow_html=True)
-
     course =st.selectbox("🎓 Program / Class",get_courses(category),           key="sel_course")
     stream =st.selectbox("📖 Stream",          get_streams(category,course),    key="sel_stream")
     subject=st.selectbox("🧾 Subject",         get_subjects(category,course,stream),key="sel_subject")
@@ -1653,33 +1689,86 @@ def show_study_tools(username):
 # AUTH UI  — registration CLOSED
 # ─────────────────────────────────────────────────────────────────────────────
 def auth_ui():
-    _,col,_=st.columns([1,1.4,1])
-    with col:
-        render_header("StudySmart","Your Smart Exam Preparation Platform")
-        st.markdown('<div class="sf-card">', unsafe_allow_html=True)
+   def auth_ui():
+    """Login and Registration screen"""
 
-        st.markdown("### 🔐 Sign In")
-        with st.form("login_form",clear_on_submit=False):
-            u=st.text_input("👤 Username",placeholder="Enter your username",key="login_u")
-            p=st.text_input("🔑 Password",placeholder="Enter password",type="password",key="login_p")
-            submitted=st.form_submit_button("Sign In 🚀",use_container_width=True)
-
-        if submitted:
-            ok,res=do_login(u,p)
-            if ok:
-                st.session_state.logged_in=True; st.session_state.username=res
-                # ── Check-in on login automatically ──
-                result=check_daily_login(res)
-                st.session_state.daily_checkin_done=True
-                auto_check_badges(res)
-                st.success(f"✅ Welcome back, {res}! {result.get('message','')}"); time.sleep(0.8); st.rerun()
-            else: st.error(res)
-
+    _, col_c, _ = st.columns([1, 2, 1])
+    with col_c:
         st.markdown("""
-        <div style="text-align:center;padding:12px 0 4px 0;font-size:.8rem;color:#94a3b8;">
-        🔒 Registration is currently closed.
-        </div>
+            <div class="sf-header">
+                <div class="sf-header-title">StudySmart</div>
+                <div class="sf-header-subtitle">Your Smart Exam Preparation Platform</div>
+            </div>
+            <div class="sf-watermark">POWERED BY AI</div>
         """, unsafe_allow_html=True)
+
+        st.markdown('<div class="sf-card">', unsafe_allow_html=True)
+        tab1, tab2 = st.tabs(["🔐 Login", "📝 Register"])
+
+        with tab1:
+            with st.form("login_form", clear_on_submit=False):
+                u = st.text_input(
+                    "👤 Username",
+                    key="login_u",
+                    placeholder="Enter your username"
+                )
+                p = st.text_input(
+                    "🔑 Password",
+                    type="password",
+                    key="login_p",
+                    placeholder="Enter your password"
+                )
+
+                login_submit = st.form_submit_button("Sign In 🚀", use_container_width=True)
+
+            if login_submit:
+                if u.strip() and p.strip():
+                    conn = sqlite3.connect("users.db")
+                    c = conn.cursor()
+
+                    c.execute(
+                        "SELECT * FROM users WHERE username=? AND password=?",
+                        (u.strip(), hash_p(p))
+                    )
+                    user_row = c.fetchone()
+                    conn.close()
+
+                    if user_row:
+                        # Make sure stats row exists before rerun
+                        conn = sqlite3.connect("users.db")
+                        c = conn.cursor()
+                        c.execute(
+                            "INSERT OR IGNORE INTO user_stats (username) VALUES (?)",
+                            (u.strip(),)
+                        )
+                        conn.commit()
+                        conn.close()
+
+                        st.session_state.logged_in = True
+                        st.session_state.username = u.strip()
+
+                        try:
+                            auto_check_badges(u.strip())
+                        except Exception:
+                            pass
+
+                        st.success("✅ Login successful!")
+                        time.sleep(0.6)
+                        st.rerun()
+                    else:
+                        st.error("❌ Invalid username or password.")
+                else:
+                    st.warning("⚠️ Please enter both username and password.")
+
+        with tab2:
+            st.info("📝 Registration is currently closed. Contact admin for access.")
+            st.markdown("""
+            <div style="padding:16px; background:rgba(59,130,246,0.08); border-radius:10px; margin-top:12px;">
+                <strong>ℹ️ Account Access:</strong><br/>
+                If you don't have an account, please contact the administrator for registration.
+            </div>
+            """, unsafe_allow_html=True)
+
         st.markdown('</div>', unsafe_allow_html=True)
 
 # ─────────────────────────────────────────────────────────────────────────────
