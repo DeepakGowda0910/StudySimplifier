@@ -513,8 +513,6 @@ def init_db():
         )
     """)
 
-    conn.commit()
-
     def get_columns(table_name):
         c.execute(f"PRAGMA table_info({table_name})")
         return [row[1] for row in c.fetchall()]
@@ -531,8 +529,6 @@ def init_db():
     add_column_if_missing("user_stats", "total_minutes", "INTEGER DEFAULT 0")
 
     # achievements migrations
-    add_column_if_missing("achievements", "username", "TEXT")
-    add_column_if_missing("achievements", "badge_id", "TEXT")
     add_column_if_missing("achievements", "earned_at", "TEXT")
 
     # flashcards migrations
