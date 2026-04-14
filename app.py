@@ -2781,6 +2781,11 @@ def main_app():
     elif page == "achievements": show_achievements(username)
     else:                        show_dashboard(username)
 
+# ═══════════════════════════════════════════════════════════════════════════════
+# ENTRY POINT
+# ═══════════════════════════════════════════════════════════════════════════════
+init_db()
+init_session_state()
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # MAINTENANCE MODE
