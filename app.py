@@ -2007,7 +2007,7 @@ def show_achievements(username):
         st.success("🎉 Great work — keep studying to unlock more badges!")
     st.markdown('</div>', unsafe_allow_html=True)
 # ─────────────────────────────────────────────────────────────────────────────
-# FLASHCARDS PAGE
+# Part 4 - FLASHCARDS PAGE
 # ─────────────────────────────────────────────────────────────────────────────
 def show_flashcards(username):
     render_back_button()
@@ -2584,50 +2584,9 @@ def show_study_tools(username):
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# MAINTENANCE MODE SETTINGS
-# ─────────────────────────────────────────────────────────────────────────────
-MAINTENANCE_MODE = True  # ← Set to True to enable maintenance mode
-ADMIN_USERNAME   = "admin"  # ← Your username to bypass maintenance
-MAINTENANCE_MESSAGE = """
-## 🛠️ StudySmart AI is Under Maintenance
-
-We're currently performing scheduled maintenance to improve your experience.
-
-**Expected downtime:** 2 hours  
-**What's happening:** Database upgrades & performance improvements  
-**Impact:** All AI generation features are temporarily unavailable
-
----
-
-### 📞 Contact Support
-If you need immediate assistance, please email:  
-**support@studysmart.ai**
-
-We appreciate your patience while we make StudySmart even better!  
-*— The StudySmart Team*
-"""
-
-
-# ─────────────────────────────────────────────────────────────────────────────
-# AUTH UI  — Login + Registration (with Maintenance Mode)
+# AUTH UI  — Login + Registration
 # ─────────────────────────────────────────────────────────────────────────────
 def auth_ui():
-    # ── MAINTENANCE BANNER ────────────────────────────────────────────────
-    if MAINTENANCE_MODE:
-        st.markdown("""
-        <div style="background:linear-gradient(135deg,#fef3c7,#fde68a);
-            border:2px solid #f59e0b;border-radius:16px;
-            padding:20px 24px;margin-bottom:20px;text-align:center;">
-            <div style="font-size:2.2rem;">🔧</div>
-            <div style="font-weight:800;font-size:1.2rem;color:#92400e;
-                margin-top:8px;">MAINTENANCE MODE</div>
-            <div style="font-size:.9rem;color:#92400e;margin-top:6px;">
-                The app is currently undergoing maintenance.
-                <br>You can still log in to access basic features.
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
-
     _, col_c, _ = st.columns([1, 2, 1])
     with col_c:
         st.markdown("""
@@ -2690,24 +2649,6 @@ def auth_ui():
                 "🔑 Password", type="password", key="login_p",
                 placeholder="Enter your password"
             )
-            
-            # ── MAINTENANCE NOTE ──────────────────────────────────────────
-            if MAINTENANCE_MODE:
-                st.markdown("""
-                <div style="background:#fef3c7;border:1px solid #fbbf24;
-                    border-radius:10px;padding:10px 14px;margin-bottom:12px;">
-                    <div style="display:flex;align-items:center;gap:8px;">
-                        <span style="font-size:1.2rem;">⚠️</span>
-                        <span style="font-weight:600;color:#92400e;font-size:.85rem;">
-                            Maintenance Mode Active
-                        </span>
-                    </div>
-                    <div style="font-size:.78rem;color:#92400e;margin-top:4px;">
-                        AI features are temporarily disabled for all users except administrators.
-                    </div>
-                </div>
-                """, unsafe_allow_html=True)
-            
             if st.button("Sign In 🚀", use_container_width=True, key="login_btn"):
                 if u.strip() and p.strip():
                     conn = sqlite3.connect("users.db")
@@ -2754,27 +2695,6 @@ def auth_ui():
         # ── REGISTER ───────────────────────────────────────────────────────
         with tab2:
             st.markdown("#### 📝 Create Your Free Account")
-            
-            # ── MAINTENANCE WARNING ───────────────────────────────────────
-            if MAINTENANCE_MODE:
-                st.markdown("""
-                <div style="background:#fef3c7;border:1px solid #fbbf24;
-                    border-radius:10px;padding:12px 16px;margin-bottom:14px;">
-                    <div style="display:flex;align-items:center;gap:8px;">
-                        <span style="font-size:1.2rem;">⏸️</span>
-                        <span style="font-weight:700;color:#92400e;font-size:.9rem;">
-                            Registration Temporarily Paused
-                        </span>
-                    </div>
-                    <div style="font-size:.8rem;color:#92400e;margin-top:4px;">
-                        New registrations are disabled during maintenance.
-                        Please try again in a few hours.
-                    </div>
-                </div>
-                """, unsafe_allow_html=True)
-                st.markdown('</div>', unsafe_allow_html=True)
-                return  # ← Stop registration during maintenance
-
             nu = st.text_input(
                 "👤 New Username", key="reg_u",
                 placeholder="Min 3 characters"
@@ -2841,28 +2761,79 @@ def auth_ui():
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# MAINTENANCE CHECK DECORATOR
-# ─────────────────────────────────────────────────────────────────────────────
-def check_maintenance(username):
-    """Check if user should see maintenance mode."""
-    if not MAINTENANCE_MODE:
-        return False  # No maintenance mode active
-    
-    # Admin bypass
-    if username == ADMIN_USERNAME:
-        return False
-    
-    # All other users see maintenance
-    return True
-
-
-# ─────────────────────────────────────────────────────────────────────────────
-# MAIN APP ROUTER (with Maintenance Mode)
+# MAIN APP ROUTER
 # ─────────────────────────────────────────────────────────────────────────────
 def main_app():
     username = st.session_state.username
-    
-    # ── MAINTENANCE MODE CHECK ────────────────────────────────────────────
-    if check_maintenance(username):
-        # Show maintenance page to regular users
-        st.markdown("""
+
+    # ── ONBOARDING GATE — show wizard if profile not set ─────────────────
+    if not is_onboarded(username):
+        show_onboarding(username)
+        return                        # ← stop here; no sidebar, no dashboard
+
+    # ── Normal app flow ───────────────────────────────────────────────────
+    render_sidebar(username)
+    page = st.session_state.active_page
+
+    if   page == "dashboard":    show_dashboard(username)
+    elif page == "study":        show_study_tools(username)
+    elif page == "flashcards":   show_flashcards(username)
+    elif page == "achievements": show_achievements(username)
+    else:                        show_dashboard(username)
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# MAINTENANCE MODE
+# ═══════════════════════════════════════════════════════════════════════════════
+
+MAINTENANCE_MODE = True
+ALLOWED_USERS_MAINTENANCE = ["Deepak"]  # ← Change this!
+
+if MAINTENANCE_MODE:
+    if st.session_state.logged_in:
+        if st.session_state.username not in ALLOWED_USERS_MAINTENANCE:
+            st.error("""
+            ❌ **StudySmart AI is Currently Under Maintenance**
+            
+            We're upgrading our platform to bring you better features.
+            
+            🔧 **Expected Duration:** 2-3 hours
+            
+            Thank you for your patience! We'll be back soon. 💪
+            """)
+            st.stop()
+    else:
+        _, col, _ = st.columns([1, 2, 1])
+        with col:
+            st.markdown("""
+            <div style="text-align:center;padding:60px 20px;">
+                <div style="font-size:5rem;margin-bottom:20px;">🛠️</div>
+                <div style="font-size:2.2rem;font-weight:900;
+                    background:linear-gradient(135deg,#ef4444,#f97316);
+                    -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+                    background-clip:text;">
+                    Under Maintenance
+                </div>
+                <div style="font-size:1.1rem;color:#64748b;margin-top:12px;
+                    line-height:1.6;">
+                    StudySmart AI is currently undergoing scheduled maintenance.
+                    <br><br>
+                    <b>We'll be back shortly!</b>
+                    <br><br>
+                    <span style="font-size:0.95rem;">
+                    ⏱️ Expected return: In a few hours<br>
+                    📧 Questions? Contact support@studysmart.ai
+                    </span>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+            st.stop()
+
+init_db()
+init_session_state()
+
+if st.session_state.logged_in:
+    main_app()
+else:
+    auth_ui()
+
