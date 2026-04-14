@@ -4,6 +4,9 @@ import json
 import google.generativeai as genai
 from datetime import datetime, timedelta
 import os
+import os
+import tempfile
+DB_PATH = os.path.join(tempfile.gettempdir(), "users.db")
 from pathlib import Path
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -356,7 +359,7 @@ Generate helpful, structured content appropriate for the tool type.
 
 def get_weekly_progress(username):
     """Get weekly study progress."""
-    conn = sqlite3.connect("users.db")
+    conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     
     # Get current week's minutes
@@ -405,7 +408,7 @@ def _ensure_column(cursor, table_name, column_name, column_def):
 
 
 def init_db():
-    conn = sqlite3.connect("users.db")
+    conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
 
     # Core users
@@ -507,24 +510,24 @@ WHITELISTED_USERS = {
 
 def seed_whitelisted_users():
     """Insert whitelisted users into DB if they don't exist."""
-    conn = sqlite3.connect("users.db")
+    conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
+
     for uname, pwd in WHITELISTED_USERS.items():
         c.execute(
             "INSERT OR IGNORE INTO users (username, password) VALUES (?, ?)",
-            (uname, pwd)
+            (uname, hash_p(pwd))
         )
+
     conn.commit()
     conn.close()
-
-seed_whitelisted_users()
 
 # ─────────────────────────────────────────────────────────────────────────────
 # AUTH HELPERS
 # ─────────────────────────────────────────────────────────────────────────────
 def verify_user(username, password):
     """Check if username/password match DB record."""
-    conn = sqlite3.connect("users.db")
+    conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     c.execute(
         "SELECT username FROM users WHERE username=? AND password=?",
@@ -538,7 +541,7 @@ def verify_user(username, password):
 # PROFILE HELPERS
 # ─────────────────────────────────────────────────────────────────────────────
 def get_user_profile(username):
-    conn = sqlite3.connect("users.db")
+    conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     c.execute(
         "SELECT category, course, stream, board, onboarded FROM user_profiles WHERE username=?",
@@ -557,7 +560,7 @@ def get_user_profile(username):
     return None
 
 def save_user_profile(username, category, course, stream, board):
-    conn = sqlite3.connect("users.db")
+    conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     c.execute("""
         INSERT INTO user_profiles (username, category, course, stream, board, onboarded)
@@ -576,7 +579,7 @@ def save_user_profile(username, category, course, stream, board):
 # STATS HELPERS
 # ─────────────────────────────────────────────────────────────────────────────
 def get_user_stats(username):
-    conn = sqlite3.connect("users.db")
+    conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     c.execute(
         "SELECT streak_days, last_login, total_study_minutes, weekly_minutes, xp_points FROM user_stats WHERE username=?",
@@ -606,7 +609,7 @@ def get_user_stats(username):
 
 def update_streak(username):
     """Update login streak and XP on each login."""
-    conn = sqlite3.connect("users.db")
+    conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     today = datetime.now().strftime("%Y-%m-%d")
 
@@ -642,7 +645,7 @@ def update_streak(username):
 
 def add_study_minutes(username, minutes):
     """Add study minutes and XP after a timer session."""
-    conn = sqlite3.connect("users.db")
+    conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     today = datetime.now().strftime("%Y-%m-%d")
     week_key = datetime.now().strftime("%Y-W%W")
@@ -680,7 +683,7 @@ def add_study_minutes(username, minutes):
 # BADGE HELPERS
 # ─────────────────────────────────────────────────────────────────────────────
 def get_earned_badges(username):
-    conn = sqlite3.connect("users.db")
+    conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     c.execute("SELECT badge_id FROM badges WHERE username=?", (username,))
     rows = c.fetchall()
@@ -688,7 +691,7 @@ def get_earned_badges(username):
     return {r[0] for r in rows}
 
 def award_badge(username, badge_id):
-    conn = sqlite3.connect("users.db")
+    conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     c.execute(
         "INSERT OR IGNORE INTO badges (username, badge_id) VALUES (?, ?)",
@@ -713,7 +716,7 @@ def auto_check_badges(username):
     if total_min >= 300 and "study_300" not in earned: award_badge(username, "study_300")
 
     # Flashcard badge
-    conn = sqlite3.connect("users.db")
+    conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     c.execute("SELECT COUNT(*) FROM flashcards WHERE username=?", (username,))
     fc_count = c.fetchone()[0]
@@ -726,7 +729,7 @@ def auto_check_badges(username):
 # ─────────────────────────────────────────────────────────────────────────────
 def get_due_flashcards(username):
     today = datetime.now().strftime("%Y-%m-%d")
-    conn = sqlite3.connect("users.db")
+    conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     c.execute("""
         SELECT id, front, back, subject, chapter, next_review_date, review_count
@@ -739,7 +742,7 @@ def get_due_flashcards(username):
     return rows
 
 def get_all_flashcards(username):
-    conn = sqlite3.connect("users.db")
+    conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     c.execute("""
         SELECT id, front, back, subject, chapter, next_review_date, review_count
@@ -751,7 +754,7 @@ def get_all_flashcards(username):
     return rows
 
 def add_flashcard(username, front, back, subject="", chapter=""):
-    conn = sqlite3.connect("users.db")
+    conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     c.execute("""
         INSERT INTO flashcards (username, front, back, subject, chapter)
@@ -767,7 +770,7 @@ def update_flashcard_review(card_id, quality):
     intervals = {1: 7, 2: 3, 3: 1}
     days = intervals.get(quality, 1)
     next_date = (datetime.now() + timedelta(days=days)).strftime("%Y-%m-%d")
-    conn = sqlite3.connect("users.db")
+    conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     c.execute("""
         UPDATE flashcards
@@ -778,7 +781,7 @@ def update_flashcard_review(card_id, quality):
     conn.close()
 
 def delete_flashcard(card_id):
-    conn = sqlite3.connect("users.db")
+    conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     c.execute("DELETE FROM flashcards WHERE id=?", (card_id,))
     conn.commit()
@@ -860,7 +863,7 @@ def get_gemini_model():
     return None
 
 def log_study_history(username, tool, subject):
-    conn = sqlite3.connect("users.db")
+    conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     c.execute(
         "INSERT INTO study_history (username, tool, subject) VALUES (?, ?, ?)",
@@ -1191,7 +1194,7 @@ def auth_ui():
                 if not u.strip() or not p.strip():
                     st.warning("⚠️ Please enter both username and password.")
                 else:
-                    conn = sqlite3.connect("users.db")
+                    conn = sqlite3.connect(DB_PATH)
                     c = conn.cursor()
                     c.execute(
                         "SELECT * FROM users WHERE username=? AND password=?",
@@ -1201,7 +1204,7 @@ def auth_ui():
                     conn.close()
 
                     if user_row:
-                        conn = sqlite3.connect("users.db")
+                        conn = sqlite3.connect(DB_PATH)
                         c = conn.cursor()
 
                         c.execute(
@@ -1269,7 +1272,7 @@ def auth_ui():
                 elif len(new_password) < 6:
                     st.error("Password must be at least 6 characters.")
                 else:
-                    conn = sqlite3.connect("users.db")
+                    conn = sqlite3.connect(DB_PATH)
                     c = conn.cursor()
                     try:
                         c.execute(
@@ -1599,7 +1602,7 @@ if "current_subject_for_timer" not in st.session_state:
 # ACTIVITY LOG HELPERS
 # ─────────────────────────────────────────────────────────────────────────────
 def save_activity_log(username, tool, chapter, subject, preview):
-    conn = sqlite3.connect("users.db")
+    conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     c.execute("""
         CREATE TABLE IF NOT EXISTS activity_log (
@@ -1627,7 +1630,7 @@ def save_activity_log(username, tool, chapter, subject, preview):
     conn.close()
 
 def get_activity_log(username, limit=8):
-    conn = sqlite3.connect("users.db")
+    conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     try:
         c.execute("""
@@ -1688,7 +1691,7 @@ def add_to_history(tool, chapter, subject, preview, username=None):
 # BADGES
 # ─────────────────────────────────────────────────────────────────────────────
 def get_earned_badges(username):
-    conn = sqlite3.connect("users.db")
+    conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     try:
         c.execute("SELECT badge_id FROM badges WHERE username=?", (username,))
@@ -1699,7 +1702,7 @@ def get_earned_badges(username):
     return {r[0] for r in rows}
 
 def award_badge(username, badge_id):
-    conn = sqlite3.connect("users.db")
+    conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     try:
         c.execute("""
@@ -1739,7 +1742,7 @@ def auto_check_badges(username):
     if total_min >= 300 and "study_300" not in earned:
         award_badge(username, "study_300")
 
-    conn = sqlite3.connect("users.db")
+    conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     try:
         c.execute("SELECT COUNT(*) FROM flashcards WHERE username=?", (username,))
@@ -2170,7 +2173,7 @@ def show_achievements(username):
             shown = True
             break
         elif bid == "fc_10":
-            conn = sqlite3.connect("users.db")
+            conn = sqlite3.connect(DB_PATH)
             c = conn.cursor()
             try:
                 c.execute("SELECT COUNT(*) FROM flashcards WHERE username=?", (username,))
@@ -2398,7 +2401,7 @@ def show_settings(username):
     col1, col2 = st.columns(2)
     with col1:
         if st.button("🔄 Reset Onboarding", use_container_width=True, key="reset_ob"):
-            conn = sqlite3.connect("users.db")
+            conn = sqlite3.connect(DB_PATH)
             c = conn.cursor()
             c.execute("UPDATE user_profiles SET onboarded=0 WHERE username=?", (username,))
             conn.commit()
@@ -2408,7 +2411,7 @@ def show_settings(username):
             st.rerun()
     with col2:
         if st.button("🗑️ Clear Activity Log", use_container_width=True, key="clear_log"):
-            conn = sqlite3.connect("users.db")
+            conn = sqlite3.connect(DB_PATH)
             c = conn.cursor()
             c.execute("DELETE FROM activity_log WHERE username=?", (username,))
             conn.commit()
@@ -2432,7 +2435,7 @@ def show_settings(username):
 # ─────────────────────────────────────────────────────────────────────────────
 def check_daily_login(username):
     """Check and update daily login streak."""
-    conn = sqlite3.connect("users.db")
+    conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     today = datetime.now().strftime("%Y-%m-%d")
     yesterday = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
@@ -2466,7 +2469,7 @@ def check_daily_login(username):
 
 def award_xp(username, amount):
     """Award XP to user."""
-    conn = sqlite3.connect("users.db")
+    conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     c.execute("INSERT OR IGNORE INTO user_stats (username) VALUES (?)", (username,))
     c.execute("UPDATE user_stats SET total_xp = total_xp + ? WHERE username=?", (amount, username))
@@ -2475,7 +2478,7 @@ def award_xp(username, amount):
 
 def record_study_session(username, subject, minutes):
     """Record a study session in the database."""
-    conn = sqlite3.connect("users.db")
+    conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     today = datetime.now().strftime("%Y-%m-%d")
 
