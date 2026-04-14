@@ -397,44 +397,64 @@ def get_weekly_progress(username):
         "progress": min(100, (current_week / 300) * 100) if 300 > 0 else 0
     }
 
+def _ensure_column(cursor, table_name, column_name, column_def):
+    cursor.execute(f"PRAGMA table_info({table_name})")
+    existing_cols = {row[1] for row in cursor.fetchall()}
+    if column_name not in existing_cols:
+        cursor.execute(f"ALTER TABLE {table_name} ADD COLUMN {column_name} {column_def}")
+
+
 def init_db():
     conn = sqlite3.connect("users.db")
     c = conn.cursor()
 
-    # Users table
+    # Core users
     c.execute("""
         CREATE TABLE IF NOT EXISTS users (
             username TEXT PRIMARY KEY,
-            password TEXT NOT NULL,
-            created_at TEXT DEFAULT CURRENT_TIMESTAMP
+            password TEXT NOT NULL
         )
     """)
 
-    # User profiles table
+    # User profile / onboarding compatibility
     c.execute("""
-        CREATE TABLE IF NOT EXISTS user_profiles (
+        CREATE TABLE IF NOT EXISTS user_profile (
             username TEXT PRIMARY KEY,
             category TEXT DEFAULT '',
             course TEXT DEFAULT '',
             stream TEXT DEFAULT '',
             board TEXT DEFAULT '',
-            onboarded INTEGER DEFAULT 0
+            onboarded INTEGER DEFAULT 0,
+            created_at TEXT DEFAULT ''
         )
     """)
 
-    # User stats table
+    # Stats table
     c.execute("""
         CREATE TABLE IF NOT EXISTS user_stats (
             username TEXT PRIMARY KEY,
+            total_xp INTEGER DEFAULT 0,
             streak_days INTEGER DEFAULT 0,
             last_login TEXT DEFAULT '',
-            total_study_minutes INTEGER DEFAULT 0,
-            weekly_minutes TEXT DEFAULT '{}',
-            xp_points INTEGER DEFAULT 0
+            total_minutes INTEGER DEFAULT 0
         )
     """)
 
-    # Badges table
+    # Add compatibility columns if older schema exists
+    _ensure_column(c, "user_stats", "total_study_minutes", "INTEGER DEFAULT 0")
+    _ensure_column(c, "user_stats", "weekly_minutes", "TEXT DEFAULT '{}'")
+    _ensure_column(c, "user_stats", "xp_points", "INTEGER DEFAULT 0")
+
+    # Achievements / badges compatibility
+    c.execute("""
+        CREATE TABLE IF NOT EXISTS achievements (
+            username TEXT,
+            badge_id TEXT,
+            earned_at TEXT,
+            PRIMARY KEY (username, badge_id)
+        )
+    """)
+
     c.execute("""
         CREATE TABLE IF NOT EXISTS badges (
             username TEXT,
@@ -444,21 +464,25 @@ def init_db():
         )
     """)
 
-    # Flashcards table
+    # Flashcards compatibility
     c.execute("""
         CREATE TABLE IF NOT EXISTS flashcards (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             username TEXT,
-            front TEXT,
-            back TEXT,
+            front_text TEXT DEFAULT '',
+            back_text TEXT DEFAULT '',
+            front TEXT DEFAULT '',
+            back TEXT DEFAULT '',
             subject TEXT DEFAULT '',
             chapter TEXT DEFAULT '',
-            next_review_date TEXT DEFAULT CURRENT_DATE,
+            ease_factor REAL DEFAULT 2.5,
+            interval_days INTEGER DEFAULT 1,
+            next_review_date TEXT DEFAULT '',
             review_count INTEGER DEFAULT 0
         )
     """)
 
-    # Study history table
+    # Study history
     c.execute("""
         CREATE TABLE IF NOT EXISTS study_history (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -471,8 +495,6 @@ def init_db():
 
     conn.commit()
     conn.close()
-
-init_db()
 
 # ─────────────────────────────────────────────────────────────────────────────
 # WHITELISTED USERS (add usernames here — registration is disabled)
@@ -1122,55 +1144,120 @@ def render_sidebar(username):
             go_to("settings")
 
         st.markdown("---")
-        if st.button("🚪 Logout", use_container_width=True, key="logout_btn"):
-            st.session_state.page = "login"
-            st.session_state.username = ""
-            st.rerun()
+if st.button("🚪 Logout", use_container_width=True, key="logout_btn"):
+    st.session_state.logged_in = False
+    st.session_state.username = ""
+    st.session_state.page = "login"
+    st.session_state.active_page = "dashboard"
+    st.rerun()
+
 # ─────────────────────────────────────────────────────────────────────────────
 # Part 5 LOGIN PAGE
 # ─────────────────────────────────────────────────────────────────────────────
 def auth_ui():
+    """Login / Register UI"""
+
     _, col_c, _ = st.columns([1, 2, 1])
 
     with col_c:
-        st.markdown("## 🎓 StudySmart AI")
-        st.markdown("### Login / Register")
+        st.markdown("""
+            <div class="sf-header">
+                <div class="sf-header-title">StudySmart</div>
+                <div class="sf-header-subtitle">Your Smart Exam Preparation Platform</div>
+            </div>
+            <div class="sf-watermark">POWERED BY AI</div>
+        """, unsafe_allow_html=True)
+
+        st.markdown('<div class="sf-card">', unsafe_allow_html=True)
 
         tab1, tab2 = st.tabs(["🔐 Login", "📝 Register"])
 
         with tab1:
-            username = st.text_input("Username", key="login_user")
-            password = st.text_input("Password", type="password", key="login_pass")
+            with st.form("login_form", clear_on_submit=False):
+                u = st.text_input(
+                    "👤 Username",
+                    key="login_u",
+                    placeholder="Enter your username"
+                )
+                p = st.text_input(
+                    "🔑 Password",
+                    type="password",
+                    key="login_p",
+                    placeholder="Enter your password"
+                )
+                login_submit = st.form_submit_button("Sign In 🚀", use_container_width=True)
 
-            if st.button("Sign In 🚀", use_container_width=True, key="login_btn"):
-                if not username.strip() or not password.strip():
-                    st.error("Please enter both username and password.")
+            if login_submit:
+                if not u.strip() or not p.strip():
+                    st.warning("⚠️ Please enter both username and password.")
                 else:
                     conn = sqlite3.connect("users.db")
                     c = conn.cursor()
                     c.execute(
                         "SELECT * FROM users WHERE username=? AND password=?",
-                        (username.strip(), hash_p(password))
+                        (u.strip(), hash_p(p))
                     )
-                    user = c.fetchone()
+                    user_row = c.fetchone()
                     conn.close()
 
-                    if user:
+                    if user_row:
+                        conn = sqlite3.connect("users.db")
+                        c = conn.cursor()
+
+                        c.execute(
+                            "INSERT OR IGNORE INTO user_stats (username) VALUES (?)",
+                            (u.strip(),)
+                        )
+
+                        c.execute(
+                            "INSERT OR IGNORE INTO user_profile (username) VALUES (?)",
+                            (u.strip(),)
+                        )
+
+                        conn.commit()
+                        conn.close()
+
                         st.session_state.logged_in = True
-                        st.session_state.username = username.strip()
+                        st.session_state.username = u.strip()
+                        st.session_state.page = "dashboard"
+                        st.session_state.active_page = "dashboard"
+
+                        try:
+                            auto_check_badges(u.strip())
+                        except Exception:
+                            pass
+
                         st.success("✅ Login successful!")
-                        time.sleep(0.5)
+                        time.sleep(0.6)
                         st.rerun()
                     else:
                         st.error("❌ Invalid username or password.")
 
         with tab2:
-            st.markdown("### 📝 Create New Account")
-            new_username = st.text_input("Choose a username", key="reg_user")
-            new_password = st.text_input("Create password", type="password", key="reg_pass")
-            new_password_confirm = st.text_input("Confirm password", type="password", key="reg_pass_confirm")
+            with st.form("register_form", clear_on_submit=True):
+                new_username = st.text_input(
+                    "Choose a username",
+                    key="reg_user",
+                    placeholder="Minimum 3 characters"
+                )
+                new_password = st.text_input(
+                    "Create password",
+                    type="password",
+                    key="reg_pass",
+                    placeholder="Minimum 6 characters"
+                )
+                new_password_confirm = st.text_input(
+                    "Confirm password",
+                    type="password",
+                    key="reg_pass_confirm"
+                )
 
-            if st.button("✅ Create Account", use_container_width=True, key="register_btn"):
+                register_submit = st.form_submit_button(
+                    "✅ Create Account",
+                    use_container_width=True
+                )
+
+            if register_submit:
                 new_username = new_username.strip()
 
                 if not new_username or not new_password or not new_password_confirm:
@@ -1182,10 +1269,9 @@ def auth_ui():
                 elif len(new_password) < 6:
                     st.error("Password must be at least 6 characters.")
                 else:
+                    conn = sqlite3.connect("users.db")
+                    c = conn.cursor()
                     try:
-                        conn = sqlite3.connect("users.db")
-                        c = conn.cursor()
-
                         c.execute(
                             "INSERT INTO users (username, password) VALUES (?, ?)",
                             (new_username, hash_p(new_password))
@@ -1196,7 +1282,6 @@ def auth_ui():
                             (new_username,)
                         )
 
-                        # Optional: only keep this if your app uses user_profile table
                         c.execute(
                             "INSERT OR IGNORE INTO user_profile (username) VALUES (?)",
                             (new_username,)
@@ -1204,11 +1289,12 @@ def auth_ui():
 
                         conn.commit()
                         st.success("✅ Account created! You can now login.")
-
                     except sqlite3.IntegrityError:
                         st.error("❌ Username already exists.")
                     finally:
                         conn.close()
+
+        st.markdown('</div>', unsafe_allow_html=True)
 
 # ─────────────────────────────────────────────────────────────────────────────
 # ONBOARDING WIZARD
@@ -2427,38 +2513,131 @@ def record_study_session(username, subject, minutes):
 # ─────────────────────────────────────────────────────────────────────────────
 # ROUTER / MAIN APP
 # ─────────────────────────────────────────────────────────────────────────────
-def main():
-    # Sidebar (only when logged in)
-    if st.session_state.page != "login" and st.session_state.username:
-        render_sidebar(st.session_state.username)
+def go_to(page):
+    page_alias = {
+        "study_tools": "study",
+        "study": "study",
+        "dashboard": "dashboard",
+        "flashcards": "flashcards",
+        "achievements": "achievements",
+        "settings": "settings",
+        "login": "login",
+        "onboarding": "onboarding",
+    }
 
-    # Page router
-    if st.session_state.page == "login":
-        show_login()
-    elif st.session_state.page == "onboarding":
-        show_onboarding(st.session_state.username)
-    elif st.session_state.page == "dashboard":
-        show_dashboard(st.session_state.username)
-    elif st.session_state.page == "study_tools":
-        show_study_tools(st.session_state.username)
-    elif st.session_state.page == "flashcards":
-        show_flashcards(st.session_state.username)
-    elif st.session_state.page == "achievements":
-        show_achievements(st.session_state.username)
-    elif st.session_state.page == "settings":
-        show_settings(st.session_state.username)
-    else:
-        # Default fallback
+    st.session_state.page = page
+
+    if page in page_alias and page not in ["login", "onboarding"]:
+        st.session_state.active_page = page_alias[page]
+
+    st.rerun()
+
+
+def main_app():
+    username = st.session_state.get("username", "").strip()
+    if not username:
+        st.session_state.logged_in = False
         st.session_state.page = "login"
-        st.rerun()
+        auth_ui()
+        return
 
-    # Auto-redirect to onboarding if needed
-    if (st.session_state.page != "login" and st.session_state.page != "onboarding" and
-        st.session_state.username):
-        profile = get_user_profile(st.session_state.username)
-        if not profile or not profile.get("onboarded"):
-            st.session_state.page = "onboarding"
-            st.rerun()
+    render_sidebar(username)
+
+    current_page = st.session_state.get("page", "dashboard")
+    normalized_page = "study" if current_page == "study_tools" else current_page
+
+    if normalized_page == "dashboard":
+        show_dashboard(username)
+    elif normalized_page == "study":
+        show_study_tools(username)
+    elif normalized_page == "flashcards":
+        show_flashcards(username)
+    elif normalized_page == "achievements":
+        show_achievements(username)
+    elif normalized_page == "settings":
+        if "show_settings" in globals() and callable(show_settings):
+            show_settings(username)
+        else:
+            show_dashboard(username)
+    elif normalized_page == "onboarding":
+        if "show_onboarding" in globals() and callable(show_onboarding):
+            show_onboarding(username)
+        else:
+            show_dashboard(username)
+    else:
+        show_dashboard(username)
+
+def init_session_state():
+    defaults = {
+        "logged_in": False,
+        "username": "",
+        "page": "login",
+        "active_page": "dashboard",
+
+        "history": [],
+        "current_chapters": [],
+        "last_chapter_key": "",
+
+        "generated_result": None,
+        "generated_model": None,
+        "generated_label": None,
+        "generated_tool": None,
+        "generated_chapter": None,
+        "generated_subject": None,
+        "generated_topic": None,
+        "generated_course": None,
+        "generated_stream": None,
+        "generated_board": None,
+        "generated_audience": None,
+        "generated_output_style": None,
+
+        "answers_result": None,
+        "answers_model": None,
+        "show_answers": False,
+
+        "fullpaper_result": None,
+        "fullpaper_model": None,
+        "show_fullpaper": False,
+
+        "daily_checkin_done": False,
+        "study_timer_active": False,
+        "study_timer_start": None,
+        "current_subject_for_timer": "General",
+
+        "review_idx": 0,
+        "review_show_ans": False,
+    }
+
+    for key, value in defaults.items():
+        if key not in st.session_state:
+            st.session_state[key] = value
+
+    if st.session_state.get("logged_in", False) and st.session_state.get("page") == "login":
+        st.session_state.page = "dashboard"
+
+    if st.session_state.get("page") == "study_tools":
+        st.session_state.active_page = "study"
+    elif st.session_state.get("page") in ["dashboard", "study", "flashcards", "achievements", "settings"]:
+        st.session_state.active_page = st.session_state.page
+
+
+def main():
+    init_db()
+    init_session_state()
+
+    if "seed_whitelisted_users" in globals() and callable(seed_whitelisted_users):
+        try:
+            seed_whitelisted_users()
+        except Exception:
+            pass
+
+    if not st.session_state.get("logged_in", False):
+        st.session_state.page = "login"
+        auth_ui()
+        return
+
+    main_app()
+
 
 # ─────────────────────────────────────────────────────────────────────────────
 # ENTRY POINT
