@@ -10,14 +10,33 @@ import io
 import json
 import time
 import datetime
-from pathlib import Path
 
+from pathlib import Path
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import cm
 from reportlab.lib import colors
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, HRFlowable
 from reportlab.lib.enums import TA_CENTER, TA_LEFT
+
+def render_stat_card(icon, title, subtitle, bg, border, shadow, tick):
+    """
+    Renders a consistent, safe HTML card for the dashboard.
+    """
+    card_html = f'''
+    <div style="
+        background:{bg}; border:{border}; border-radius:16px;
+        padding:16px 10px; text-align:center; box-shadow:{shadow};
+        margin-bottom:4px; min-height:130px;
+        display:flex; flex-direction:column;
+        justify-content:center; align-items:center;">
+        <div style="font-size:2.1rem;">{icon}</div>
+        <div style="font-weight:800; font-size:.9rem; color:#0f172a; margin-top:7px;">{title}</div>
+        <div style="font-size:.74rem; color:#64748b; margin-top:3px;">{subtitle}</div>
+        {tick}
+    </div>
+    '''
+    return st.markdown(card_html, unsafe_allow_html=True)
 
 # ─────────────────────────────────────────────────────────────────────────────
 # PAGE CONFIG
@@ -1307,23 +1326,7 @@ def render_checkbox_card(title, subtitle, icon, is_selected):
     shadow = "0 4px 18px rgba(37,99,235,.18)" if is_selected else "0 2px 12px rgba(15,23,42,.06)"
     tick   = "<div style='font-size:.72rem;color:#2563eb;font-weight:700;margin-top:7px;'>✓ Selected</div>" if is_selected else ""
 
-   st.markdown(
-    f'''
-    <div style="
-        background:{bg}; border:{border}; border-radius:16px;
-        padding:16px 10px; text-align:center; box-shadow:{shadow};
-        margin-bottom:4px; min-height:130px;
-        display:flex; flex-direction:column;
-        justify-content:center; align-items:center;">
-        <div style="font-size:2.1rem;">{icon}</div>
-        <div style="font-weight:800; font-size:.9rem; color:#0f172a; margin-top:7px;">{title}</div>
-        <div style="font-size:.74rem; color:#64748b; margin-top:3px;">{subtitle}</div>
-        {tick}
-    </div>
-    ''',
-    unsafe_allow_html=True
-)
-
+   render_stat_card(icon, title, subtitle, bg, border, shadow, tick)
 
 # ─────────────────────────────────────────────────────────────────────────────
 # UI HELPERS
