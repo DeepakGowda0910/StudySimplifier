@@ -1,7 +1,6 @@
-
-code = r'''# ═══════════════════════════════════════════════════════════════════════════════
-# STUDYSMART AI — app.py  (Complete · All Features · All Fixes · Login Page Visible)
-# ═══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# STUDYSMART AI â€” app.py  (Complete Â· All Features Â· All Fixes Â· Login Page Visible)
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 import streamlit as st
 import google.generativeai as genai
@@ -14,19 +13,19 @@ from reportlab.lib import colors
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, HRFlowable
 from reportlab.lib.enums import TA_CENTER
 
-# ─────────────────────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 # PAGE CONFIG  (MUST be first Streamlit call)
-# ─────────────────────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 st.set_page_config(
     page_title="StudySmart AI",
-    page_icon="🎓",
+    page_icon="ðŸŽ“",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
 
-# ─────────────────────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 # FULL CSS  (original from your uploaded file)
-# ─────────────────────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap');
@@ -110,7 +109,7 @@ st.markdown("""
         line-height: 1;
     }
 
-    /* ── App hero (inside pages) ── */
+    /* â”€â”€ App hero (inside pages) â”€â”€ */
     .sf-hero { text-align:center; padding:14px 0 8px 0; }
     .sf-hero-title {
         font-size:2rem; font-weight:800;
@@ -126,7 +125,7 @@ st.markdown("""
         font-weight:800; letter-spacing:.12em; text-transform:uppercase;
     }
 
-    /* ── Cards ── */
+    /* â”€â”€ Cards â”€â”€ */
     .sf-card {
         position:relative !important; z-index:10 !important;
         background:#ffffff !important; border:1px solid #dde5f0 !important;
@@ -146,7 +145,7 @@ st.markdown("""
     .sf-soft-card *,.sf-soft-card p,
     .sf-soft-card span,.sf-soft-card strong { color:#0f172a !important; }
 
-    /* ── Metric cards ── */
+    /* â”€â”€ Metric cards â”€â”€ */
     .mc {
         border-radius:14px; padding:14px 10px;
         color:white !important; text-align:center;
@@ -161,11 +160,11 @@ st.markdown("""
     .mc .val   { font-size:1.45rem; font-weight:800; margin:3px 0; }
     .mc .lbl   { font-size:.75rem; opacity:.93; }
 
-    /* ── XP bar ── */
+    /* â”€â”€ XP bar â”€â”€ */
     .xp-wrap { background:#e2e8f0; border-radius:999px; height:10px; overflow:hidden; }
     .xp-fill { height:100%; border-radius:999px; background:linear-gradient(90deg,#3b82f6,#8b5cf6); }
 
-    /* ── History ── */
+    /* â”€â”€ History â”€â”€ */
     .sf-hist {
         background:#f8fbff !important; border:1px solid #e2e8f0 !important;
         border-left:4px solid #3b82f6 !important; border-radius:12px !important;
@@ -176,7 +175,7 @@ st.markdown("""
     .sf-hist b { color:#1d4ed8 !important; }
     .sf-hist small { color:#475569 !important; }
 
-    /* ── Output boxes ── */
+    /* â”€â”€ Output boxes â”€â”€ */
     .sf-output {
         background:#eff6ff !important; border:1px solid #bfdbfe !important;
         border-left:4px solid #2563eb !important; border-radius:14px !important;
@@ -201,7 +200,7 @@ st.markdown("""
     .sf-fullpaper *,.sf-fullpaper p,.sf-fullpaper li,.sf-fullpaper span,.sf-fullpaper strong { color:#0f172a !important; }
     .sf-fullpaper h1,.sf-fullpaper h2,.sf-fullpaper h3 { color:#6d28d9 !important; }
 
-    /* ── Flashcards ── */
+    /* â”€â”€ Flashcards â”€â”€ */
     .fc-front {
         background:linear-gradient(135deg,#4f46e5,#7c3aed) !important;
         border-radius:16px; padding:24px 18px; color:white !important;
@@ -217,7 +216,7 @@ st.markdown("""
     }
     .fc-back * { color:white !important; }
 
-    /* ── Badges ── */
+    /* â”€â”€ Badges â”€â”€ */
     .bdg {
         background:#ffffff !important; border:1px solid #e2e8f0 !important;
         border-radius:14px !important; padding:12px 8px !important;
@@ -230,7 +229,7 @@ st.markdown("""
     .bdg .bn  { font-weight:700; font-size:.82rem; margin-top:4px; color:#0f172a !important; }
     .bdg .bs  { font-size:.72rem; color:#475569 !important; margin-top:2px; }
 
-    /* ── Selectbox ── */
+    /* â”€â”€ Selectbox â”€â”€ */
     div[data-baseweb="select"] > div:first-child {
         border:1.5px solid #c7d4e8 !important; border-radius:11px !important;
         background:#ffffff !important; min-height:42px !important;
@@ -251,7 +250,7 @@ st.markdown("""
     }
     div[role="option"]:hover { background:#eff6ff !important; color:#1d4ed8 !important; }
 
-    /* ── Inputs ── */
+    /* â”€â”€ Inputs â”€â”€ */
     .stTextInput > div > div > input,
     .stTextArea > div > div > textarea {
         border:1.5px solid #c7d4e8 !important;
@@ -260,7 +259,7 @@ st.markdown("""
         color:#0f172a !important;
     }
 
-    /* ── Buttons ── */
+    /* â”€â”€ Buttons â”€â”€ */
     .stButton > button {
         width: 100% !important;
         border-radius: 12px !important;
@@ -292,7 +291,7 @@ st.markdown("""
         color: #ffffff !important;
     }
 
-    /* ── Radio ── */
+    /* â”€â”€ Radio â”€â”€ */
     .stRadio > div { gap: 10px !important; }
     .stRadio > div > label {
         background:#f1f5f9 !important; border:1px solid #e2e8f0 !important;
@@ -304,7 +303,7 @@ st.markdown("""
         color:#1d4ed8 !important; font-weight:700 !important;
     }
 
-    /* ── Alerts ── */
+    /* â”€â”€ Alerts â”€â”€ */
     div[data-testid="stSuccessMessage"] {
         background: rgba(16, 185, 129, 0.08) !important;
         border: 1.5px solid rgba(16, 185, 129, 0.3) !important;
@@ -323,7 +322,7 @@ st.markdown("""
 
     hr { border: none; border-top: 1px solid #e2e8f0; margin: 20px 0; }
 
-    /* ── Mobile ── */
+    /* â”€â”€ Mobile â”€â”€ */
     @media (max-width: 768px) {
         .sf-header-title { font-size: 2.8rem !important; }
         .sf-header-subtitle { font-size: 1rem !important; }
@@ -361,27 +360,27 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# ─────────────────────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 # DATA LOADER
-# ─────────────────────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 @st.cache_data
 def load_study_data():
     try:
         with open(Path("data/study_data.json"), "r", encoding="utf-8") as f:
             return json.load(f)
     except FileNotFoundError:
-        st.error("❌ data/study_data.json not found!")
+        st.error("âŒ data/study_data.json not found!")
         return {}
     except json.JSONDecodeError:
-        st.error("❌ study_data.json is not valid JSON!")
+        st.error("âŒ study_data.json is not valid JSON!")
         return {}
 
 STUDY_DATA = load_study_data()
 BOARDS     = ["CBSE", "ICSE", "State Board", "ISC", "IB", "Cambridge"]
 
-# ─────────────────────────────────────────────────────────────────────────────
-# DATABASE (FIXED — cursor stays alive for all migrations)
-# ─────────────────────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# DATABASE (FIXED â€” cursor stays alive for all migrations)
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def init_db():
     conn = sqlite3.connect("users.db", check_same_thread=False)
     c = conn.cursor()
@@ -411,7 +410,7 @@ def init_db():
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         username TEXT, subject TEXT, minutes INTEGER DEFAULT 0, sess_date TEXT)""")
 
-    # safe migration helper — cursor stays valid
+    # safe migration helper â€” cursor stays valid
     def cols(t):
         c.execute(f"PRAGMA table_info({t})")
         return [r[1] for r in c.fetchall()]
@@ -435,9 +434,9 @@ def init_db():
     conn.commit()
     conn.close()
 
-# ─────────────────────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 # HELPERS
-# ─────────────────────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def hash_p(pw): return hashlib.sha256(pw.encode()).hexdigest()
 
 def get_courses(cat):
@@ -456,9 +455,9 @@ def get_chapters(cat,c,s,sub,top):
     try: return STUDY_DATA[cat][c][s][sub][top]
     except: return ["No chapters found"]
 
-# ─────────────────────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 # XP / STREAK / STATS
-# ─────────────────────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def award_xp(username, xp):
     conn = sqlite3.connect("users.db", check_same_thread=False); c = conn.cursor()
     c.execute("INSERT OR IGNORE INTO user_stats (username) VALUES (?)",(username,))
@@ -475,14 +474,14 @@ def check_daily_login(username):
         last, streak = row
         if last == today:
             conn.close()
-            return {"message":f"✅ Already checked in today · 🔥 {streak} day streak!","xp":0}
+            return {"message":f"âœ… Already checked in today Â· ðŸ”¥ {streak} day streak!","xp":0}
         yesterday = (datetime.date.today()-datetime.timedelta(days=1)).isoformat()
         streak = (streak+1) if last==yesterday else 1
         xp = 20
         c.execute("UPDATE user_stats SET last_login=?,streak_days=?,total_xp=COALESCE(total_xp,0)+? WHERE username=?",
                   (today,streak,xp,username))
         conn.commit(); conn.close()
-        return {"message":f"🔥 {streak} day streak! +{xp} XP","xp":xp,"streak":streak}
+        return {"message":f"ðŸ”¥ {streak} day streak! +{xp} XP","xp":xp,"streak":streak}
     conn.close()
     return {"message":"Checked in!","xp":0}
 
@@ -548,21 +547,21 @@ def record_study_session(username, subject, minutes):
     try: auto_check_badges(username)
     except: pass
 
-# ─────────────────────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 # BADGES
-# ─────────────────────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 ALL_BADGES = [
-    {"id":"first_login","name":"First Step",     "icon":"👣","desc":"Logged in for the first time"},
-    {"id":"streak_3",   "name":"Heatwave",        "icon":"🔥","desc":"3-day study streak"},
-    {"id":"streak_7",   "name":"Weekly Warrior",  "icon":"🎖️","desc":"7-day study streak"},
-    {"id":"streak_14",  "name":"Fortnight Champ", "icon":"🏆","desc":"14-day study streak"},
-    {"id":"streak_30",  "name":"Monthly Master",  "icon":"👑","desc":"30-day study streak"},
-    {"id":"first_gen",  "name":"Starter Spark",   "icon":"✨","desc":"Generated first AI content"},
-    {"id":"qp_generated","name":"Paper Setter",   "icon":"📝","desc":"Generated a question paper"},
-    {"id":"quiz_done",  "name":"Quiz Taker",       "icon":"🧠","desc":"Generated a quiz"},
-    {"id":"fc_10",      "name":"Card Collector",  "icon":"🗂️","desc":"Created 10 flashcards"},
-    {"id":"study_60",   "name":"Hour Hero",        "icon":"⏱️","desc":"Studied 60 minutes total"},
-    {"id":"study_300",  "name":"Study Champion",  "icon":"🎓","desc":"Studied 5 hours total"},
+    {"id":"first_login","name":"First Step",     "icon":"ðŸ‘£","desc":"Logged in for the first time"},
+    {"id":"streak_3",   "name":"Heatwave",        "icon":"ðŸ”¥","desc":"3-day study streak"},
+    {"id":"streak_7",   "name":"Weekly Warrior",  "icon":"ðŸŽ–ï¸","desc":"7-day study streak"},
+    {"id":"streak_14",  "name":"Fortnight Champ", "icon":"ðŸ†","desc":"14-day study streak"},
+    {"id":"streak_30",  "name":"Monthly Master",  "icon":"ðŸ‘‘","desc":"30-day study streak"},
+    {"id":"first_gen",  "name":"Starter Spark",   "icon":"âœ¨","desc":"Generated first AI content"},
+    {"id":"qp_generated","name":"Paper Setter",   "icon":"ðŸ“","desc":"Generated a question paper"},
+    {"id":"quiz_done",  "name":"Quiz Taker",       "icon":"ðŸ§ ","desc":"Generated a quiz"},
+    {"id":"fc_10",      "name":"Card Collector",  "icon":"ðŸ—‚ï¸","desc":"Created 10 flashcards"},
+    {"id":"study_60",   "name":"Hour Hero",        "icon":"â±ï¸","desc":"Studied 60 minutes total"},
+    {"id":"study_300",  "name":"Study Champion",  "icon":"ðŸŽ“","desc":"Studied 5 hours total"},
 ]
 
 def _award_raw(username, badge_id, c):
@@ -597,9 +596,9 @@ def auto_check_badges(username):
     except: pass
     finally: conn.close()
 
-# ─────────────────────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 # FLASHCARD HELPERS  (SM-2 algorithm)
-# ─────────────────────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def save_flashcard(username, front, back, subject="", chapter=""):
     conn = sqlite3.connect("users.db", check_same_thread=False); c = conn.cursor()
     today = datetime.date.today().isoformat()
@@ -645,9 +644,9 @@ def get_all_flashcards(username):
         FROM flashcards WHERE username=? ORDER BY created_date DESC""",(username,))
     rows=c.fetchall(); conn.close(); return rows
 
-# ─────────────────────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 # AI ENGINE
-# ─────────────────────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def get_available_models():
     api_key=st.secrets.get("GEMINI_API_KEY","")
     if not api_key: return ["Error: GEMINI_API_KEY not found"]
@@ -660,15 +659,15 @@ def get_available_models():
 
 def generate_with_fallback(prompt):
     api_key=st.secrets.get("GEMINI_API_KEY","")
-    if not api_key: return ("⚠️ API key missing in secrets.toml","None")
+    if not api_key: return ("âš ï¸ API key missing in secrets.toml","None")
     try: genai.configure(api_key=api_key)
-    except Exception as e: return (f"❌ Config error: {e}","None")
+    except Exception as e: return (f"âŒ Config error: {e}","None")
     try:
         available=[m.name for m in genai.list_models()
                    if "gemini" in m.name.lower()
                    and "generateContent" in getattr(m,"supported_generation_methods",[])]
-    except Exception as e: return (f"❌ Could not list models: {e}","None")
-    if not available: return ("❌ No Gemini models available.","None")
+    except Exception as e: return (f"âŒ Could not list models: {e}","None")
+    if not available: return ("âŒ No Gemini models available.","None")
     for model_name in available:
         try:
             model=genai.GenerativeModel(model_name)
@@ -679,7 +678,7 @@ def generate_with_fallback(prompt):
             if response and getattr(response,"text",None):
                 return response.text, model_name
         except: continue
-    return ("❌ All models failed.","None")
+    return ("âŒ All models failed.","None")
 
 def parse_flashcards(raw_text):
     cards=[]
@@ -698,27 +697,27 @@ def build_prompt(tool, chapter, topic, subject, audience, style, board="", cours
     base=(f"You are an expert educator creating study material for {audience}.\n"
           f"Subject: {subject} | Topic: {topic} | Chapter: {chapter} | Board/Syllabus: {board}\n"
           f"Requirements: Accurate, Exam-focused, Well-structured, With examples, Error-free.\n\n")
-    if tool=="📝 Summary":
-        if style=="🧪 Question Paper":
+    if tool=="ðŸ“ Summary":
+        if style=="ðŸ§ª Question Paper":
             return (f"You are an expert exam paper setter.\nBoard:{board}|Course:{course}|Subject:{subject}|For:{audience}\n\n"
                     f"Create a complete professional exam paper:\n- Section A: 10 MCQs (1 mark each)\n"
                     f"- Section B: 5 Short Answers (3 marks each)\n- Section C: 4 Long Answers (5 marks each)\n"
                     f"- Section D: 1-2 Case Studies (6-8 marks each)\nTotal: 100 marks. NO answers in this paper.")
-        if style=="📄 Detailed":
+        if style=="ðŸ“„ Detailed":
             return base+"Create a detailed chapter summary: overview, key concepts, definitions, formulas, 2 worked examples, common mistakes, exam tips."
-        if style=="⚡ Short & Quick":
+        if style=="âš¡ Short & Quick":
             return base+"Create a quick-reference summary: one-liner definition, 5-7 key points, formulas, quick tips. Max 500 words."
         return base+"Create structured notes: clear headings, bullets, definitions, examples, revision points."
-    if tool=="🧠 Quiz":
+    if tool=="ðŸ§  Quiz":
         return base+"Create: 5 MCQs (4 options each, mark answer), 5 short-answer Q&As, 3 long-answer Q&As with model answers."
-    if tool=="📌 Revision Notes":
+    if tool=="ðŸ“Œ Revision Notes":
         return base+"Create revision notes: top 10 must-know points, formula sheet, mnemonics, comparisons, exam focus areas."
-    if tool=="🧪 Question Paper":
+    if tool=="ðŸ§ª Question Paper":
         return (f"You are an expert exam paper setter.\nBoard:{board}|Course:{course}|Subject:{subject}|For:{audience}\n\n"
                 f"Create a complete professional exam paper:\n- Section A: 10 MCQs (1 mark each)\n"
                 f"- Section B: 5 Short Answers (3 marks each)\n- Section C: 4 Long Answers (5 marks each)\n"
                 f"- Section D: 1-2 Case Studies (6-8 marks each)\nTotal: 100 marks. DO NOT provide answers.")
-    if tool=="❓ Exam Q&A":
+    if tool=="â“ Exam Q&A":
         return base+"Create exam Q&A bank: 8-10 frequently asked Qs with model answers, conceptual Qs, application Qs."
     return base+"Create complete exam-ready study material."
 
@@ -728,17 +727,17 @@ def build_flashcard_prompt(subject, chapter, topic):
             f"CARD 2\nFRONT: ...\nBACK: ...\n(Continue for all 10. No extra text.)")
 
 def get_effective_output_name(tool, style):
-    if tool=="📝 Summary":
-        if style=="🧪 Question Paper": return "Question Paper"
-        return {"📄 Detailed":"Detailed Summary","⚡ Short & Quick":"Quick Summary","📋 Notes Format":"Study Notes"}.get(style,"Summary")
-    return {"🧠 Quiz":"Quiz","📌 Revision Notes":"Revision Notes","🧪 Question Paper":"Question Paper","❓ Exam Q&A":"Exam Q&A"}.get(tool,"Study Material")
+    if tool=="ðŸ“ Summary":
+        if style=="ðŸ§ª Question Paper": return "Question Paper"
+        return {"ðŸ“„ Detailed":"Detailed Summary","âš¡ Short & Quick":"Quick Summary","ðŸ“‹ Notes Format":"Study Notes"}.get(style,"Summary")
+    return {"ðŸ§  Quiz":"Quiz","ðŸ“Œ Revision Notes":"Revision Notes","ðŸ§ª Question Paper":"Question Paper","â“ Exam Q&A":"Exam Q&A"}.get(tool,"Study Material")
 
 def get_button_label(tool, style):
-    return f"⚡ Generate {get_effective_output_name(tool,style)}"
+    return f"âš¡ Generate {get_effective_output_name(tool,style)}"
 
-# ─────────────────────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 # PDF GENERATION
-# ─────────────────────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def generate_pdf(title, subtitle, content, color_hex="#1d4ed8"):
     buffer=io.BytesIO()
     doc=SimpleDocTemplate(buffer,pagesize=A4,topMargin=2*cm,bottomMargin=2*cm,leftMargin=1.5*cm,rightMargin=1.5*cm)
@@ -764,8 +763,8 @@ def generate_pdf(title, subtitle, content, color_hex="#1d4ed8"):
             story.append(Paragraph(f"<b><font size=16>{line[2:]}</font></b>",
                 ParagraphStyle("H1",parent=styles["Normal"],fontSize=16,fontName="Helvetica-Bold",
                                textColor=colors.HexColor(color_hex),spaceAfter=8,spaceBefore=12)))
-        elif line.startswith(("- ","* ","• ")):
-            story.append(Paragraph(f"• {line[2:]}",body_style))
+        elif line.startswith(("- ","* ","â€¢ ")):
+            story.append(Paragraph(f"â€¢ {line[2:]}",body_style))
         elif line.startswith("**") and line.endswith("**"):
             story.append(Paragraph(f"<b>{line[2:-2]}</b>",body_style))
         else:
@@ -777,9 +776,9 @@ def generate_pdf(title, subtitle, content, color_hex="#1d4ed8"):
     doc.build(story)
     buffer.seek(0); return buffer
 
-# ─────────────────────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 # SESSION STATE + NAV
-# ─────────────────────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def init_session_state():
     defaults={
         "logged_in":False,"username":"","active_page":"dashboard",
@@ -819,15 +818,15 @@ def add_to_history(tool, chapter, subject, result):
     st.session_state.history.insert(0,entry)
     st.session_state.history=st.session_state.history[:10]
 
-# ─────────────────────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 # UI HELPERS
-# ─────────────────────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def render_header(title, subtitle):
     st.markdown(f"""
         <div class="sf-hero">
             <div class="sf-hero-title">{title}</div>
             <div class="sf-hero-sub">{subtitle}</div>
-            <div class="sf-powered">✦ POWERED BY AI ✦</div>
+            <div class="sf-powered">âœ¦ POWERED BY AI âœ¦</div>
         </div>
     """, unsafe_allow_html=True)
     st.markdown("<div style='height:8px'></div>", unsafe_allow_html=True)
@@ -835,21 +834,21 @@ def render_header(title, subtitle):
 def render_back_button():
     col_btn,_=st.columns([1,3])
     with col_btn:
-        if st.button("← Back to Dashboard",key="back_to_dash",use_container_width=True):
+        if st.button("â† Back to Dashboard",key="back_to_dash",use_container_width=True):
             go_to("dashboard")
     st.markdown("<div style='height:4px'></div>", unsafe_allow_html=True)
 
-# ─────────────────────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 # SIDEBAR
-# ─────────────────────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def render_sidebar(username):
     stats=get_user_stats(username) or {}
     with st.sidebar:
         st.markdown(f"""
             <div style="text-align:center;padding:12px 0 10px 0;">
-                <div style="font-size:2rem;">🎓</div>
+                <div style="font-size:2rem;">ðŸŽ“</div>
                 <div style="font-size:1.02rem;font-weight:800;color:#2563eb;">StudySmart AI</div>
-                <div style="font-size:.77rem;margin-top:3px;">Hi, {username} 👋</div>
+                <div style="font-size:.77rem;margin-top:3px;">Hi, {username} ðŸ‘‹</div>
             </div>
         """, unsafe_allow_html=True)
 
@@ -858,14 +857,14 @@ def render_sidebar(username):
             st.markdown(f"""<div style="text-align:center;padding:7px 3px;
                 background:linear-gradient(135deg,#ff6b6b,#feca57);
                 border-radius:10px;color:white;font-weight:800;font-size:.85rem;">
-                🔥 {stats.get('streak_days',0)}<br>
+                ðŸ”¥ {stats.get('streak_days',0)}<br>
                 <span style="font-size:.62rem;font-weight:500;color:white;">day streak</span>
             </div>""", unsafe_allow_html=True)
         with c2:
             st.markdown(f"""<div style="text-align:center;padding:7px 3px;
                 background:linear-gradient(135deg,#8b5cf6,#7c3aed);
                 border-radius:10px;color:white;font-weight:800;font-size:.85rem;">
-                ⭐ Lv {stats.get('level',1)}<br>
+                â­ Lv {stats.get('level',1)}<br>
                 <span style="font-size:.62rem;font-weight:500;color:white;">{stats.get('total_xp',0)} XP</span>
             </div>""", unsafe_allow_html=True)
 
@@ -873,23 +872,23 @@ def render_sidebar(username):
 
         # Daily Check-in
         if not st.session_state.daily_checkin_done:
-            if st.button("✅ Daily Check-in (+20 XP)",use_container_width=True,key="sb_checkin"):
+            if st.button("âœ… Daily Check-in (+20 XP)",use_container_width=True,key="sb_checkin"):
                 result=check_daily_login(username)
                 st.session_state.daily_checkin_done=True
                 auto_check_badges(username)
                 st.success(result.get("message","Checked in!"))
                 st.rerun()
         else:
-            st.success(f"✅ Checked in · 🔥 {stats.get('streak_days',0)} days")
+            st.success(f"âœ… Checked in Â· ðŸ”¥ {stats.get('streak_days',0)} days")
 
         st.divider()
 
         # Study Timer
-        st.markdown("**⏱️ Study Timer**")
+        st.markdown("**â±ï¸ Study Timer**")
         if st.session_state.study_timer_active and st.session_state.study_timer_start:
             elapsed=int((datetime.datetime.now()-st.session_state.study_timer_start).total_seconds()//60)
-            st.info(f"🟢 Running: {elapsed} min — {st.session_state.current_subject_for_timer}")
-            if st.button("⏹️ Stop & Save",use_container_width=True,key="sb_stop"):
+            st.info(f"ðŸŸ¢ Running: {elapsed} min â€” {st.session_state.current_subject_for_timer}")
+            if st.button("â¹ï¸ Stop & Save",use_container_width=True,key="sb_stop"):
                 st.session_state.study_timer_active=False
                 dur=max(1,elapsed)
                 subj=st.session_state.get("current_subject_for_timer","General")
@@ -897,58 +896,58 @@ def render_sidebar(username):
                 xp_earned=max(5,(dur//10)*10)
                 award_xp(username,xp_earned)
                 auto_check_badges(username)
-                st.success(f"✅ {dur} min saved! +{xp_earned} XP")
+                st.success(f"âœ… {dur} min saved! +{xp_earned} XP")
                 st.rerun()
         else:
-            if st.button("▶️ Start Timer",use_container_width=True,key="sb_start"):
+            if st.button("â–¶ï¸ Start Timer",use_container_width=True,key="sb_start"):
                 st.session_state.study_timer_active=True
                 st.session_state.study_timer_start=datetime.datetime.now()
                 st.rerun()
 
         st.divider()
-        st.markdown("**🧭 Navigate**")
-        pages=[("🏠 Dashboard","dashboard"),("📚 Study Tools","study"),
-               ("🗂️ Flashcards","flashcards"),("🏅 Achievements","achievements")]
+        st.markdown("**ðŸ§­ Navigate**")
+        pages=[("ðŸ  Dashboard","dashboard"),("ðŸ“š Study Tools","study"),
+               ("ðŸ—‚ï¸ Flashcards","flashcards"),("ðŸ… Achievements","achievements")]
         for label,page in pages:
             if st.button(label,use_container_width=True,key=f"nav_{page}"):
                 go_to(page)
 
         st.divider()
-        st.markdown("**📜 Recent Activity**")
+        st.markdown("**ðŸ“œ Recent Activity**")
         if st.session_state.history:
             for h in st.session_state.history[:3]:
                 st.markdown(f"""<div class="sf-hist">
-                    🕐 {h['time']} | <b>{h['tool']}</b><br>
-                    📖 {h['chapter']} — {h['subject']}<br>
+                    ðŸ• {h['time']} | <b>{h['tool']}</b><br>
+                    ðŸ“– {h['chapter']} â€” {h['subject']}<br>
                     <small>{h['preview']}</small>
                 </div>""", unsafe_allow_html=True)
         else:
             st.caption("No activity yet.")
 
-        with st.expander("🤖 AI Status"):
+        with st.expander("ðŸ¤– AI Status"):
             if st.button("Check Models",use_container_width=True,key="sb_models"):
                 with st.spinner("Checking..."):
                     mdls=get_available_models()
-                for m in mdls: st.write(f"✅ {m}")
+                for m in mdls: st.write(f"âœ… {m}")
 
         st.divider()
-        if st.button("🚪 Logout",use_container_width=True,key="sb_logout"):
+        if st.button("ðŸšª Logout",use_container_width=True,key="sb_logout"):
             for k in list(st.session_state.keys()): del st.session_state[k]
             st.rerun()
 
-# ─────────────────────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 # DASHBOARD
-# ─────────────────────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def show_dashboard(username):
     render_header("StudySmart","Your Daily Learning Companion")
     stats=get_user_stats(username) or {}
 
     c1,c2,c3,c4=st.columns(4)
     for col,cls,icon,val,lbl in [
-        (c1,"mc-blue",  "🔥",stats.get("streak_days",0),"Day Streak"),
-        (c2,"mc-green", "⭐",f"Level {stats.get('level',1)}","Your Level"),
-        (c3,"mc-purple","📚",stats.get("flashcards_due",0),"Cards Due"),
-        (c4,"mc-amber", "⏱️",f"{stats.get('weekly_study_minutes',0)} min","This Week"),
+        (c1,"mc-blue",  "ðŸ”¥",stats.get("streak_days",0),"Day Streak"),
+        (c2,"mc-green", "â­",f"Level {stats.get('level',1)}","Your Level"),
+        (c3,"mc-purple","ðŸ“š",stats.get("flashcards_due",0),"Cards Due"),
+        (c4,"mc-amber", "â±ï¸",f"{stats.get('weekly_study_minutes',0)} min","This Week"),
     ]:
         with col:
             st.markdown(f'<div class="mc {cls}"><div class="icon">{icon}</div><div class="val">{val}</div><div class="lbl">{lbl}</div></div>',unsafe_allow_html=True)
@@ -958,17 +957,17 @@ def show_dashboard(username):
     total_xp=stats.get("total_xp",0); lvl=stats.get("level",1)
     lp=stats.get("level_progress",total_xp%500); pct=min(100,int((lp/500)*100))
     st.markdown(f"""<div style="display:flex;justify-content:space-between;font-size:.85rem;font-weight:700;margin-bottom:5px;">
-        <span>⭐ Level {lvl}</span><span>{total_xp} XP &nbsp;·&nbsp; {500-lp} XP to next level</span>
+        <span>â­ Level {lvl}</span><span>{total_xp} XP &nbsp;Â·&nbsp; {500-lp} XP to next level</span>
     </div><div class="xp-wrap"><div class="xp-fill" style="width:{pct}%;"></div></div>""", unsafe_allow_html=True)
     st.markdown('</div>', unsafe_allow_html=True)
 
     left,right=st.columns([1.1,1])
     with left:
         st.markdown('<div class="sf-card">', unsafe_allow_html=True)
-        st.markdown("**🌱 Study Momentum**")
+        st.markdown("**ðŸŒ± Study Momentum**")
         mins=stats.get("total_study_minutes",0); growth=min(100,mins//10)
-        plant=(("🌱","Seedling") if growth<20 else ("🌿","Sprout") if growth<40 else
-               ("🪴","Growing Plant") if growth<70 else ("🌳","Strong Tree") if growth<90 else ("🌲","Master Tree"))
+        plant=(("ðŸŒ±","Seedling") if growth<20 else ("ðŸŒ¿","Sprout") if growth<40 else
+               ("ðŸª´","Growing Plant") if growth<70 else ("ðŸŒ³","Strong Tree") if growth<90 else ("ðŸŒ²","Master Tree"))
         st.markdown(f"""<div class="sf-soft-card" style="text-align:center;margin-bottom:10px;">
             <div style="font-size:2.6rem;">{plant[0]}</div>
             <div style="font-weight:800;font-size:.93rem;">{plant[1]}</div>
@@ -977,28 +976,28 @@ def show_dashboard(username):
         st.markdown('</div>', unsafe_allow_html=True)
 
         st.markdown('<div class="sf-card">', unsafe_allow_html=True)
-        st.markdown("**⚡ Quick Actions**")
-        if st.button("📚 Open Study Tools",  use_container_width=True,key="d_study"):  go_to("study")
-        if st.button("🗂️ Review Flashcards", use_container_width=True,key="d_fc"):     go_to("flashcards")
-        if st.button("🏅 View Achievements", use_container_width=True,key="d_ach"):    go_to("achievements")
+        st.markdown("**âš¡ Quick Actions**")
+        if st.button("ðŸ“š Open Study Tools",  use_container_width=True,key="d_study"):  go_to("study")
+        if st.button("ðŸ—‚ï¸ Review Flashcards", use_container_width=True,key="d_fc"):     go_to("flashcards")
+        if st.button("ðŸ… View Achievements", use_container_width=True,key="d_ach"):    go_to("achievements")
         st.markdown('</div>', unsafe_allow_html=True)
 
     with right:
         st.markdown('<div class="sf-card">', unsafe_allow_html=True)
-        st.markdown("**📜 Recent Activity**")
+        st.markdown("**ðŸ“œ Recent Activity**")
         if not st.session_state.history:
             st.info("No activity yet. Generate your first study content!")
         else:
             for h in st.session_state.history:
                 st.markdown(f"""<div class="sf-hist">
-                    🕐 {h['time']} | <b>{h['tool']}</b><br>
-                    📖 {h['chapter']} — {h['subject']}<br>
+                    ðŸ• {h['time']} | <b>{h['tool']}</b><br>
+                    ðŸ“– {h['chapter']} â€” {h['subject']}<br>
                     <small>{h['preview']}</small>
                 </div>""", unsafe_allow_html=True)
         st.markdown('</div>', unsafe_allow_html=True)
 
         st.markdown('<div class="sf-card">', unsafe_allow_html=True)
-        st.markdown("**🏅 Badge Snapshot**")
+        st.markdown("**ðŸ… Badge Snapshot**")
         earned=get_earned_badges(username)
         earned_list=[b for b in ALL_BADGES if b["id"] in earned][:4]
         if earned_list:
@@ -1008,15 +1007,15 @@ def show_dashboard(username):
                     st.markdown(f"""<div class="bdg earned">
                         <div class="bi">{badge['icon']}</div>
                         <div class="bn">{badge['name']}</div>
-                        <div class="bs">✅ Earned</div>
+                        <div class="bs">âœ… Earned</div>
                     </div>""", unsafe_allow_html=True)
         else:
             st.info("Complete daily check-in to earn your first badge!")
         st.markdown('</div>', unsafe_allow_html=True)
 
-# ─────────────────────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 # ACHIEVEMENTS
-# ─────────────────────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def show_achievements(username):
     render_back_button()
     render_header("Achievements","Badges unlock automatically as you learn")
@@ -1027,20 +1026,20 @@ def show_achievements(username):
     locked_list=[b for b in ALL_BADGES if b["id"] not in earned]
 
     st.markdown('<div class="sf-card">', unsafe_allow_html=True)
-    st.markdown(f"**✅ {len(earned_list)} / {len(ALL_BADGES)} badges earned**")
+    st.markdown(f"**âœ… {len(earned_list)} / {len(ALL_BADGES)} badges earned**")
     st.progress(len(earned_list)/len(ALL_BADGES) if ALL_BADGES else 0)
     st.markdown("""
     <div style="font-size:.82rem;color:#475569;margin-top:8px;">
-    🔥 <b>Streaks</b> — log in every day &nbsp;|&nbsp;
-    ⏱️ <b>Study time</b> — use the Study Timer &nbsp;|&nbsp;
-    ✨ <b>Content</b> — generate with AI &nbsp;|&nbsp;
-    🗂️ <b>Flashcards</b> — create 10 cards
+    ðŸ”¥ <b>Streaks</b> â€” log in every day &nbsp;|&nbsp;
+    â±ï¸ <b>Study time</b> â€” use the Study Timer &nbsp;|&nbsp;
+    âœ¨ <b>Content</b> â€” generate with AI &nbsp;|&nbsp;
+    ðŸ—‚ï¸ <b>Flashcards</b> â€” create 10 cards
     </div>
     """, unsafe_allow_html=True)
     st.markdown('</div>', unsafe_allow_html=True)
 
     if earned_list:
-        st.markdown("## ✅ Earned Badges")
+        st.markdown("## âœ… Earned Badges")
         cols=st.columns(min(4,len(earned_list)))
         for i,b in enumerate(earned_list):
             with cols[i%4]:
@@ -1052,7 +1051,7 @@ def show_achievements(username):
 
     if locked_list:
         st.markdown("---")
-        st.markdown("## 🔒 Locked Badges")
+        st.markdown("## ðŸ”’ Locked Badges")
         hints={"streak_3":"Log in 3 days in a row","streak_7":"Log in 7 days in a row",
                "streak_14":"Log in 14 days in a row","streak_30":"Log in 30 days in a row",
                "first_gen":"Generate any AI content","qp_generated":"Generate a Question Paper",
@@ -1063,7 +1062,7 @@ def show_achievements(username):
             with cols[i%4]:
                 hint=hints.get(b["id"],b["desc"])
                 st.markdown(f"""<div class="bdg">
-                    <div class="bi" style="opacity:.28;">🔒</div>
+                    <div class="bi" style="opacity:.28;">ðŸ”’</div>
                     <div class="bn">{b['name']}</div>
                     <div class="bs">{hint}</div>
                 </div>""", unsafe_allow_html=True)
@@ -1071,36 +1070,36 @@ def show_achievements(username):
     streak=stats.get("streak_days",0)
     total_min=stats.get("total_study_minutes",0)
     st.markdown('<div class="sf-card" style="margin-top:14px;">', unsafe_allow_html=True)
-    st.markdown("**📈 Your Progress Towards Next Badge**")
+    st.markdown("**ðŸ“ˆ Your Progress Towards Next Badge**")
     for b in locked_list:
         bid=b["id"]
-        if bid=="streak_3"   and streak<3:   st.caption(f"🔥 Streak: {streak}/3 days"); st.progress(streak/3)
-        elif bid=="streak_7" and streak<7:   st.caption(f"🔥 Streak: {streak}/7 days"); st.progress(streak/7)
-        elif bid=="streak_14"and streak<14:  st.caption(f"🔥 Streak: {streak}/14 days"); st.progress(streak/14)
-        elif bid=="streak_30"and streak<30:  st.caption(f"🔥 Streak: {streak}/30 days"); st.progress(streak/30)
-        elif bid=="study_60" and total_min<60:  st.caption(f"⏱️ Study time: {total_min}/60 min"); st.progress(total_min/60)
-        elif bid=="study_300"and total_min<300: st.caption(f"⏱️ Study time: {total_min}/300 min"); st.progress(total_min/300)
+        if bid=="streak_3"   and streak<3:   st.caption(f"ðŸ”¥ Streak: {streak}/3 days"); st.progress(streak/3)
+        elif bid=="streak_7" and streak<7:   st.caption(f"ðŸ”¥ Streak: {streak}/7 days"); st.progress(streak/7)
+        elif bid=="streak_14"and streak<14:  st.caption(f"ðŸ”¥ Streak: {streak}/14 days"); st.progress(streak/14)
+        elif bid=="streak_30"and streak<30:  st.caption(f"ðŸ”¥ Streak: {streak}/30 days"); st.progress(streak/30)
+        elif bid=="study_60" and total_min<60:  st.caption(f"â±ï¸ Study time: {total_min}/60 min"); st.progress(total_min/60)
+        elif bid=="study_300"and total_min<300: st.caption(f"â±ï¸ Study time: {total_min}/300 min"); st.progress(total_min/300)
         elif bid=="fc_10":
             conn=sqlite3.connect("users.db"); cc=conn.cursor()
             cc.execute("SELECT COUNT(*) FROM flashcards WHERE username=?",(username,))
             fc=cc.fetchone()[0]; conn.close()
-            if fc<10: st.caption(f"🗂️ Flashcards: {fc}/10"); st.progress(fc/10)
+            if fc<10: st.caption(f"ðŸ—‚ï¸ Flashcards: {fc}/10"); st.progress(fc/10)
     st.markdown('</div>', unsafe_allow_html=True)
 
-# ─────────────────────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 # FLASHCARDS PAGE
-# ─────────────────────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def show_flashcards(username):
     render_back_button()
     render_header("Flashcards","Spaced repetition for lasting memory")
-    tab1,tab2,tab3=st.tabs(["📖 Review Due","➕ Create","📋 My Library"])
+    tab1,tab2,tab3=st.tabs(["ðŸ“– Review Due","âž• Create","ðŸ“‹ My Library"])
 
     with tab1:
         due=get_due_flashcards(username)
         if not due:
-            st.success("🎉 No flashcards due today — great job!")
+            st.success("ðŸŽ‰ No flashcards due today â€” great job!")
             total=len(get_all_flashcards(username))
-            if total>0: st.info(f"📚 You have {total} flashcard(s) in your library.")
+            if total>0: st.info(f"ðŸ“š You have {total} flashcard(s) in your library.")
             return
         st.markdown(f"**{len(due)} card(s) due for review**")
         idx=st.session_state.review_idx
@@ -1119,7 +1118,7 @@ def show_flashcards(username):
         st.markdown("<div style='height:8px'></div>",unsafe_allow_html=True)
 
         if not st.session_state.review_show_ans:
-            if st.button("👁️ Show Answer",use_container_width=True,key="show_ans_btn"):
+            if st.button("ðŸ‘ï¸ Show Answer",use_container_width=True,key="show_ans_btn"):
                 st.session_state.review_show_ans=True; st.rerun()
         else:
             st.markdown(f"""
@@ -1132,8 +1131,8 @@ def show_flashcards(username):
             st.markdown("**How well did you remember?**")
             b1,b2,b3,b4=st.columns(4)
             for col,lbl,perf,ks in [
-                (b1,"😓 Again",1,"again"),(b2,"😐 Hard",2,"hard"),
-                (b3,"🙂 Good",3,"good"),(b4,"😄 Easy",4,"easy")
+                (b1,"ðŸ˜“ Again",1,"again"),(b2,"ðŸ˜ Hard",2,"hard"),
+                (b3,"ðŸ™‚ Good",3,"good"),(b4,"ðŸ˜„ Easy",4,"easy")
             ]:
                 with col:
                     if st.button(lbl,use_container_width=True,key=f"fc_{ks}_{card_id}"):
@@ -1147,29 +1146,29 @@ def show_flashcards(username):
         cl,cr=st.columns(2)
         with cl:
             st.markdown('<div class="sf-card">', unsafe_allow_html=True)
-            st.markdown("### ✍️ Manual Card")
+            st.markdown("### âœï¸ Manual Card")
             with st.form("manual_fc"):
                 f_front=st.text_input("Front (Question)")
                 f_back=st.text_area("Back (Answer)",height=75)
                 f_subj=st.text_input("Subject (optional)")
                 f_chap=st.text_input("Chapter (optional)")
-                if st.form_submit_button("➕ Save Card",use_container_width=True):
+                if st.form_submit_button("âž• Save Card",use_container_width=True):
                     if f_front.strip() and f_back.strip():
                         save_flashcard(username,f_front.strip(),f_back.strip(),f_subj.strip(),f_chap.strip())
                         award_xp(username,5)
                         auto_check_badges(username)
-                        st.success("✅ Card saved! +5 XP"); st.rerun()
-                    else: st.warning("⚠️ Front and Back required.")
+                        st.success("âœ… Card saved! +5 XP"); st.rerun()
+                    else: st.warning("âš ï¸ Front and Back required.")
             st.markdown('</div>', unsafe_allow_html=True)
 
         with cr:
             st.markdown('<div class="sf-card">', unsafe_allow_html=True)
-            st.markdown("### 🤖 AI Generate")
+            st.markdown("### ðŸ¤– AI Generate")
             with st.form("ai_fc"):
                 ai_subj=st.text_input("Subject")
                 ai_chap=st.text_input("Chapter")
                 ai_top=st.text_input("Topic (optional)")
-                if st.form_submit_button("⚡ Generate 10 Cards",use_container_width=True):
+                if st.form_submit_button("âš¡ Generate 10 Cards",use_container_width=True):
                     if ai_subj.strip() and ai_chap.strip():
                         with st.spinner("Generating flashcards..."):
                             raw,mdl=generate_with_fallback(build_flashcard_prompt(ai_subj.strip(),ai_chap.strip(),ai_top.strip()))
@@ -1178,9 +1177,9 @@ def show_flashcards(username):
                             for card in cards: save_flashcard(username,card["front"],card["back"],ai_subj.strip(),ai_chap.strip())
                             award_xp(username,len(cards)*5)
                             auto_check_badges(username)
-                            st.success(f"✅ {len(cards)} cards saved! +{len(cards)*5} XP"); st.rerun()
-                        else: st.error("❌ Generation failed.")
-                    else: st.warning("⚠️ Subject and Chapter required.")
+                            st.success(f"âœ… {len(cards)} cards saved! +{len(cards)*5} XP"); st.rerun()
+                        else: st.error("âŒ Generation failed.")
+                    else: st.warning("âš ï¸ Subject and Chapter required.")
             st.markdown('</div>', unsafe_allow_html=True)
 
     with tab3:
@@ -1188,49 +1187,49 @@ def show_flashcards(username):
         all_cards=get_all_flashcards(username)
         if not all_cards:
             st.markdown("<div style='text-align:center;padding:30px;color:#64748b;'>"
-                        "📭 No flashcards yet.<br>Create your first card in the ➕ Create tab."
+                        "ðŸ“­ No flashcards yet.<br>Create your first card in the âž• Create tab."
                         "</div>", unsafe_allow_html=True)
         else:
-            st.caption(f"📚 Total: {len(all_cards)} flashcards in your library")
+            st.caption(f"ðŸ“š Total: {len(all_cards)} flashcards in your library")
             for row in all_cards:
                 c_id,front,back,subj,chap,nrd,rc=row
-                with st.expander(f"📌 {front[:60]}{'...' if len(front)>60 else ''}"):
+                with st.expander(f"ðŸ“Œ {front[:60]}{'...' if len(front)>60 else ''}"):
                     st.markdown(f"**Q:** {front}")
                     st.markdown(f"**A:** {back}")
-                    st.caption(f"Subject: {subj or '—'} | Chapter: {chap or '—'} | Next review: {nrd} | Reviews done: {rc}")
-                    if st.button("🗑️ Delete this card",key=f"del_fc_{c_id}",use_container_width=True):
+                    st.caption(f"Subject: {subj or 'â€”'} | Chapter: {chap or 'â€”'} | Next review: {nrd} | Reviews done: {rc}")
+                    if st.button("ðŸ—‘ï¸ Delete this card",key=f"del_fc_{c_id}",use_container_width=True):
                         delete_flashcard(c_id); st.rerun()
         st.markdown('</div>', unsafe_allow_html=True)
 
-# ─────────────────────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 # STUDY TOOLS PAGE
-# ─────────────────────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def show_study_tools(username):
     render_back_button()
     render_header("Study Tools","AI-powered exam preparation")
 
-    tool=st.radio("🛠️ Select Tool",
-        ["📝 Summary","🧠 Quiz","📌 Revision Notes","🧪 Question Paper","❓ Exam Q&A"],
+    tool=st.radio("ðŸ› ï¸ Select Tool",
+        ["ðŸ“ Summary","ðŸ§  Quiz","ðŸ“Œ Revision Notes","ðŸ§ª Question Paper","â“ Exam Q&A"],
         horizontal=True,key="study_tool_radio")
 
     if not STUDY_DATA:
-        st.error("❌ No study data loaded. Check data/study_data.json"); return
+        st.error("âŒ No study data loaded. Check data/study_data.json"); return
 
     st.markdown('<div class="sf-card">', unsafe_allow_html=True)
     ca,cb=st.columns([1.5,1])
     with ca:
-        category=st.selectbox("📚 Category",list(STUDY_DATA.keys()),key="sel_cat")
+        category=st.selectbox("ðŸ“š Category",list(STUDY_DATA.keys()),key="sel_cat")
     with cb:
-        course=st.selectbox("🎓 Program / Class",get_courses(category),key="sel_course")
-        stream=st.selectbox("📖 Stream",get_streams(category,course),key="sel_stream")
-        subject=st.selectbox("🧾 Subject",get_subjects(category,course,stream),key="sel_subject")
+        course=st.selectbox("ðŸŽ“ Program / Class",get_courses(category),key="sel_course")
+        stream=st.selectbox("ðŸ“– Stream",get_streams(category,course),key="sel_stream")
+        subject=st.selectbox("ðŸ§¾ Subject",get_subjects(category,course,stream),key="sel_subject")
         board="University / National Syllabus"
         if category=="K-12th":
-            board=st.selectbox("🏫 Board",BOARDS,key="sel_board")
+            board=st.selectbox("ðŸ« Board",BOARDS,key="sel_board")
         else:
-            st.info(f"📌 Syllabus: {board}")
+            st.info(f"ðŸ“Œ Syllabus: {board}")
 
-    topic=st.selectbox("🗂️ Topic",get_topics(category,course,stream,subject),key="sel_topic")
+    topic=st.selectbox("ðŸ—‚ï¸ Topic",get_topics(category,course,stream,subject),key="sel_topic")
 
     chapter_key=f"{category}||{course}||{stream}||{subject}||{topic}"
     if st.session_state.last_chapter_key!=chapter_key:
@@ -1238,12 +1237,12 @@ def show_study_tools(username):
         st.session_state.last_chapter_key=chapter_key
         reset_generation_state()
 
-    chapter=st.selectbox("📝 Chapter",st.session_state.current_chapters,key="sel_chapter")
+    chapter=st.selectbox("ðŸ“ Chapter",st.session_state.current_chapters,key="sel_chapter")
     st.session_state.current_subject_for_timer=subject
     st.markdown('</div>', unsafe_allow_html=True)
 
-    style=st.radio("⚙️ Output Style",
-        ["📄 Detailed","⚡ Short & Quick","📋 Notes Format","🧪 Question Paper"],
+    style=st.radio("âš™ï¸ Output Style",
+        ["ðŸ“„ Detailed","âš¡ Short & Quick","ðŸ“‹ Notes Format","ðŸ§ª Question Paper"],
         horizontal=True,key="study_style_radio")
 
     eff_label=get_effective_output_name(tool,style)
@@ -1252,10 +1251,10 @@ def show_study_tools(username):
 
     if st.button(btn_label,use_container_width=True,key="gen_btn"):
         if not chapter or chapter=="No chapters found":
-            st.warning("⚠️ Please select a valid chapter."); return
+            st.warning("âš ï¸ Please select a valid chapter."); return
         audience=(f"{board} {course} students" if category=="K-12th" else f"{course} students")
         prompt=build_prompt(tool,chapter,topic,subject,audience,style,board=board,course=course)
-        with st.spinner(f"⚡ Generating {eff_label}..."):
+        with st.spinner(f"âš¡ Generating {eff_label}..."):
             result,model_used=generate_with_fallback(prompt)
         st.session_state.update({
             "generated_result":result,"generated_model":model_used,
@@ -1287,18 +1286,18 @@ def show_study_tools(username):
         g_audience=st.session_state.generated_audience
 
         if st.session_state.generated_model=="None":
-            st.error("❌ Generation failed."); st.markdown(result); return
+            st.error("âŒ Generation failed."); st.markdown(result); return
 
         is_qp=(g_label=="Question Paper")
         box_cls="sf-fullpaper" if is_qp else "sf-output"
 
         st.markdown(f'<div class="{box_cls}">', unsafe_allow_html=True)
-        st.markdown(f"### {g_label} — {g_chapter}")
+        st.markdown(f"### {g_label} â€” {g_chapter}")
         st.markdown(result)
         st.markdown('</div>', unsafe_allow_html=True)
 
         if not is_qp:
-            if st.button("🗂️ Save as Flashcards",use_container_width=True,key="save_fc_btn"):
+            if st.button("ðŸ—‚ï¸ Save as Flashcards",use_container_width=True,key="save_fc_btn"):
                 with st.spinner("Creating flashcards..."):
                     raw,mdl=generate_with_fallback(build_flashcard_prompt(g_subject,g_chapter,g_topic or ""))
                 if mdl!="None":
@@ -1306,21 +1305,21 @@ def show_study_tools(username):
                     for card in cards: save_flashcard(username,card["front"],card["back"],g_subject,g_chapter)
                     award_xp(username,len(cards)*5)
                     auto_check_badges(username)
-                    st.success(f"✅ {len(cards)} flashcards saved! +{len(cards)*5} XP")
-                else: st.error("❌ Flashcard generation failed.")
+                    st.success(f"âœ… {len(cards)} flashcards saved! +{len(cards)*5} XP")
+                else: st.error("âŒ Flashcard generation failed.")
             try:
-                pdf=generate_pdf(f"{g_label} — {g_chapter}",f"{g_subject} | {g_topic} | {g_course}",result)
+                pdf=generate_pdf(f"{g_label} â€” {g_chapter}",f"{g_subject} | {g_topic} | {g_course}",result)
                 safe=(g_chapter.replace(" ","_").replace(":","").replace("/","-")+".pdf")
-                st.download_button("⬇️ Download PDF",data=pdf,file_name=safe,mime="application/pdf",use_container_width=True,key="dl_main_pdf")
-            except Exception as e: st.warning(f"⚠️ PDF error: {e}")
+                st.download_button("â¬‡ï¸ Download PDF",data=pdf,file_name=safe,mime="application/pdf",use_container_width=True,key="dl_main_pdf")
+            except Exception as e: st.warning(f"âš ï¸ PDF error: {e}")
         else:
             try:
-                qp_pdf=generate_pdf(f"Question Paper — {g_subject}",f"{g_board} | {g_course} | {g_stream}",result,"#7c3aed")
+                qp_pdf=generate_pdf(f"Question Paper â€” {g_subject}",f"{g_board} | {g_course} | {g_stream}",result,"#7c3aed")
                 safe_qp=(g_subject.replace(" ","_").replace(":","").replace("/","-")+"_QuestionPaper.pdf")
-                st.download_button("⬇️ Download Question Paper PDF",data=qp_pdf,file_name=safe_qp,mime="application/pdf",use_container_width=True,key="dl_qp_pdf")
-            except Exception as e: st.warning(f"⚠️ PDF error: {e}")
+                st.download_button("â¬‡ï¸ Download Question Paper PDF",data=qp_pdf,file_name=safe_qp,mime="application/pdf",use_container_width=True,key="dl_qp_pdf")
+            except Exception as e: st.warning(f"âš ï¸ PDF error: {e}")
 
-            if st.button("📋 Generate Answer Key",use_container_width=True,key="ans_btn"):
+            if st.button("ðŸ“‹ Generate Answer Key",use_container_width=True,key="ans_btn"):
                 with st.spinner("Generating answer key..."):
                     ans_r,ans_m=generate_with_fallback(
                         f"Provide complete model answers for this question paper:\n\n{result}\n\n"
@@ -1332,18 +1331,18 @@ def show_study_tools(username):
             if st.session_state.show_answers and st.session_state.answers_result:
                 if st.session_state.answers_model!="None":
                     st.markdown('<div class="sf-answers">', unsafe_allow_html=True)
-                    st.markdown(f"### 📋 Answer Key — {g_subject}")
+                    st.markdown(f"### ðŸ“‹ Answer Key â€” {g_subject}")
                     st.markdown(st.session_state.answers_result)
                     st.markdown('</div>', unsafe_allow_html=True)
                     try:
-                        ans_pdf=generate_pdf(f"Answer Key — {g_subject}",f"{g_board}|{g_course}",st.session_state.answers_result,"#059669")
+                        ans_pdf=generate_pdf(f"Answer Key â€” {g_subject}",f"{g_board}|{g_course}",st.session_state.answers_result,"#059669")
                         safe_a=(g_chapter.replace(" ","_").replace(":","").replace("/","-")+"_Answers.pdf")
-                        st.download_button("⬇️ Download Answer Key PDF",data=ans_pdf,file_name=safe_a,mime="application/pdf",use_container_width=True,key="dl_ans_pdf")
-                    except Exception as e: st.warning(f"⚠️ PDF error: {e}")
+                        st.download_button("â¬‡ï¸ Download Answer Key PDF",data=ans_pdf,file_name=safe_a,mime="application/pdf",use_container_width=True,key="dl_ans_pdf")
+                    except Exception as e: st.warning(f"âš ï¸ PDF error: {e}")
 
-            if st.button(f"🗂️ Generate Full {g_subject} Paper",use_container_width=True,key="full_qp_btn"):
+            if st.button(f"ðŸ—‚ï¸ Generate Full {g_subject} Paper",use_container_width=True,key="full_qp_btn"):
                 with st.spinner("Generating full subject paper..."):
-                    full_r,full_m=generate_with_fallback(build_prompt("🧪 Question Paper",g_chapter,g_topic,g_subject,g_audience,"📄 Detailed",g_board,g_course))
+                    full_r,full_m=generate_with_fallback(build_prompt("ðŸ§ª Question Paper",g_chapter,g_topic,g_subject,g_audience,"ðŸ“„ Detailed",g_board,g_course))
                 st.session_state.fullpaper_result=full_r
                 st.session_state.fullpaper_model=full_m
                 st.session_state.show_fullpaper=True
@@ -1351,18 +1350,18 @@ def show_study_tools(username):
             if st.session_state.show_fullpaper and st.session_state.fullpaper_result:
                 if st.session_state.fullpaper_model!="None":
                     st.markdown('<div class="sf-fullpaper">', unsafe_allow_html=True)
-                    st.markdown(f"### 🗂️ Full Subject Paper — {g_subject}")
+                    st.markdown(f"### ðŸ—‚ï¸ Full Subject Paper â€” {g_subject}")
                     st.markdown(st.session_state.fullpaper_result)
                     st.markdown('</div>', unsafe_allow_html=True)
                     try:
-                        full_pdf=generate_pdf(f"Full Paper — {g_subject}",f"{g_board}|{g_course}|{g_stream}",st.session_state.fullpaper_result,"#7c3aed")
+                        full_pdf=generate_pdf(f"Full Paper â€” {g_subject}",f"{g_board}|{g_course}|{g_stream}",st.session_state.fullpaper_result,"#7c3aed")
                         safe_f=f"{g_subject}_{g_board}_FullPaper.pdf".replace(" ","_")
-                        st.download_button("⬇️ Download Full Paper PDF",data=full_pdf,file_name=safe_f,mime="application/pdf",use_container_width=True,key="dl_full_pdf")
-                    except Exception as e: st.warning(f"⚠️ PDF error: {e}")
+                        st.download_button("â¬‡ï¸ Download Full Paper PDF",data=full_pdf,file_name=safe_f,mime="application/pdf",use_container_width=True,key="dl_full_pdf")
+                    except Exception as e: st.warning(f"âš ï¸ PDF error: {e}")
 
-# ─────────────────────────────────────────────────────────────────────────────
-# AUTH UI  (Login page — registration CLOSED)
-# ─────────────────────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# AUTH UI  (Login page â€” registration CLOSED)
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def auth_ui():
     _, col_c, _ = st.columns([1, 2, 1])
     with col_c:
@@ -1375,13 +1374,13 @@ def auth_ui():
         """, unsafe_allow_html=True)
 
         st.markdown('<div class="sf-card">', unsafe_allow_html=True)
-        tab1, tab2 = st.tabs(["🔐 Login", "📝 Register"])
+        tab1, tab2 = st.tabs(["ðŸ” Login", "ðŸ“ Register"])
 
         with tab1:
             with st.form("login_form", clear_on_submit=False):
-                u = st.text_input("👤 Username", key="login_u", placeholder="Enter your username")
-                p = st.text_input("🔑 Password", type="password", key="login_p", placeholder="Enter your password")
-                login_submit = st.form_submit_button("Sign In 🚀", use_container_width=True)
+                u = st.text_input("ðŸ‘¤ Username", key="login_u", placeholder="Enter your username")
+                p = st.text_input("ðŸ”‘ Password", type="password", key="login_p", placeholder="Enter your password")
+                login_submit = st.form_submit_button("Sign In ðŸš€", use_container_width=True)
 
             if login_submit:
                 if u.strip() and p.strip():
@@ -1407,28 +1406,28 @@ def auth_ui():
                             auto_check_badges(u.strip())
                         except Exception: pass
 
-                        st.success("✅ Login successful!")
+                        st.success("âœ… Login successful!")
                         time.sleep(0.6)
                         st.rerun()
                     else:
-                        st.error("❌ Invalid username or password.")
+                        st.error("âŒ Invalid username or password.")
                 else:
-                    st.warning("⚠️ Please enter both username and password.")
+                    st.warning("âš ï¸ Please enter both username and password.")
 
         with tab2:
-            st.info("📝 Registration is currently closed. Contact admin for access.")
+            st.info("ðŸ“ Registration is currently closed. Contact admin for access.")
             st.markdown("""
             <div style="padding:16px;background:rgba(59,130,246,0.08);border-radius:10px;margin-top:12px;">
-                <strong>ℹ️ Account Access:</strong><br/>
+                <strong>â„¹ï¸ Account Access:</strong><br/>
                 If you don't have an account, please contact the administrator for registration.
             </div>
             """, unsafe_allow_html=True)
 
         st.markdown('</div>', unsafe_allow_html=True)
 
-# ─────────────────────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 # MAIN ROUTER
-# ─────────────────────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def main_app():
     render_sidebar(st.session_state.username)
     page=st.session_state.active_page
@@ -1438,9 +1437,9 @@ def main_app():
     elif page=="achievements": show_achievements(st.session_state.username)
     else:                      show_dashboard(st.session_state.username)
 
-# ─────────────────────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 # ENTRY POINT
-# ─────────────────────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 init_db()
 init_session_state()
 
@@ -1448,11 +1447,3 @@ if st.session_state.logged_in:
     main_app()
 else:
     auth_ui()
-'''
-
-with open("/tmp/app.py", "w", encoding="utf-8") as f:
-    f.write(code)
-
-lines = code.count('\n')
-print(f"✅ Done! Lines: {lines} | Size: {len(code)//1024} KB")
-
