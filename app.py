@@ -1307,20 +1307,22 @@ def render_checkbox_card(title, subtitle, icon, is_selected):
     shadow = "0 4px 18px rgba(37,99,235,.18)" if is_selected else "0 2px 12px rgba(15,23,42,.06)"
     tick   = "<div style='font-size:.72rem;color:#2563eb;font-weight:700;margin-top:7px;'>✓ Selected</div>" if is_selected else ""
 
-     st.markdown(f"""
+     st.markdown(
+    f"""
     <div style='
-        background:{bg};border:{border};border-radius:16px;
-        padding:16px 10px;text-align:center;box-shadow:{shadow};
-        margin-bottom:4px;min-height:130px;
-        display:flex;flex-direction:column;
-        justify-content:center;align-items:center;'>
+        background:{bg}; border:{border}; border-radius:16px;
+        padding:16px 10px; text-align:center; box-shadow:{shadow};
+        margin-bottom:4px; min-height:130px;
+        display:flex; flex-direction:column;
+        justify-content:center; align-items:center;'>
         <div style='font-size:2.1rem;'>{icon}</div>
-        <div style='font-weight:800;font-size:.9rem;color:#0f172a;margin-top:7px;'>{title}</div>
-        <div style='font-size:.74rem;color:#64748b;margin-top:3px;'>{subtitle}</div>
+        <div style='font-weight:800; font-size:.9rem; color:#0f172a; margin-top:7px;'>{title}</div>
+        <div style='font-size:.74rem; color:#64748b; margin-top:3px;'>{subtitle}</div>
         {tick}
     </div>
-    """, unsafe_allow_html=True)
-
+    """,
+    unsafe_allow_html=True
+)
 
 # ─────────────────────────────────────────────────────────────────────────────
 # UI HELPERS
