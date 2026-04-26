@@ -1,2579 +1,696 @@
 {
-  "8th Standard": {
-    "8th Standard": {
+  "K-12th": {
+    "Class 10": {
       "General": {
-        "Mathematics": {
-          "Rational Numbers": [
-            "Properties of Rational Numbers",
-            "Representation on Number Line",
-            "Operations on Rational Numbers"
-          ],
-          "Linear Equations in One Variable": [
-            "Solving Linear Equations",
-            "Applications of Linear Equations",
-            "Reducing Equations to Simpler Form"
-          ],
-          "Understanding Quadrilaterals": [
-            "Types of Quadrilaterals",
-            "Angle Sum Property",
-            "Properties of Parallelograms"
-          ],
-          "Data Handling": [
-            "Bar Graphs and Histograms",
-            "Pie Charts",
-            "Probability"
-          ],
-          "Mensuration": [
-            "Area of Trapezium and Polygon",
-            "Surface Area and Volume of Cube and Cuboid",
-            "Surface Area and Volume of Cylinder"
-          ],
-          "Algebraic Expressions and Identities": [
-            "Multiplication of Algebraic Expressions",
-            "Standard Identities",
-            "Factorisation"
-          ],
-          "Exponents and Powers": [
-            "Powers with Negative Exponents",
-            "Laws of Exponents",
-            "Scientific Notation"
-          ],
-          "Direct and Inverse Proportions": [
-            "Direct Proportion",
-            "Inverse Proportion",
-            "Real Life Applications"
-          ],
-          "Comparing Quantities": [
-            "Percentage and Profit Loss",
-            "Simple and Compound Interest",
-            "Discount and Tax"
-          ],
-          "Playing with Numbers": [
-            "Divisibility Rules",
-            "General Form of Numbers",
-            "Puzzles and Games"
-          ]
-        },
         "Science": {
-          "Crop Production and Management": [
-            "Agricultural Practices",
-            "Irrigation Methods",
-            "Crop Protection and Storage"
-          ],
-          "Microorganisms": [
-            "Types of Microorganisms",
-            "Useful and Harmful Microorganisms",
-            "Diseases Caused by Microorganisms"
-          ],
-          "Metals and Non-metals": [
-            "Properties of Metals",
-            "Properties of Non-metals",
-            "Reactions of Metals"
-          ],
-          "Combustion and Flame": [
-            "Conditions for Combustion",
-            "Types of Combustion",
-            "Structure of Flame"
-          ],
-          "Cell Structure and Function": [
-            "Cell Theory",
-            "Plant vs Animal Cell",
-            "Cell Organelles"
-          ],
-          "Conservation of Plants and Animals": [
-            "Deforestation and Its Consequences",
-            "Biosphere Reserves",
-            "Endangered Species"
-          ],
-          "Force and Pressure": [
-            "Types of Forces",
-            "Pressure in Fluids",
-            "Atmospheric Pressure"
-          ],
-          "Light": [
-            "Laws of Reflection",
-            "Regular and Diffused Reflection",
-            "Human Eye and Defects of Vision"
-          ],
-          "Sound": [
-            "Propagation of Sound",
-            "Human Ear",
-            "Noise Pollution"
-          ],
-          "Chemical Effects of Electric Current": [
-            "Conductors and Insulators",
-            "Electrolysis",
-            "Electroplating"
-          ],
-          "Pollution of Air and Water": [
-            "Air Pollution and Greenhouse Effect",
-            "Water Pollution",
-            "Potable Water"
-          ]
+          "Physics": ["Light - Reflection and Refraction", "The Human Eye and the Colourful World", "Electricity", "Magnetic Effects of Electric Current"],
+          "Chemistry": ["Chemical Reactions and Equations", "Acids, Bases and Salts", "Metals and Non-metals", "Carbon and its Compounds", "Periodic Classification of Elements"],
+          "Biology": ["Life Processes", "Control and Coordination", "How do Organisms Reproduce?", "Heredity and Evolution", "Our Environment"]
         },
-        "Social Science": {
-          "History": [
-            "How When and Where",
-            "From Trade to Territory",
-            "Ruling the Countryside",
-            "Tribals Dikus and the Vision of a Golden Age",
-            "When People Rebel 1857 and After",
-            "Colonialism and the City",
-            "Weavers Iron Smelters and Factory Owners",
-            "Civilising the Native Educating the Nation",
-            "Women Caste and Reform",
-            "The Changing World of Visual Arts"
-          ],
-          "Geography": [
-            "Resources and Development",
-            "Land Soil Water Natural Vegetation and Wildlife Resources",
-            "Mineral and Power Resources",
-            "Agriculture",
-            "Industries",
-            "Human Resources"
-          ],
-          "Civics": [
-            "The Indian Constitution",
-            "Understanding Secularism",
-            "Why Do We Need a Parliament",
-            "Understanding Laws",
-            "Judiciary",
-            "Understanding Marginalisation"
-          ]
-        },
-        "English": {
-          "Literature": [
-            "Honeydew Prose Chapters",
-            "Honeydew Poems",
-            "It So Happened Supplementary Reader"
-          ],
-          "Grammar": [
-            "Parts of Speech",
-            "Tenses",
-            "Voice and Narration",
-            "Clauses and Phrases",
-            "Punctuation and Spelling"
-          ],
-          "Writing Skills": [
-            "Formal and Informal Letters",
-            "Paragraph Writing",
-            "Essay Writing",
-            "Notice and Message Writing"
-          ]
-        },
-        "Computer Science": {
-          "Introduction to Computers": [
-            "Generations of Computers",
-            "Types of Computers",
-            "Input and Output Devices"
-          ],
-          "MS Office and LibreOffice": [
-            "Word Processing",
-            "Spreadsheets Basics",
-            "Presentation Basics"
-          ],
-          "Internet Basics": [
-            "Internet and WWW",
-            "Email Communication",
-            "Cyber Safety"
-          ]
-        }
-      }
-    }
-  },
-  "9th Standard": {
-    "9th Standard": {
-      "General": {
         "Mathematics": {
-          "Number Systems": [
-            "Irrational Numbers",
-            "Real Numbers and their Decimal Expansions",
-            "Operations on Real Numbers",
-            "Laws of Exponents"
-          ],
-          "Polynomials": [
-            "Polynomials in One Variable",
-            "Zeroes of a Polynomial",
-            "Remainder Theorem",
-            "Factor Theorem",
-            "Algebraic Identities"
-          ],
-          "Coordinate Geometry": [
-            "Cartesian System",
-            "Plotting Points",
-            "Linear Equations in Two Variables"
-          ],
-          "Lines and Angles": [
-            "Basic Terms in Geometry",
-            "Intersecting and Non-Intersecting Lines",
-            "Pairs of Angles",
-            "Parallel Lines and Transversal"
-          ],
-          "Triangles": [
-            "Congruence of Triangles",
-            "Criteria for Congruence",
-            "Properties of Triangles",
-            "Inequalities in a Triangle"
-          ],
-          "Quadrilaterals": [
-            "Angle Sum Property",
-            "Properties of Parallelogram",
-            "Mid-Point Theorem"
-          ],
-          "Circles": [
-            "Circles and Its Related Terms",
-            "Angle Subtended by a Chord",
-            "Equal Chords",
-            "Cyclic Quadrilateral"
-          ],
-          "Herons Formula": [
-            "Area of Triangle by Herons Formula",
-            "Application to Quadrilaterals"
-          ],
-          "Surface Areas and Volumes": [
-            "Surface Area of Cuboid and Cube",
-            "Surface Area of Cylinder Cone Sphere",
-            "Volume of Cuboid Cylinder Cone Sphere"
-          ],
-          "Statistics and Probability": [
-            "Collection and Presentation of Data",
-            "Measures of Central Tendency",
-            "Probability Empirical Approach"
-          ]
-        },
-        "Science": {
-          "Matter in Our Surroundings": [
-            "States of Matter",
-            "Interconversion of States",
-            "Evaporation"
-          ],
-          "Is Matter Around Us Pure": [
-            "Mixtures and Solutions",
-            "Separating Mixtures",
-            "Physical and Chemical Changes"
-          ],
-          "Atoms and Molecules": [
-            "Laws of Chemical Combination",
-            "Atomic Mass",
-            "Molecules and Formulae",
-            "Mole Concept"
-          ],
-          "Structure of the Atom": [
-            "Charged Particles in Matter",
-            "Thomson Rutherford Bohr Models",
-            "Isotopes and Isobars"
-          ],
-          "Cell Fundamental Unit of Life": [
-            "Discovery of Cell",
-            "Cell Structure and Function",
-            "Prokaryotic vs Eukaryotic Cells"
-          ],
-          "Tissues": [
-            "Plant Tissues",
-            "Animal Tissues"
-          ],
-          "Motion": [
-            "Types of Motion",
-            "Uniform and Non-Uniform Motion",
-            "Equations of Motion",
-            "Graphical Representation"
-          ],
-          "Force and Laws of Motion": [
-            "Newtons Laws of Motion",
-            "Law of Conservation of Momentum",
-            "Inertia and Mass"
-          ],
-          "Gravitation": [
-            "Universal Law of Gravitation",
-            "Free Fall and Weight",
-            "Thrust and Pressure",
-            "Archimedes Principle"
-          ],
-          "Work and Energy": [
-            "Work Done by a Force",
-            "Kinetic and Potential Energy",
-            "Conservation of Energy",
-            "Power"
-          ],
-          "Sound": [
-            "Production of Sound",
-            "Propagation and Reflection",
-            "Echo and Reverberation",
-            "Range of Hearing"
-          ],
-          "Natural Resources": [
-            "Biosphere and Life Processes",
-            "Air Water Soil as Resources",
-            "Biogeochemical Cycles"
-          ],
-          "Improvement in Food Resources": [
-            "Crop Production and Management",
-            "Animal Husbandry",
-            "Fisheries and Apiculture"
-          ]
+          "Algebra": ["Polynomials", "Pair of Linear Equations", "Quadratic Equations", "Arithmetic Progressions"],
+          "Geometry": ["Triangles", "Circles", "Constructions", "Coordinate Geometry"],
+          "Trigonometry": ["Introduction to Trigonometry", "Some Applications of Trigonometry"],
+          "Mensuration & Statistics": ["Areas Related to Circles", "Surface Areas and Volumes", "Statistics", "Probability"]
         },
         "Social Science": {
-          "History": [
-            "The French Revolution",
-            "Socialism in Europe and the Russian Revolution",
-            "Nazism and the Rise of Hitler",
-            "Forest Society and Colonialism",
-            "Pastoralists in the Modern World"
-          ],
-          "Geography": [
-            "India Size and Location",
-            "Physical Features of India",
-            "Drainage",
-            "Climate",
-            "Natural Vegetation and Wildlife",
-            "Population"
-          ],
-          "Political Science": [
-            "What is Democracy Why Democracy",
-            "Constitutional Design",
-            "Electoral Politics",
-            "Working of Institutions",
-            "Democratic Rights"
-          ],
-          "Economics": [
-            "The Story of Village Palampur",
-            "People as Resource",
-            "Poverty as a Challenge",
-            "Food Security in India"
-          ]
+          "History": ["The Rise of Nationalism in Europe", "Nationalism in India", "The Making of a Global World", "The Age of Industrialisation"],
+          "Geography": ["Resources and Development", "Forest and Wildlife Resources", "Water Resources", "Agriculture", "Minerals and Energy Resources"],
+          "Political Science": ["Power Sharing", "Federalism", "Democracy and Diversity", "Gender, Religion and Caste", "Political Parties"],
+          "Economics": ["Development", "Sectors of the Indian Economy", "Money and Credit", "Globalisation and the Indian Economy"]
         },
-        "English": {
-          "Literature Beehive": [
-            "The Fun They Had",
-            "The Sound of Music",
-            "The Little Girl",
-            "A Truly Beautiful Mind",
-            "The Snake and the Mirror",
-            "My Childhood",
-            "Packing",
-            "Reach for the Top",
-            "The Bond of Love"
-          ],
-          "Literature Moments": [
-            "The Lost Child",
-            "The Adventures of Toto",
-            "Iswaran the Storyteller",
-            "In the Kingdom of Fools",
-            "The Happy Prince"
-          ],
-          "Grammar": [
-            "Subject Verb Agreement",
-            "Tenses Advanced",
-            "Modals",
-            "Reported Speech",
-            "Active and Passive Voice"
-          ],
-          "Writing Skills": [
-            "Diary Entry",
-            "Story Writing",
-            "Formal Letters",
-            "Article Writing"
-          ]
+        "Languages": {
+          "English": ["Grammar (Tenses, Modals, Voice)", "Literature (Prose & Poetry)", "Writing Skills (Essay, Letters)"],
+          "Hindi": ["Vyakaran (Samas, Alankar)", "Sahitya (Kavita, Kahani)", "Lekhan (Patra, Nibandh)"],
+          "Kannada": ["Vyakarana (Sandhi, Samasa)", "Sahitya (Gadya, Padya)", "Prabandha Lekhana"],
+          "Tamil": ["Ilakkanam (Ezhuthu, Sol)", "Ilakkiyam (Thirukkural, Seyyul)", "Katturai Ezhudhuthal"],
+          "Telugu": ["Vyakaranam (Sandhulu, Samasalu)", "Sahityam (Padyalu, Gadyam)", "Vyasa Rachana"],
+          "Malayalam": ["Vyakaranam", "Sahityam (Kavitha, Padam)", "Rachana (Essay Writing)"]
         }
       }
-    }
-  },
-  "10th Standard": {
-    "10th Standard": {
-      "General": {
-        "Mathematics": {
-          "Real Numbers": [
-            "Euclids Division Lemma",
-            "Fundamental Theorem of Arithmetic",
-            "Irrational Numbers",
-            "Rational Numbers and Decimal Expansions"
-          ],
-          "Polynomials": [
-            "Zeroes and Coefficients",
-            "Division Algorithm",
-            "Types of Polynomials"
-          ],
-          "Pair of Linear Equations in Two Variables": [
-            "Graphical Method",
-            "Substitution Method",
-            "Elimination Method",
-            "Cross Multiplication Method"
-          ],
-          "Quadratic Equations": [
-            "Standard Form of Quadratic Equation",
-            "Solution by Factorisation",
-            "Completing the Square",
-            "Discriminant and Nature of Roots"
-          ],
-          "Arithmetic Progressions": [
-            "General Term of AP",
-            "Sum of First n Terms",
-            "Application Problems"
-          ],
-          "Triangles": [
-            "Similar Triangles Criteria",
-            "Basic Proportionality Theorem",
-            "Pythagoras Theorem"
-          ],
-          "Coordinate Geometry": [
-            "Distance Formula",
-            "Section Formula",
-            "Area of a Triangle"
-          ],
-          "Introduction to Trigonometry": [
-            "Trigonometric Ratios",
-            "Trigonometric Identities",
-            "Trigonometric Ratios of Complementary Angles"
-          ],
-          "Applications of Trigonometry": [
-            "Heights and Distances",
-            "Angle of Elevation and Depression"
-          ],
-          "Circles": [
-            "Tangent to a Circle",
-            "Number of Tangents from External Point"
-          ],
-          "Areas Related to Circles": [
-            "Perimeter and Area of Circle",
-            "Sector and Segment",
-            "Areas of Combinations of Plane Figures"
-          ],
-          "Surface Areas and Volumes": [
-            "Combinations of Solids",
-            "Conversion of Solids",
-            "Frustum of a Cone"
-          ],
-          "Statistics": [
-            "Mean of Grouped Data",
-            "Median of Grouped Data",
-            "Mode of Grouped Data",
-            "Cumulative Frequency Curve"
-          ],
-          "Probability": [
-            "Classical Probability",
-            "Complementary Events",
-            "Problem Based Probability"
-          ]
-        },
-        "Physics": {
-          "Light Reflection and Refraction": [
-            "Laws of Reflection",
-            "Spherical Mirrors and Mirror Formula",
-            "Refraction Through Glass Slab",
-            "Lens Formula and Magnification"
-          ],
-          "Human Eye and the Colourful World": [
-            "Structure of Human Eye",
-            "Defects of Vision",
-            "Dispersion of Light",
-            "Atmospheric Refraction"
-          ],
-          "Electricity": [
-            "Electric Circuit",
-            "Ohms Law",
-            "Resistance Series and Parallel",
-            "Heating Effect of Electric Current"
-          ],
-          "Magnetic Effects of Electric Current": [
-            "Magnetic Field and Field Lines",
-            "Force on a Current Carrying Conductor",
-            "Electric Motor",
-            "Electromagnetic Induction",
-            "Electric Generator"
-          ],
-          "Sources of Energy": [
-            "Conventional Sources of Energy",
-            "Non-Conventional Sources",
-            "Nuclear Energy",
-            "Environmental Impact"
-          ]
-        },
-        "Chemistry": {
-          "Chemical Reactions and Equations": [
-            "Types of Chemical Reactions",
-            "Balancing Chemical Equations",
-            "Oxidation and Reduction"
-          ],
-          "Acids Bases and Salts": [
-            "Properties of Acids and Bases",
-            "pH Scale",
-            "Salts and Their Uses"
-          ],
-          "Metals and Non-Metals": [
-            "Physical and Chemical Properties",
-            "Reactivity Series",
-            "Extraction of Metals",
-            "Corrosion"
-          ],
-          "Carbon and Its Compounds": [
-            "Bonding in Carbon",
-            "Organic Compounds",
-            "Functional Groups",
-            "Soaps and Detergents"
-          ],
-          "Periodic Classification of Elements": [
-            "Early Attempts at Classification",
-            "Modern Periodic Table",
-            "Trends in the Periodic Table"
-          ]
-        },
-        "Biology": {
-          "Life Processes": [
-            "Nutrition Autotrophic and Heterotrophic",
-            "Respiration",
-            "Transportation in Plants and Animals",
-            "Excretion"
-          ],
-          "Control and Coordination": [
-            "Nervous System",
-            "Reflex Action",
-            "Hormones in Animals and Plants"
-          ],
-          "How Do Organisms Reproduce": [
-            "Asexual Reproduction",
-            "Sexual Reproduction in Plants",
-            "Sexual Reproduction in Humans",
-            "Reproductive Health"
-          ],
-          "Heredity and Evolution": [
-            "Heredity and Variation",
-            "Mendels Laws",
-            "Sex Determination",
-            "Evolution and Natural Selection"
-          ],
-          "Our Environment": [
-            "Ecosystems",
-            "Food Chains and Food Webs",
-            "Ozone Layer Depletion",
-            "Waste Management"
-          ],
-          "Management of Natural Resources": [
-            "Conservation of Natural Resources",
-            "The Three Rs",
-            "Forest and Wildlife Conservation",
-            "Water Harvesting"
-          ]
-        },
-        "Social Science": {
-          "History": [
-            "The Rise of Nationalism in Europe",
-            "Nationalism in India",
-            "The Making of a Global World",
-            "The Age of Industrialisation",
-            "Print Culture and the Modern World"
-          ],
-          "Geography": [
-            "Resources and Development",
-            "Forest and Wildlife Resources",
-            "Water Resources",
-            "Agriculture",
-            "Minerals and Energy Resources",
-            "Manufacturing Industries",
-            "Lifelines of National Economy"
-          ],
-          "Political Science": [
-            "Power Sharing",
-            "Federalism",
-            "Gender Religion and Caste",
-            "Political Parties",
-            "Outcomes of Democracy"
-          ],
-          "Economics": [
-            "Development",
-            "Sectors of the Indian Economy",
-            "Money and Credit",
-            "Globalisation and the Indian Economy",
-            "Consumer Rights"
-          ]
-        },
-        "English": {
-          "Literature First Flight": [
-            "A Letter to God",
-            "Nelson Mandela Long Walk to Freedom",
-            "Two Stories About Flying",
-            "From the Diary of Anne Frank",
-            "The Hundred Dresses",
-            "Glimpses of India",
-            "Mijbil the Otter",
-            "Madam Rides the Bus",
-            "The Sermon at Benares",
-            "The Proposal"
-          ],
-          "Literature Footprints Without Feet": [
-            "A Triumph of Surgery",
-            "The Thiefs Story",
-            "The Midnight Visitor",
-            "A Question of Trust",
-            "Footprints Without Feet",
-            "The Making of a Scientist",
-            "The Necklace",
-            "Bholi",
-            "The Book That Saved the Earth"
-          ],
-          "Grammar": [
-            "Editing and Omission",
-            "Transformation of Sentences",
-            "Gap Filling Exercises",
-            "Comprehension Passages"
-          ],
-          "Writing Skills": [
-            "Formal and Informal Letters",
-            "Article and Speech Writing",
-            "Report Writing",
-            "Notice Writing"
-          ]
-        }
-      }
-    }
-  },
-  "11th Standard": {
-    "11th Standard": {
+    },
+    "Class 12": {
       "Science": {
         "Physics": {
-          "Physical World and Measurement": [
-            "Scope of Physics",
-            "Physical Quantities and Units",
-            "Dimensions and Dimensional Analysis"
-          ],
-          "Kinematics": [
-            "Motion in a Straight Line",
-            "Motion in a Plane",
-            "Projectile Motion",
-            "Relative Velocity"
-          ],
-          "Laws of Motion": [
-            "Newtons Laws",
-            "Friction",
-            "Circular Motion",
-            "Equilibrium of Forces"
-          ],
-          "Work, Energy and Power": [
-            "Work Done by a Constant and Variable Force",
-            "Kinetic and Potential Energy",
-            "Conservation of Mechanical Energy",
-            "Power"
-          ],
-          "System of Particles and Rotational Motion": [
-            "Centre of Mass",
-            "Angular Velocity and Acceleration",
-            "Torque and Angular Momentum",
-            "Moment of Inertia"
-          ],
-          "Gravitation": [
-            "Universal Law of Gravitation",
-            "Acceleration due to Gravity",
-            "Orbital Velocity and Escape Velocity",
-            "Satellites"
-          ],
-          "Properties of Bulk Matter": [
-            "Elastic Behaviour",
-            "Viscosity and Surface Tension",
-            "Fluid Pressure and Bernoullis Principle"
-          ],
-          "Thermodynamics": [
-            "Thermal Equilibrium and Temperature",
-            "Heat and Work",
-            "Laws of Thermodynamics",
-            "Carnot Engine"
-          ],
-          "Behaviour of Perfect Gas and Kinetic Theory": [
-            "Equation of State",
-            "Kinetic Theory of Gases",
-            "Specific Heats of Gases"
-          ],
-          "Oscillations and Waves": [
-            "Periodic Motion and SHM",
-            "Damped and Forced Oscillations",
-            "Wave Motion",
-            "Superposition and Standing Waves"
-          ]
+          "Electrostatics": ["Electric Charges and Fields", "Electrostatic Potential and Capacitance"],
+          "Current Electricity": ["Current Electricity"],
+          "Magnetic Effects": ["Moving Charges and Magnetism", "Magnetism and Matter", "Electromagnetic Induction", "Alternating Current"],
+          "Optics": ["Ray Optics and Optical Instruments", "Wave Optics"],
+          "Modern Physics": ["Dual Nature of Radiation and Matter", "Atoms", "Nuclei", "Semiconductor Electronics"]
         },
         "Chemistry": {
-          "Some Basic Concepts of Chemistry": [
-            "Laws of Chemical Combination",
-            "Mole Concept",
-            "Stoichiometry"
-          ],
-          "Structure of Atom": [
-            "Bohrs Model",
-            "Quantum Mechanical Model",
-            "Electronic Configuration"
-          ],
-          "Classification of Elements and Periodicity": [
-            "Modern Periodic Law",
-            "Trends in Properties",
-            "Periodic Table Groups and Periods"
-          ],
-          "Chemical Bonding and Molecular Structure": [
-            "Ionic and Covalent Bonds",
-            "VSEPR Theory",
-            "Hybridisation",
-            "Molecular Orbital Theory"
-          ],
-          "States of Matter": [
-            "Gaseous State and Gas Laws",
-            "Liquid State",
-            "Solid State Basics"
-          ],
-          "Thermodynamics": [
-            "System and Surroundings",
-            "Enthalpy and Hesss Law",
-            "Gibbs Free Energy"
-          ],
-          "Equilibrium": [
-            "Chemical Equilibrium",
-            "Le Chateliers Principle",
-            "Ionic Equilibrium and pH"
-          ],
-          "Redox Reactions": [
-            "Oxidation and Reduction",
-            "Balancing Redox Equations"
-          ],
-          "Hydrogen": [
-            "Preparation and Properties",
-            "Hydrogen Peroxide",
-            "Heavy Water"
-          ],
-          "s-Block Elements": [
-            "Alkali Metals",
-            "Alkaline Earth Metals",
-            "Important Compounds"
-          ],
-          "p-Block Elements Group 13 and 14": [
-            "Boron Family",
-            "Carbon Family",
-            "Important Compounds"
-          ],
-          "Organic Chemistry Basic Principles": [
-            "Classification of Organic Compounds",
-            "IUPAC Nomenclature",
-            "Reaction Mechanisms"
-          ],
-          "Hydrocarbons": [
-            "Alkanes",
-            "Alkenes and Alkynes",
-            "Aromatic Hydrocarbons"
-          ],
-          "Environmental Chemistry": [
-            "Air Pollution",
-            "Water Pollution",
-            "Soil Pollution"
-          ]
-        },
-        "Biology": {
-          "The Living World": [
-            "Diversity of Living Organisms",
-            "Taxonomic Categories",
-            "Taxonomical Aids"
-          ],
-          "Biological Classification": [
-            "Five Kingdom Classification",
-            "Monera Protista Fungi",
-            "Plantae and Animalia"
-          ],
-          "Plant Kingdom": [
-            "Algae Bryophytes Pteridophytes",
-            "Gymnosperms and Angiosperms",
-            "Plant Life Cycles"
-          ],
-          "Animal Kingdom": [
-            "Basis of Classification",
-            "Non-Chordates",
-            "Chordates"
-          ],
-          "Morphology of Flowering Plants": [
-            "Root Stem Leaf",
-            "Flower Fruit Seed",
-            "Modifications"
-          ],
-          "Anatomy of Flowering Plants": [
-            "Tissues",
-            "Anatomy of Root Stem Leaf"
-          ],
-          "Structural Organisation in Animals": [
-            "Tissue Types",
-            "Organ Systems",
-            "Earthworm Cockroach Frog"
-          ],
-          "Cell Biology": [
-            "Cell Theory and Cell Types",
-            "Cell Organelles",
-            "Cell Division Mitosis and Meiosis"
-          ],
-          "Biomolecules": [
-            "Carbohydrates",
-            "Proteins and Enzymes",
-            "Nucleic Acids"
-          ],
-          "Plant Physiology": [
-            "Transport in Plants",
-            "Mineral Nutrition",
-            "Photosynthesis",
-            "Respiration in Plants",
-            "Plant Growth and Development"
-          ],
-          "Human Physiology": [
-            "Digestion and Absorption",
-            "Breathing and Exchange of Gases",
-            "Body Fluids and Circulation",
-            "Excretory Products",
-            "Locomotion and Movement",
-            "Neural Control and Coordination",
-            "Chemical Coordination"
-          ]
+          "Physical Chemistry": ["Solutions", "Electrochemistry", "Chemical Kinetics", "Surface Chemistry"],
+          "Inorganic Chemistry": ["Isolation of Elements", "p-Block Elements", "d and f Block Elements", "Coordination Compounds"],
+          "Organic Chemistry": ["Haloalkanes and Haloarenes", "Alcohols, Phenols and Ethers", "Aldehydes, Ketones and Carboxylic Acids", "Amines", "Biomolecules", "Polymers"]
         },
         "Mathematics": {
-          "Sets": [
-            "Sets and Representations",
-            "Subsets and Power Sets",
-            "Operations on Sets",
-            "Venn Diagrams"
-          ],
-          "Relations and Functions": [
-            "Cartesian Product",
-            "Types of Relations",
-            "Types of Functions",
-            "Algebra of Functions"
-          ],
-          "Trigonometric Functions": [
-            "Angle and Radian Measure",
-            "Trigonometric Functions and Identities",
-            "Graphs of Trig Functions",
-            "Trigonometric Equations"
-          ],
-          "Principle of Mathematical Induction": [
-            "Principle of Induction",
-            "Proof by Induction"
-          ],
-          "Complex Numbers and Quadratic Equations": [
-            "Complex Numbers and Argand Plane",
-            "Algebra of Complex Numbers",
-            "Quadratic Equations with Complex Roots"
-          ],
-          "Linear Inequalities": [
-            "Algebraic Solutions",
-            "Graphical Solutions",
-            "Systems of Inequalities"
-          ],
-          "Permutations and Combinations": [
-            "Fundamental Principle of Counting",
-            "Permutations",
-            "Combinations"
-          ],
-          "Binomial Theorem": [
-            "Binomial Theorem for Positive Integers",
-            "General and Middle Term"
-          ],
-          "Sequences and Series": [
-            "AP and GP",
-            "Sum of Special Series",
-            "Infinite GP"
-          ],
-          "Straight Lines": [
-            "Slope of a Line",
-            "Forms of Equation of a Line",
-            "Distance of a Point from a Line"
-          ],
-          "Conic Sections": [
-            "Circles",
-            "Parabola",
-            "Ellipse",
-            "Hyperbola"
-          ],
-          "Introduction to 3D Geometry": [
-            "Coordinate Axes in 3D",
-            "Distance Formula in 3D",
-            "Section Formula"
-          ],
-          "Limits and Derivatives": [
-            "Concept of Limit",
-            "Algebra of Limits",
-            "Derivatives",
-            "Algebra of Derivatives"
-          ],
-          "Statistics": [
-            "Measures of Dispersion",
-            "Mean Deviation",
-            "Variance and Standard Deviation"
-          ],
-          "Probability": [
-            "Random Experiments and Events",
-            "Axiomatic Probability",
-            "Conditional Probability Basics"
-          ]
+          "Calculus": ["Continuity and Differentiability", "Applications of Derivatives", "Integrals", "Applications of the Integrals", "Differential Equations"],
+          "Algebra": ["Matrices", "Determinants"],
+          "Vectors and 3D": ["Vector Algebra", "Three Dimensional Geometry"],
+          "Probability & LP": ["Linear Programming", "Probability"]
         },
-        "Computer Science": {
-          "Computer Fundamentals": [
-            "Evolution of Computers",
-            "Hardware and Software",
-            "Number Systems"
-          ],
-          "Programming in Python": [
-            "Introduction to Python",
-            "Data Types and Variables",
-            "Control Structures",
-            "Functions",
-            "Strings and Lists"
-          ],
-          "Data Structures Basics": [
-            "Stacks",
-            "Queues",
-            "Searching and Sorting"
-          ]
+        "Biology": {
+          "Reproduction": ["Reproduction in Organisms", "Sexual Reproduction in Flowering Plants", "Human Reproduction", "Reproductive Health"],
+          "Genetics": ["Principles of Inheritance and Variation", "Molecular Basis of Inheritance", "Evolution"],
+          "Ecology": ["Organisms and Populations", "Ecosystem", "Biodiversity and Conservation", "Environmental Issues"]
+        },
+        "Languages": {
+          "English": ["Writing Skills (Letters, Reports)", "Literature (Flamingo, Vistas)", "Reading Comprehension"],
+          "Hindi": ["Vyakaran & Rachana", "Aroh (Kavya & Gadya)", "Vitan"],
+          "Kannada": ["Vyakarana", "Sahitya Spandana", "Pallava"],
+          "Tamil": ["Urainadai", "Seyyul", "Ilakkanam"],
+          "Telugu": ["Padyabagam", "Gadyabagam", "Vyakaranam"]
         }
       },
       "Commerce": {
         "Accountancy": {
-          "Introduction to Accounting": [
-            "Accounting Principles and Concepts",
-            "Journal Entries",
-            "Ledger and Trial Balance"
-          ],
-          "Financial Statements I": [
-            "Trading Account",
-            "Profit and Loss Account",
-            "Balance Sheet"
-          ],
-          "Bank Reconciliation Statement": [
-            "Causes of Difference",
-            "Preparation of BRS"
-          ],
-          "Depreciation": [
-            "Methods of Depreciation",
-            "Straight Line and WDV Method"
-          ],
-          "Bills of Exchange": [
-            "Bill of Exchange and Promissory Note",
-            "Accounting Treatment"
-          ]
+          "Partnership Accounts": ["Fundamentals", "Admission of a Partner", "Retirement and Death of a Partner", "Dissolution of a Partnership Firm"],
+          "Company Accounts": ["Accounting for Share Capital", "Issue and Redemption of Debentures"],
+          "Analysis of Financial Statements": ["Financial Statements of a Company", "Accounting Ratios", "Cash Flow Statement"]
         },
         "Business Studies": {
-          "Nature and Purpose of Business": [
-            "Concept and Characteristics of Business",
-            "Objectives and Classification"
-          ],
-          "Forms of Business Organisation": [
-            "Sole Proprietorship",
-            "Partnership",
-            "Company and Cooperative"
-          ],
-          "Private and Public Sector Enterprises": [
-            "Public Sector Enterprises",
-            "Global Enterprises and Joint Ventures"
-          ],
-          "Business Services": [
-            "Banking",
-            "Insurance",
-            "Transport and Communication"
-          ],
-          "Emerging Modes of Business": [
-            "E-Business",
-            "Outsourcing"
-          ],
-          "Social Responsibility of Business": [
-            "Concept of Social Responsibility",
-            "Business Ethics"
-          ]
+          "Principles of Management": ["Nature and Significance of Management", "Principles of Management", "Business Environment"],
+          "Functions of Management": ["Planning", "Organising", "Staffing", "Directing", "Controlling"],
+          "Business Finance and Marketing": ["Financial Management", "Financial Markets", "Marketing Management", "Consumer Protection"]
         },
         "Economics": {
-          "Microeconomics": [
-            "Introduction to Economics",
-            "Consumer Behaviour and Demand",
-            "Producer Behaviour and Supply",
-            "Forms of Market"
-          ],
-          "Statistics for Economics": [
-            "Collection and Organisation of Data",
-            "Measures of Central Tendency",
-            "Measures of Dispersion",
-            "Index Numbers"
-          ]
+          "Macroeconomics": ["National Income and Related Aggregates", "Money and Banking", "Determination of Income and Employment", "Government Budget", "Balance of Payments"],
+          "Indian Economic Development": ["Development Experience (1947-90)", "Economic Reforms since 1991", "Current Challenges facing Indian Economy"]
         },
-        "Mathematics Commerce": {
-          "Relations and Functions": [
-            "Types of Relations",
-            "Types of Functions"
-          ],
-          "Algebra": [
-            "Matrices",
-            "Determinants",
-            "Linear Programming"
-          ],
-          "Calculus": [
-            "Limits and Continuity",
-            "Differentiation",
-            "Application of Derivatives",
-            "Integration"
-          ]
+        "Mathematics": {
+          "Calculus": ["Continuity and Differentiability", "Applications of Derivatives", "Integrals"],
+          "Statistics & Probability": ["Probability Distributions", "Linear Programming"]
+        },
+        "Languages": {
+          "English": ["Writing Skills", "Literature", "Business Communication Focus"],
+          "Hindi": ["Vyakaran", "Sahitya"],
+          "Kannada": ["Vyakarana", "Sahitya"]
         }
       },
-      "Humanities": {
+      "Arts (Humanities)": {
         "History": {
-          "Writing and City Life": [
-            "Mesopotamian Civilisation",
-            "Urban Centres and Trade"
-          ],
-          "An Empire Across Three Continents": [
-            "Roman Empire",
-            "Society and Economy"
-          ],
-          "Nomadic Empires": [
-            "Mongol Empire",
-            "Expansion and Legacy"
-          ],
-          "The Three Orders": [
-            "Medieval Europe",
-            "Feudalism and Church"
-          ],
-          "Changing Cultural Traditions": [
-            "Renaissance in Europe",
-            "Humanism and Art"
-          ],
-          "Displacing Indigenous Peoples": [
-            "European Colonialism",
-            "Impact on Indigenous Cultures"
-          ],
-          "Paths to Modernisation": [
-            "Japan and China",
-            "Industrial and Social Changes"
-          ]
-        },
-        "Political Science": {
-          "Constitution": [
-            "Why Constitution",
-            "Making of Indian Constitution"
-          ],
-          "Rights": [
-            "Rights in the Indian Constitution",
-            "Fundamental Rights"
-          ],
-          "Separation of Powers": [
-            "Legislature Executive Judiciary",
-            "Checks and Balances"
-          ],
-          "Social Movements": [
-            "Introduction to Social Movements",
-            "Womens Movement",
-            "Dalit Movement"
-          ],
-          "Indian Democracy": [
-            "Elections and Representation",
-            "Political Parties in India"
-          ]
+          "Ancient India": ["Bricks, Beads and Bones", "Kings, Farmers and Towns", "Kinship, Caste and Class"],
+          "Medieval India": ["Through the Eyes of Travellers", "Bhakti-Sufi Traditions", "Kings and Chronicles"],
+          "Modern India": ["Colonialism and the Countryside", "Mahatma Gandhi and the Nationalist Movement", "Framing the Constitution"]
         },
         "Geography": {
-          "Fundamentals of Physical Geography": [
-            "Origin and Evolution of Earth",
-            "Interior of the Earth",
-            "Rocks and Minerals",
-            "Geomorphic Processes",
-            "Landforms and Their Evolution"
-          ],
-          "India Physical Environment": [
-            "India Location",
-            "Structure and Physiography",
-            "Drainage System",
-            "Climate Vegetation and Soil"
-          ]
-        },
-        "Sociology": {
-          "Introducing Sociology": [
-            "Sociology and Society",
-            "Terms Concepts and Their Use",
-            "Understanding Social Institutions"
-          ],
-          "Understanding Society": [
-            "Social Structure",
-            "Culture and Socialisation",
-            "Social Change"
-          ]
-        },
-        "Psychology": {
-          "Introduction to Psychology": [
-            "What is Psychology",
-            "Methods of Inquiry"
-          ],
-          "Biological and Cultural Bases": [
-            "Evolutionary Perspective",
-            "Biological Basis of Behaviour"
-          ],
-          "Learning and Memory": [
-            "Theories of Learning",
-            "Memory Processes"
-          ],
-          "Motivation and Emotion": [
-            "Nature of Motivation",
-            "Theories of Emotion"
-          ]
-        }
-      }
-    }
-  },
-  "12th Standard": {
-    "12th Standard": {
-      "Science": {
-        "Physics": {
-          "Electrostatics": [
-            "Electric Charges and Fields",
-            "Gausss Law",
-            "Electrostatic Potential and Capacitance"
-          ],
-          "Current Electricity": [
-            "Electric Current and Drift Velocity",
-            "Ohms Law and Resistance",
-            "Kirchhoffs Laws",
-            "Wheatstone Bridge and Potentiometer"
-          ],
-          "Magnetic Effects of Current and Magnetism": [
-            "Biot-Savart Law",
-            "Amperes Law",
-            "Moving Coil Galvanometer",
-            "Magnetism and Matter"
-          ],
-          "Electromagnetic Induction and Alternating Currents": [
-            "Faradays Laws",
-            "Lenzs Law",
-            "Self and Mutual Inductance",
-            "AC Circuit and Resonance"
-          ],
-          "Electromagnetic Waves": [
-            "Displacement Current",
-            "EM Spectrum"
-          ],
-          "Optics": [
-            "Ray Optics Reflection and Refraction",
-            "Lens and Mirror Formulae",
-            "Wave Optics Interference and Diffraction",
-            "Polarisation"
-          ],
-          "Dual Nature of Radiation and Matter": [
-            "Photoelectric Effect",
-            "de Broglie Hypothesis",
-            "Davisson-Germer Experiment"
-          ],
-          "Atoms and Nuclei": [
-            "Bohrs Model of Hydrogen Atom",
-            "Nuclear Fission and Fusion",
-            "Radioactivity"
-          ],
-          "Electronic Devices": [
-            "Semiconductor Diode",
-            "Transistor Action and Applications",
-            "Logic Gates"
-          ]
-        },
-        "Chemistry": {
-          "Solid State": [
-            "Types of Solids",
-            "Crystal Lattices",
-            "Defects in Solids"
-          ],
-          "Solutions": [
-            "Types of Solutions",
-            "Raoults Law",
-            "Colligative Properties"
-          ],
-          "Electrochemistry": [
-            "Electrochemical Cells",
-            "Nernst Equation",
-            "Electrolysis",
-            "Corrosion"
-          ],
-          "Chemical Kinetics": [
-            "Rate of Reaction",
-            "Rate Laws and Rate Constant",
-            "Activation Energy and Arrhenius Equation"
-          ],
-          "Surface Chemistry": [
-            "Adsorption",
-            "Catalysis",
-            "Colloids and Emulsions"
-          ],
-          "p-Block Elements Group 15 to 18": [
-            "Nitrogen Family",
-            "Oxygen Family",
-            "Halogens",
-            "Noble Gases"
-          ],
-          "d and f Block Elements": [
-            "Transition Elements",
-            "Lanthanoids and Actinoids",
-            "Important Compounds"
-          ],
-          "Coordination Compounds": [
-            "Werners Theory",
-            "Nomenclature",
-            "Bonding Theories"
-          ],
-          "Haloalkanes and Haloarenes": [
-            "Nomenclature and Properties",
-            "Reactions and Mechanisms"
-          ],
-          "Alcohols Phenols and Ethers": [
-            "Preparation and Properties",
-            "Chemical Reactions"
-          ],
-          "Aldehydes Ketones and Carboxylic Acids": [
-            "Nucleophilic Addition",
-            "Oxidation and Reduction",
-            "Carboxylic Acid Derivatives"
-          ],
-          "Amines": [
-            "Classification and Nomenclature",
-            "Preparation and Reactions",
-            "Diazonium Salts"
-          ],
-          "Biomolecules": [
-            "Carbohydrates",
-            "Proteins and Enzymes",
-            "Nucleic Acids DNA and RNA"
-          ],
-          "Polymers": [
-            "Classification of Polymers",
-            "Types of Polymerisation",
-            "Commercially Important Polymers"
-          ],
-          "Chemistry in Everyday Life": [
-            "Drugs and Medicines",
-            "Chemicals in Food",
-            "Cleansing Agents"
-          ]
-        },
-        "Biology": {
-          "Reproduction": [
-            "Asexual Reproduction in Organisms",
-            "Sexual Reproduction in Flowering Plants",
-            "Human Reproduction",
-            "Reproductive Health"
-          ],
-          "Genetics and Evolution": [
-            "Principles of Inheritance",
-            "Molecular Basis of Inheritance",
-            "Evolution and Evidences"
-          ],
-          "Biology in Human Welfare": [
-            "Human Health and Disease",
-            "Microbes in Human Welfare"
-          ],
-          "Biotechnology": [
-            "Principles and Processes",
-            "Applications in Medicine and Agriculture"
-          ],
-          "Ecology": [
-            "Organisms and Population",
-            "Ecosystem",
-            "Biodiversity and Conservation",
-            "Environmental Issues"
-          ]
-        },
-        "Mathematics": {
-          "Relations and Functions": [
-            "Types of Relations and Functions",
-            "Inverse Trigonometric Functions"
-          ],
-          "Algebra": [
-            "Matrices",
-            "Determinants"
-          ],
-          "Calculus": [
-            "Continuity and Differentiability",
-            "Applications of Derivatives",
-            "Integrals",
-            "Applications of Integrals",
-            "Differential Equations"
-          ],
-          "Vectors and 3D Geometry": [
-            "Vectors Algebra",
-            "3D Geometry Lines and Planes"
-          ],
-          "Linear Programming": [
-            "Formulation of LPP",
-            "Graphical Solution"
-          ],
-          "Probability": [
-            "Conditional Probability",
-            "Bayes Theorem",
-            "Random Variables and Distributions"
-          ]
-        },
-        "Computer Science": {
-          "Python Advanced": [
-            "Functions and Modules",
-            "File Handling",
-            "Exception Handling",
-            "Object Oriented Programming"
-          ],
-          "Data Structures": [
-            "Stacks and Queues",
-            "Linked Lists",
-            "Trees and Graphs Basics"
-          ],
-          "Database Management": [
-            "Introduction to DBMS",
-            "SQL Queries",
-            "Relational Algebra"
-          ],
-          "Networking": [
-            "Network Topologies",
-            "Protocols and Devices",
-            "Cyber Security"
-          ]
-        }
-      },
-      "Commerce": {
-        "Accountancy": {
-          "Partnership Accounts": [
-            "Introduction to Partnership",
-            "Admission of a Partner",
-            "Retirement and Death of Partner",
-            "Dissolution of Partnership"
-          ],
-          "Company Accounts": [
-            "Issue of Shares",
-            "Issue of Debentures",
-            "Redemption of Debentures"
-          ],
-          "Financial Statements Analysis": [
-            "Common Size Statements",
-            "Comparative Statements",
-            "Ratio Analysis"
-          ],
-          "Cash Flow Statement": [
-            "Operating Investing Financing Activities",
-            "Preparation of Cash Flow Statement"
-          ]
-        },
-        "Business Studies": {
-          "Nature and Significance of Management": [
-            "Concept and Characteristics",
-            "Management as Science and Art"
-          ],
-          "Principles of Management": [
-            "Fayols Principles",
-            "Taylors Scientific Management"
-          ],
-          "Business Environment": [
-            "Dimensions of Business Environment",
-            "Liberalisation Privatisation Globalisation"
-          ],
-          "Planning": [
-            "Nature and Process of Planning",
-            "Types of Plans"
-          ],
-          "Organising": [
-            "Organisational Structure",
-            "Delegation and Decentralisation"
-          ],
-          "Staffing": [
-            "Human Resource Management",
-            "Recruitment Selection and Training"
-          ],
-          "Directing": [
-            "Leadership and Motivation",
-            "Communication"
-          ],
-          "Controlling": [
-            "Concept and Process of Control",
-            "ROI and Budgetary Control"
-          ],
-          "Financial Management": [
-            "Financial Planning and Capital Structure",
-            "Fixed and Working Capital"
-          ],
-          "Financial Markets": [
-            "Money Market",
-            "Capital Market and Stock Exchange",
-            "SEBI"
-          ],
-          "Marketing": [
-            "Marketing Mix",
-            "Product Price Place Promotion"
-          ],
-          "Consumer Protection": [
-            "Consumer Rights",
-            "Consumer Protection Act"
-          ]
-        },
-        "Economics": {
-          "Microeconomics": [
-            "Introduction and Theory of Consumer Behaviour",
-            "Production and Costs",
-            "Revenue and Market Equilibrium",
-            "Price Determination under Different Markets"
-          ],
-          "Macroeconomics": [
-            "National Income Accounting",
-            "Money and Banking",
-            "Income Determination",
-            "Government Budget",
-            "Balance of Payments"
-          ]
-        }
-      },
-      "Humanities": {
-        "History": {
-          "Bricks Beads and Bones Harappan Civilisation": [
-            "Origins and Features",
-            "Decline of Harappan Civilisation"
-          ],
-          "Kings Farmers and Towns Early States and Economies": [
-            "Mahajanapadas",
-            "Mauryan Empire"
-          ],
-          "Kinship Caste and Class Early Societies": [
-            "Varna and Jati System",
-            "Social Hierarchies"
-          ],
-          "Thinkers Beliefs and Buildings Cultural Developments": [
-            "Buddhism and Jainism",
-            "Temple Architecture"
-          ],
-          "Through the Eyes of Travellers Perceptions of Society": [
-            "Al Biruni",
-            "Ibn Battuta",
-            "Francois Bernier"
-          ],
-          "Bhakti-Sufi Traditions Changes in Religious Beliefs": [
-            "Bhakti Movement",
-            "Sufi Movement"
-          ],
-          "An Imperial Capital Vijayanagara": [
-            "Rise and Fall",
-            "Art and Architecture"
-          ],
-          "Peasants Zamindars and the State Agrarian Society and the Mughal Empire": [
-            "Agrarian Relations",
-            "Land Revenue System"
-          ],
-          "Kings and Chronicles The Mughal Courts": [
-            "Mughal Administration",
-            "Court Culture"
-          ],
-          "Colonialism and the Countryside": [
-            "Permanent Settlement",
-            "Peasant Movements"
-          ],
-          "Rebels and the Raj 1857 Revolt": [
-            "Causes and Course of Revolt",
-            "Impact and Aftermath"
-          ],
-          "Colonial Cities": [
-            "Urbanisation",
-            "Social and Cultural Changes"
-          ],
-          "Mahatma Gandhi and the Nationalist Movement": [
-            "Gandhis Methods",
-            "Mass Movements"
-          ],
-          "Understanding Partition": [
-            "Causes of Partition",
-            "Violence and Displacement"
-          ],
-          "Framing the Constitution": [
-            "Constituent Assembly",
-            "Key Provisions"
-          ]
+          "Fundamentals of Human Geography": ["Human Geography Nature and Scope", "The World Population", "Human Development", "Primary & Secondary Activities"],
+          "India - People and Economy": ["Population", "Migration", "Land Resources and Agriculture", "Water Resources", "Transport and Communication"]
         },
         "Political Science": {
-          "Cold War Era": [
-            "Bi-Polar World",
-            "Non-Aligned Movement"
-          ],
-          "End of Bipolarity": [
-            "Disintegration of USSR",
-            "New World Order"
-          ],
-          "Contemporary World Politics": [
-            "US Hegemony",
-            "Globalisation",
-            "Security in Contemporary World"
-          ],
-          "Politics in India since Independence": [
-            "Challenges of Nation Building",
-            "Era of One-Party Dominance",
-            "Indias External Relations"
-          ],
-          "Recent Developments in Indian Politics": [
-            "Rise of Coalitions",
-            "Social Movements",
-            "Regional Aspirations"
-          ]
+          "Contemporary World Politics": ["The Cold War Era", "The End of Bipolarity", "US Hegemony in World Politics", "International Organisations"],
+          "Politics in India Since Independence": ["Challenges of Nation Building", "Era of One-Party Dominance", "Politics of Planned Development", "India's External Relations"]
         },
-        "Sociology": {
-          "Indian Society": [
-            "Introducing Indian Society",
-            "Demographic Structure",
-            "Social Institutions Continuity and Change"
-          ],
-          "Social Change and Development in India": [
-            "Structural Change",
-            "Cultural Change",
-            "Social Movements"
-          ]
-        },
-        "Psychology": {
-          "Variations in Psychological Attributes": [
-            "Intelligence",
-            "Personality Theories"
-          ],
-          "Self and Personality": [
-            "Concept of Self",
-            "Personality Assessment"
-          ],
-          "Psychological Disorders": [
-            "Anxiety Disorders",
-            "Mood Disorders",
-            "Schizophrenia"
-          ],
-          "Therapeutic Approaches": [
-            "Psychotherapy",
-            "Biomedical Therapies"
-          ],
-          "Social Influence and Group Processes": [
-            "Attitudes and Values",
-            "Group Dynamics"
-          ]
+        "Languages": {
+          "English": ["Writing Skills", "Literature"],
+          "Hindi": ["Vyakaran", "Sahitya"],
+          "Kannada": ["Vyakarana", "Sahitya"],
+          "Tamil": ["Ilakkanam", "Ilakkiyam"],
+          "Telugu": ["Vyakaranam", "Sahityam"]
         }
       }
     }
   },
   "Undergraduate": {
-    "BTech and BE": {
-      "Computer Science and Engineering": {
-        "Mathematics": {
-          "Engineering Mathematics I": [
-            "Matrices and Determinants",
-            "Calculus Differential",
-            "Calculus Integral",
-            "Vector Calculus"
-          ],
-          "Engineering Mathematics II": [
-            "Ordinary Differential Equations",
-            "Laplace Transforms",
-            "Fourier Series",
-            "Probability and Statistics"
-          ],
-          "Discrete Mathematics": [
-            "Logic and Propositional Calculus",
-            "Set Theory and Relations",
-            "Graph Theory",
-            "Combinatorics"
-          ]
+        "B.Tech": {
+      "Computer Science & Engineering (CSE)": {
+        "Programming": {
+          "C Programming": ["Introduction to C", "Control Structures", "Arrays & Strings", "Functions & Pointers", "Structures & Unions", "File Handling", "Dynamic Memory Allocation"],
+          "C++ & OOP": ["Classes and Objects", "Inheritance", "Polymorphism", "Templates", "Exception Handling", "STL"],
+          "Java Programming": ["Java Basics", "OOP in Java", "Exception Handling", "Multithreading", "Collections Framework", "JDBC"],
+          "Python Programming": ["Data Types & Variables", "Control Flow", "Functions & Modules", "OOP in Python", "Libraries (NumPy, Pandas)"]
         },
-        "Core Subjects": {
-          "Data Structures and Algorithms": [
-            "Arrays Linked Lists Stacks Queues",
-            "Trees and Graphs",
-            "Sorting and Searching Algorithms",
-            "Dynamic Programming",
-            "Greedy Algorithms"
-          ],
-          "Object Oriented Programming": [
-            "Classes and Objects",
-            "Inheritance and Polymorphism",
-            "Abstraction and Encapsulation",
-            "Exception Handling"
-          ],
-          "Operating Systems": [
-            "Process Management",
-            "Memory Management",
-            "File Systems",
-            "Deadlock and Synchronisation"
-          ],
-          "Database Management Systems": [
-            "ER Model and Relational Model",
-            "SQL and Relational Algebra",
-            "Normalisation",
-            "Transaction Management"
-          ],
-          "Computer Networks": [
-            "OSI and TCP/IP Model",
-            "Data Link and Network Layer",
-            "Transport and Application Layer",
-            "Network Security Basics"
-          ],
-          "Theory of Computation": [
-            "Finite Automata",
-            "Context-Free Grammars",
-            "Turing Machines",
-            "Decidability and Complexity"
-          ],
-          "Compiler Design": [
-            "Lexical Analysis",
-            "Parsing Techniques",
-            "Semantic Analysis",
-            "Code Generation"
-          ],
-          "Software Engineering": [
-            "SDLC Models",
-            "Requirements Engineering",
-            "Software Design",
-            "Testing and Maintenance"
-          ]
+        "Core CS": {
+          "Data Structures": ["Arrays & Linked Lists", "Stacks & Queues", "Trees (BST, AVL, Red-Black)", "Graphs", "Hashing", "Sorting & Searching Algorithms"],
+          "Algorithms": ["Asymptotic Analysis", "Divide & Conquer", "Greedy Algorithms", "Dynamic Programming", "Backtracking", "Graph Algorithms", "NP-Completeness"],
+          "Operating Systems": ["Process Management & Scheduling", "Memory Management", "Virtual Memory", "File Systems", "Deadlocks", "Concurrency & Synchronization"],
+          "Database Management Systems": ["ER Model & Relational Model", "SQL & PL/SQL", "Normalization", "Transaction Management", "Concurrency Control", "NoSQL Basics"],
+          "Computer Networks": ["OSI & TCP/IP Models", "Physical & Data Link Layer", "Network Layer (IP, Routing)", "Transport Layer (TCP/UDP)", "Application Layer Protocols"]
         },
-        "Electives": {
-          "Artificial Intelligence and Machine Learning": [
-            "Search Algorithms",
-            "Supervised and Unsupervised Learning",
-            "Neural Networks",
-            "Deep Learning Basics"
-          ],
-          "Web Technologies": [
-            "HTML CSS JavaScript",
-            "Backend Development",
-            "RESTful APIs",
-            "Frameworks Overview"
-          ],
-          "Cyber Security": [
-            "Cryptography",
-            "Network Security",
-            "Ethical Hacking Basics",
-            "Security Protocols"
-          ]
+        "Advanced CS": {
+          "Software Engineering": ["SDLC Models", "Requirements Engineering", "Design Patterns", "Software Testing", "Agile & Scrum"],
+          "Theory of Computation": ["Finite Automata", "Regular Expressions", "Context-Free Grammars", "Pushdown Automata", "Turing Machines"],
+          "Compiler Design": ["Lexical Analysis", "Syntax Analysis (Parsing)", "Semantic Analysis", "Intermediate Code Generation", "Code Optimization"],
+          "Artificial Intelligence": ["Search Algorithms", "Knowledge Representation", "Machine Learning Basics", "Neural Networks", "NLP Basics"]
+        }
+      },
+      "Electronics & Communication Engineering (ECE)": {
+        "Core EC": {
+          "Analog Electronics": ["Diode Circuits & Applications", "BJT & FET Amplifiers", "Op-Amps & Linear ICs", "Multivibrators & Timers", "Power Amplifiers"],
+          "Digital Electronics": ["Boolean Algebra & Logic Gates", "Combinational Circuits", "Sequential Circuits (Flip-Flops, Counters)", "A/D & D/A Converters", "Semiconductor Memories"],
+          "Signals & Systems": ["Continuous & Discrete Signals", "LTI Systems", "Fourier Series & Transform", "Laplace Transform", "Z-Transform"],
+          "Control Systems": ["System Modeling (Transfer Function)", "Time Response Analysis", "Stability Analysis (Routh, Nyquist)", "Root Locus Technique", "Frequency Response (Bode, Polar)"]
+        },
+        "Communication & Networking": {
+          "Communication Systems": ["Amplitude Modulation", "Angle Modulation (FM, PM)", "Pulse Modulation (PAM, PCM)", "Digital Modulation (ASK, FSK, PSK, QAM)", "Information Theory & Coding"],
+          "Digital Signal Processing": ["Discrete Fourier Transform (DFT & FFT)", "FIR & IIR Filter Design", "Multirate DSP", "Adaptive Filters"],
+          "Microwave Engineering": ["Transmission Lines", "Waveguides & Cavity Resonators", "Microwave Components", "Antennas & Radiation Patterns"],
+          "Optical Fiber Communication": ["Optical Fibers & Cables", "Optical Sources & Detectors", "Optical Amplifiers", "WDM & Optical Networks"]
+        },
+        "Embedded & VLSI": {
+          "Microprocessors & Microcontrollers": ["8085 & 8086 Architecture", "Assembly Language Programming", "8051 Microcontroller", "ARM Processor Basics", "Interfacing & Peripherals"],
+          "VLSI Design": ["CMOS Technology", "VLSI Design Flow", "Combinational & Sequential Logic Design", "FPGA & ASIC Basics", "Testing & Verification"],
+          "Embedded Systems": ["Embedded System Architecture", "Real-Time Operating Systems (RTOS)", "Embedded C Programming", "IoT Sensors & Interfacing"]
+        }
+      },
+      "Electrical & Electronics Engineering (EEE)": {
+        "Core Electrical": {
+          "Electrical Circuits": ["Network Theorems (Thevenin, Norton, Superposition)", "AC Circuit Analysis", "Transient Analysis", "Two-Port Networks", "Three-Phase Circuits"],
+          "Electrical Machines": ["DC Machines (Motor & Generator)", "Transformers", "Three-Phase Induction Motors", "Synchronous Machines", "Special Motors (Stepper, BLDC)"],
+          "Power Systems": ["Generation of Power", "Transmission Line Parameters", "Load Flow Analysis", "Fault Analysis (Symmetrical & Unsymmetrical)", "Power System Stability"],
+          "Power Electronics": ["Power Semiconductor Devices (SCR, MOSFET, IGBT)", "Rectifiers (Controlled & Uncontrolled)", "Choppers & Inverters", "Cycloconverters", "Switch Mode Power Supplies"]
+        },
+        "Control & Instrumentation": {
+          "Control Systems": ["Mathematical Modeling", "Time Domain Analysis", "Frequency Domain Analysis", "State Space Analysis", "Digital Control Systems"],
+          "Electrical Measurements": ["Measurement of Voltage, Current, Power", "Instrument Transformers (CT, PT)", "Bridges (Wheatstone, Kelvin, Schering)", "Digital Instruments & Data Acquisition"],
+          "Renewable Energy Systems": ["Solar Photovoltaic Systems", "Wind Energy Systems", "Fuel Cells & Battery Storage", "Grid Integration of Renewables"]
+        },
+        "High Voltage & Protection": {
+          "Switchgear & Protection": ["Circuit Breakers (SF6, Vacuum, Air)", "Protective Relays", "Overcurrent & Distance Protection", "Differential Protection", "Lightning & Overvoltage Protection"]
         }
       },
       "Mechanical Engineering": {
-        "Core Subjects": {
-          "Engineering Mechanics": [
-            "Statics Equilibrium",
-            "Dynamics Kinematics",
-            "Friction and Rotation"
-          ],
-          "Thermodynamics": [
-            "Laws of Thermodynamics",
-            "Heat Engines and Refrigerators",
-            "Gas Cycles"
-          ],
-          "Fluid Mechanics": [
-            "Properties of Fluids",
-            "Bernoullis Equation",
-            "Flow through Pipes"
-          ],
-          "Manufacturing Processes": [
-            "Casting and Forging",
-            "Machining Processes",
-            "Welding"
-          ],
-          "Machine Design": [
-            "Design of Shafts",
-            "Bearings",
-            "Gear Design"
-          ],
-          "Heat Transfer": [
-            "Conduction",
-            "Convection",
-            "Radiation"
-          ]
-        }
-      },
-      "Electrical Engineering": {
-        "Core Subjects": {
-          "Circuit Theory": [
-            "DC Circuit Analysis",
-            "AC Circuit Analysis",
-            "Network Theorems"
-          ],
-          "Electromagnetic Fields": [
-            "Electrostatics and Magnetostatics",
-            "Maxwells Equations",
-            "Transmission Lines"
-          ],
-          "Power Systems": [
-            "Generation Transmission Distribution",
-            "Load Flow Analysis",
-            "Fault Analysis"
-          ],
-          "Control Systems": [
-            "Transfer Functions",
-            "Time and Frequency Response",
-            "Stability Analysis"
-          ],
-          "Electrical Machines": [
-            "DC Machines",
-            "Transformers",
-            "Induction Motors"
-          ]
+        "Core Mechanical": {
+          "Engineering Mechanics": ["Statics (Force Systems, Equilibrium)", "Dynamics (Kinematics, Kinetics)", "Friction & Applications", "Analysis of Structures (Trusses, Frames)"],
+          "Strength of Materials": ["Stress & Strain", "Bending Moment & Shear Force", "Torsion", "Deflection of Beams", "Columns & Struts", "Theories of Failure"],
+          "Thermodynamics": ["Laws of Thermodynamics", "Properties of Pure Substances", "Thermodynamic Cycles (Carnot, Rankine, Otto, Diesel)", "Psychrometry"],
+          "Fluid Mechanics": ["Fluid Properties & Statics", "Fluid Kinematics & Dynamics", "Flow Through Pipes", "Boundary Layer Theory", "Compressible Flow"],
+          "Heat & Mass Transfer": ["Conduction (Steady & Transient)", "Convection (Natural & Forced)", "Radiation Heat Transfer", "Heat Exchangers", "Mass Transfer"]
+        },
+        "Design & Manufacturing": {
+          "Machine Design": ["Design of Machine Elements (Shafts, Springs)", "Gears & Gear Trains", "Bearings (Sliding & Rolling)", "Design for Static & Fatigue Loading"],
+          "Production Technology": ["Casting & Foundry", "Metal Forming (Forging, Rolling, Extrusion)", "Welding & Joining Processes", "Machining & Machine Tools", "Additive Manufacturing"],
+          "Metrology & Quality": ["Limits, Fits & Tolerances", "Measurement & Inspection", "Statistical Quality Control", "Six Sigma & Lean Manufacturing"],
+          "CAD/CAM": ["Computer-Aided Design (Solid Modeling)", "Computer-Aided Manufacturing", "CNC Programming", "Finite Element Analysis (FEA)"]
+        },
+        "Specialized": {
+          "Automobile Engineering": ["Engine Components & Systems", "Transmission & Drivetrain", "Suspension & Steering", "Braking Systems", "Vehicle Dynamics", "EV & Hybrid Technology"],
+          "Refrigeration & Air Conditioning": ["Vapour Compression & Absorption Systems", "Refrigerants & Properties", "Load Calculation & Duct Design", "Air Conditioning Systems"]
         }
       },
       "Civil Engineering": {
-        "Core Subjects": {
-          "Structural Engineering": [
-            "Strength of Materials",
-            "Structural Analysis",
-            "Steel and Concrete Design"
-          ],
-          "Geotechnical Engineering": [
-            "Soil Properties",
-            "Shear Strength",
-            "Foundation Design"
-          ],
-          "Hydraulics and Water Resources": [
-            "Open Channel Flow",
-            "Pipe Flow",
-            "Water Supply Engineering"
-          ],
-          "Transportation Engineering": [
-            "Highway Design",
-            "Traffic Engineering",
-            "Pavement Design"
-          ],
-          "Environmental Engineering": [
-            "Water Treatment",
-            "Sewage Treatment",
-            "Air Quality Management"
-          ]
+        "Core Civil": {
+          "Structural Analysis": ["Determinate & Indeterminate Structures", "Trusses & Frames", "Moment Distribution Method", "Slope Deflection Method", "Influence Lines", "Matrix Method of Analysis"],
+          "Concrete Technology": ["Properties of Concrete", "Mix Design (IS Code Method)", "Admixtures", "Special Concretes (High Strength, Self-Compacting)"],
+          "Reinforced Concrete Design": ["Limit State Method", "Design of Beams (Singly & Doubly Reinforced)", "Design of Slabs (One-Way, Two-Way)", "Design of Columns & Footings", "Retaining Walls"],
+          "Steel Structures": ["Bolted & Welded Connections", "Design of Tension & Compression Members", "Design of Beams & Plate Girders", "Plastic Analysis & Design"],
+          "Soil Mechanics": ["Index Properties of Soils", "Permeability & Seepage", "Compaction & Consolidation", "Shear Strength of Soils", "Earth Pressure & Retaining Walls"],
+          "Foundation Engineering": ["Shallow Foundations (Footings, Raft)", "Deep Foundations (Piles, Caissons)", "Bearing Capacity", "Soil Exploration & Testing"]
+        },
+        "Infrastructure & Environmental": {
+          "Fluid Mechanics & Hydraulics": ["Hydrostatics", "Pipe Flow & Open Channel Flow", "Pumps & Turbines", "Hydraulic Structures (Dams, Spillways)"],
+          "Water Supply & Treatment": ["Water Demand & Sources", "Water Treatment Processes", "Distribution Systems", "Wastewater Characteristics", "Sewage Treatment Methods"],
+          "Transportation Engineering": ["Highway Geometric Design", "Pavement Design (Flexible & Rigid)", "Traffic Engineering & Control", "Railway & Airport Engineering"],
+          "Surveying": ["Chain & Compass Surveying", "Leveling & Contouring", "Theodolite & Total Station", "GPS & Remote Sensing", "GIS Applications"]
+        },
+        "Construction & Management": {
+          "Construction Technology": ["Building Materials", "Construction Methods & Equipment", "Formwork & Scaffolding", "Quality Control in Construction"],
+          "Project Management": ["CPM & PERT Networks", "Resource Allocation & Leveling", "Cost Estimation & Budgeting", "Contract Management & Arbitration"]
+        }
+      },
+      "Information Science & Engineering (ISE)": {
+        "Core ISE": {
+          "Data Structures & Algorithms": ["Arrays, Linked Lists, Stacks, Queues", "Trees, Graphs, Hashing", "Sorting & Searching", "Algorithm Design Techniques"],
+          "Database & Big Data": ["SQL & PL/SQL Advanced", "Data Warehousing & Mining", "NoSQL Databases (MongoDB, Cassandra)", "Big Data Analytics (Hadoop, Spark)"],
+          "Web Technologies": ["HTML5, CSS3, JavaScript", "React.js & Angular", "Node.js & Express", "PHP & MySQL", "RESTful APIs & Microservices"],
+          "Information Security": ["Cryptography (Symmetric & Asymmetric)", "Network Security", "Web Application Security", "Cyber Forensics", "Ethical Hacking Basics"]
+        },
+        "Advanced Topics": {
+          "Data Science": ["Data Wrangling & Cleaning", "Exploratory Data Analysis", "Statistical Modeling", "Machine Learning (Supervised & Unsupervised)", "Deep Learning Basics"],
+          "Cloud Computing": ["Virtualization & Hypervisors", "Cloud Service Models (IaaS, PaaS, SaaS)", "AWS/Azure/GCP Basics", "Docker & Kubernetes", "Serverless Computing"],
+          "IoT & Embedded Systems": ["IoT Architecture & Protocols", "Sensor Networks", "Raspberry Pi & Arduino", "Edge Computing", "IoT Security"]
+        }
+      },
+      "Artificial Intelligence & Machine Learning (AIML)": {
+        "Core AIML": {
+          "Mathematics for AI": ["Linear Algebra (Vectors, Matrices)", "Calculus & Optimization", "Probability & Statistics", "Information Theory"],
+          "Machine Learning": ["Supervised Learning (Regression, SVM, Decision Trees)", "Unsupervised Learning (K-Means, PCA)", "Ensemble Methods (Random Forest, Boosting)", "Model Evaluation & Tuning"],
+          "Deep Learning": ["Neural Networks & Backpropagation", "CNNs for Computer Vision", "RNNs & LSTMs for Sequences", "Transformers & Attention Mechanisms", "GANs"],
+          "Natural Language Processing": ["Text Preprocessing", "Word Embeddings (Word2Vec, GloVe)", "Sequence Models for NLP", "Transformers (BERT, GPT)", "Sentiment Analysis & Text Generation"]
+        },
+        "AI Applications": {
+          "Computer Vision": ["Image Processing Basics", "Object Detection (YOLO, SSD)", "Image Segmentation", "Face Recognition", "Video Analysis"],
+          "Reinforcement Learning": ["Markov Decision Processes", "Q-Learning & Deep Q-Networks", "Policy Gradients", "Multi-Agent Systems"],
+          "MLOps & Deployment": ["Model Deployment (Flask, FastAPI)", "Docker for ML", "ML Pipeline Automation", "Model Monitoring & Drift Detection"]
+        }
+      },
+      "Data Science": {
+        "Core Data Science": {
+          "Statistics & Probability": ["Descriptive & Inferential Statistics", "Probability Distributions", "Hypothesis Testing", "Bayesian Inference"],
+          "Data Wrangling & Visualization": ["Pandas & NumPy", "Data Cleaning Techniques", "Matplotlib & Seaborn", "Tableau & Power BI Basics"],
+          "Machine Learning": ["Regression Models", "Classification Techniques", "Clustering Algorithms", "Dimensionality Reduction", "Anomaly Detection"],
+          "Big Data Technologies": ["Hadoop Ecosystem (HDFS, MapReduce)", "Apache Spark (PySpark)", "Kafka & Stream Processing", "Data Lakes & Warehousing"]
+        },
+        "Specialized": {
+          "Time Series Analysis": ["Stationarity & Differencing", "ARIMA & SARIMA Models", "Prophet & LSTM for Forecasting"],
+          "Recommendation Systems": ["Collaborative Filtering", "Content-Based Filtering", "Matrix Factorization", "Deep Learning for Recommendations"],
+          "Business Analytics": ["A/B Testing", "Customer Analytics", "Supply Chain Analytics", "Financial Analytics"]
+        }
+      },
+      "Automobile Engineering": {
+        "Core Automobile": {
+          "Engine & Propulsion": ["Engine Construction & Components", "Fuel Injection Systems (MPFI, CRDI)", "Combustion & Emission Control", "Alternative Fuels (CNG, Electric, Hydrogen)", "Engine Testing & Performance"],
+          "Chassis & Body": ["Vehicle Body Engineering", "Chassis Design & Types", "Aerodynamics of Vehicles", "Frame & Body Materials"],
+          "Transmission & Driveline": ["Clutches & Gearboxes (Manual, Automatic)", "Differential & Final Drive", "Propeller Shaft & Axles", "Four-Wheel Drive Systems"],
+          "Suspension & Steering": ["Suspension Systems (Independent, Beam)", "Steering Geometry & Mechanisms", "Wheel Alignment & Balancing", "Braking Systems (ABS, EBD)"]
+        },
+        "Advanced Automotive": {
+          "Vehicle Dynamics": ["Longitudinal Dynamics", "Lateral Dynamics (Cornering)", "Vertical Dynamics (Ride)", "Tire Dynamics & Characteristics"],
+          "Automotive Electronics": ["ECU & Sensors", "CAN Bus & Automotive Networking", "Infotainment & Telematics", "ADAS (Advanced Driver Assistance Systems)"],
+          "Electric & Hybrid Vehicles": ["EV Powertrain Architecture", "Battery Technology & BMS", "Motor Controllers", "Regenerative Braking", "Hybrid Vehicle Configurations"]
+        }
+      },
+      "Mechatronics Engineering": {
+        "Core Mechatronics": {
+          "Mechanical Foundations": ["Engineering Mechanics", "Strength of Materials", "Thermodynamics & Fluid Power", "Mechanical Design Basics"],
+          "Electronics & Sensors": ["Analog & Digital Electronics", "Sensors & Transducers", "Signal Conditioning", "Actuators (Hydraulic, Pneumatic, Electric)"],
+          "Microcontrollers & Embedded": ["8051 & PIC Microcontrollers", "Arduino & Raspberry Pi", "Embedded C Programming", "RTOS for Mechatronics"],
+          "Control & Automation": ["Control Systems (PID, Root Locus)", "PLC & SCADA Systems", "Industrial Automation", "Robotics Kinematics & Control"],
+          "Mechatronic System Design": ["System Integration", "Data Acquisition Systems", "Mechatronics Case Studies", "Design for Manufacturing & Assembly"]
         }
       }
     },
-    "BSc": {
-      "Physics": {
-        "Core Subjects": {
-          "Classical Mechanics": [
-            "Newtons Laws and Applications",
-            "Conservation Laws",
-            "Lagrangian and Hamiltonian Mechanics"
-          ],
-          "Waves and Optics": [
-            "Wave Motion and Sound",
-            "Geometric Optics",
-            "Physical Optics"
-          ],
-          "Thermodynamics and Statistical Mechanics": [
-            "Laws of Thermodynamics",
-            "Entropy",
-            "Statistical Distributions"
-          ],
-          "Electricity and Magnetism": [
-            "Electrostatics",
-            "Magnetostatics",
-            "Maxwells Equations"
-          ],
-          "Quantum Mechanics": [
-            "Wave-Particle Duality",
-            "Schrödinger Equation",
-            "Quantum Numbers"
-          ],
-          "Nuclear Physics": [
-            "Nuclear Structure",
-            "Radioactivity",
-            "Nuclear Reactions"
-          ]
-        }
-      },
-      "Chemistry": {
-        "Core Subjects": {
-          "Physical Chemistry": [
-            "Thermodynamics",
-            "Chemical Kinetics",
-            "Electrochemistry",
-            "Quantum Chemistry"
-          ],
-          "Organic Chemistry": [
-            "Reaction Mechanisms",
-            "Stereochemistry",
-            "Carbonyl Compounds",
-            "Aromatic Chemistry"
-          ],
-          "Inorganic Chemistry": [
-            "Coordination Chemistry",
-            "Transition Metals",
-            "Organometallic Chemistry"
-          ],
-          "Analytical Chemistry": [
-            "Spectroscopic Methods",
-            "Chromatography",
-            "Titrimetric Analysis"
-          ]
-        }
-      },
-      "Mathematics": {
-        "Core Subjects": {
-          "Abstract Algebra": [
-            "Groups",
-            "Rings and Fields",
-            "Homomorphisms"
-          ],
-          "Real Analysis": [
-            "Sequences and Series",
-            "Continuity and Differentiability",
-            "Riemann Integration"
-          ],
-          "Differential Equations": [
-            "ODEs First and Higher Order",
-            "Partial Differential Equations",
-            "Laplace and Fourier Methods"
-          ],
-          "Linear Algebra": [
-            "Vector Spaces",
-            "Linear Transformations",
-            "Eigenvalues and Eigenvectors"
-          ],
-          "Numerical Methods": [
-            "Interpolation",
-            "Numerical Differentiation and Integration",
-            "Root Finding Methods"
-          ]
-        }
-      }
-    },
-    "BCom": {
+
+    "BCA": {
       "General": {
-        "Core Subjects": {
-          "Financial Accounting": [
-            "Accounting Standards",
-            "Partnership Accounts",
-            "Company Accounts",
-            "Cash Flow Statement"
-          ],
-          "Corporate Accounting": [
-            "Amalgamation and Absorption",
-            "Internal Reconstruction",
-            "Liquidation of Companies"
-          ],
-          "Business Law": [
-            "Indian Contract Act",
-            "Companies Act",
-            "Consumer Protection Act"
-          ],
-          "Income Tax": [
-            "Heads of Income",
-            "Deductions and Exemptions",
-            "Tax Computation"
-          ],
-          "Management Accounting": [
-            "Cost Accounting",
-            "Budgetary Control",
-            "Standard Costing"
-          ],
-          "Business Economics": [
-            "Demand and Supply Analysis",
-            "Market Structures",
-            "National Income"
-          ],
-          "Banking and Finance": [
-            "Banking Operations",
-            "Financial Markets",
-            "RBI and Monetary Policy"
-          ]
+        "Programming": {
+          "C & C++": ["Introduction to C", "Control Structures", "Pointers", "OOP in C++", "Classes and Objects"],
+          "Java": ["Java Basics", "Inheritance & Polymorphism", "Exception Handling", "Multithreading"],
+          "Python": ["Data Types & Variables", "Control Flow", "Functions", "Dictionaries & Lists"]
+        },
+        "Computer Science Core": {
+          "Data Structures": ["Arrays & Linked Lists", "Stacks & Queues", "Trees & Graphs", "Sorting Algorithms"],
+          "Database Management": ["RDBMS Concepts", "SQL Queries", "Normalization", "Transactions"],
+          "Operating Systems": ["Processes", "Memory Management", "File Systems", "Linux Basics"],
+          "Web Development": ["HTML & CSS", "JavaScript Basics", "PHP Fundamentals"]
+        },
+        "Languages & Communication": {
+          "English": ["Professional Communication", "Technical Writing", "Presentation Skills"],
+          "Hindi": ["Karyalaya Hindi", "Anuvad (Translation)", "Vanijya Patra (Business Letters)"],
+          "Kannada": ["Vyakarana", "Aadalita Kannada (Administrative)", "Anuvada"],
+          "Telugu": ["Vyapara Patralu", "Nirvahana Telugu", "Anuvadam"],
+          "Tamil": ["Vaniga Kadidangal", "Aaluvalaga Tamil", "Mozhipeyarppu"],
+          "Malayalam": ["Udyogika Malayalam", "Kathezhuthu"]
         }
       }
     },
-    "BA": {
-      "English Literature": {
-        "Core Subjects": {
-          "British Literature": [
-            "Old English and Medieval Literature",
-            "Renaissance Literature",
-            "18th and 19th Century Literature",
-            "Modernism and Post-Modernism"
-          ],
-          "Indian Writing in English": [
-            "Fiction",
-            "Poetry",
-            "Drama and Non-Fiction"
-          ],
-          "Literary Theory and Criticism": [
-            "Classical and Neoclassical Criticism",
-            "Marxist and Feminist Criticism",
-            "Post-Colonial Theory"
-          ]
+    "B.Sc": {
+      "General": {
+        "Physics": {
+          "Core Physics": ["Mechanics", "Thermodynamics", "Electromagnetism", "Optics", "Quantum Mechanics", "Solid State Physics"]
+        },
+        "Chemistry": {
+          "Core Chemistry": ["Physical Chemistry", "Inorganic Chemistry", "Organic Chemistry", "Analytical Chemistry", "Biochemistry"]
+        },
+        "Mathematics": {
+          "Core Mathematics": ["Calculus", "Algebra", "Differential Equations", "Real Analysis", "Complex Analysis", "Discrete Mathematics"]
+        },
+        "Biology": {
+          "Botany": ["Plant Anatomy", "Plant Physiology", "Genetics", "Ecology"],
+          "Zoology": ["Animal Diversity", "Human Anatomy", "Evolution", "Cell Biology"]
+        },
+        "Languages": {
+          "English": ["Literature", "Grammar", "Communication Skills"],
+          "Hindi": ["Sahitya Ka Itihas", "Vyakaran", "Anuvad"],
+          "Kannada": ["Sahitya Charitre", "Vyakarana", "Kavya"],
+          "Tamil": ["Ilakkiyam", "Ilakkanam"],
+          "Telugu": ["Sahityam", "Vyakaranam"],
+          "Malayalam": ["Sahitya Charitram", "Vyakaranam", "Novel & Short Story"]
         }
-      },
-      "History": {
-        "Core Subjects": {
-          "Ancient India": [
-            "Indus Valley Civilisation",
-            "Vedic Age",
-            "Mauryas and Guptas"
-          ],
-          "Medieval India": [
-            "Delhi Sultanate",
-            "Mughal Empire",
-            "Bhakti and Sufi Movements"
-          ],
-          "Modern India": [
-            "British Colonial Rule",
-            "Freedom Movement",
-            "Partition and Independence"
-          ],
-          "World History": [
-            "Industrial Revolution",
-            "World Wars",
-            "Cold War Era"
-          ]
+      }
+    },
+    "B.Com": {
+      "General": {
+        "Accounting & Finance": {
+          "Financial Accounting": ["Accounting Principles", "Journal & Ledger", "Final Accounts", "Depreciation", "Partnership Accounts"],
+          "Corporate Accounting": ["Issue of Shares", "Amalgamation", "Valuation of Goodwill", "Holding Companies"],
+          "Cost Accounting": ["Material Costing", "Labour Costing", "Overheads", "Process Costing", "Marginal Costing"],
+          "Taxation": ["Income Tax Basics", "Heads of Income", "Deductions", "GST Concepts"]
+        },
+        "Business & Management": {
+          "Business Management": ["Principles of Management", "Planning & Organizing", "Directing & Controlling"],
+          "Business Law": ["Indian Contract Act", "Sale of Goods Act", "Companies Act"],
+          "Economics": ["Microeconomics", "Macroeconomics", "Indian Economy", "Business Cycles"]
+        },
+        "Languages & Soft Skills": {
+          "English": ["Business Communication", "Report Writing", "Interview Skills"],
+          "Hindi": ["Vanijya Hindi", "Patra Lekhan"],
+          "Kannada": ["Vaishya Patra Lekhana", "Account Based Glossary in Kannada"],
+          "Telugu": ["Vyapara Patralu", "Telugu Accounting Terminology"],
+          "Tamil": ["Vaniga Kadidangal", "Tamil Accounting Terms"]
         }
-      },
-      "Political Science": {
-        "Core Subjects": {
-          "Political Theory": [
-            "Democracy and Rights",
-            "Liberalism and Marxism",
-            "Justice and Equality"
-          ],
-          "Indian Government and Politics": [
-            "Indian Constitution",
-            "Parliament and Executive",
-            "Federalism",
-            "Elections and Parties"
-          ],
-          "International Relations": [
-            "IR Theories",
-            "United Nations",
-            "Indias Foreign Policy"
-          ]
+      }
+    },
+    "B.A": {
+      "General": {
+        "Humanities": {
+          "History": ["Ancient India", "Medieval India", "Modern Indian History", "World History", "European History"],
+          "Political Science": ["Political Theory", "Indian Constitution", "International Relations", "Public Administration"],
+          "Economics": ["Microeconomics", "Macroeconomics", "Public Finance", "Development Economics"],
+          "Sociology": ["Introduction to Sociology", "Indian Society", "Social Change", "Sociological Thought"]
+        },
+        "Languages & Literature": {
+          "English": ["British Literature", "Indian Writing in English", "Literary Criticism", "American Literature"],
+          "Hindi": ["Hindi Sahitya Ka Itihas", "Kavya", "Gadya", "Natak"],
+          "Kannada": ["Halagannada", "Nadugannada", "Hosagannada Sahitya", "Janapada Sahitya"],
+          "Telugu": ["Prachina Sahityam", "Adhunika Sahityam", "Kavita"],
+          "Tamil": ["Sangam Literature", "Modern Tamil Literature", "Kappiyangal"]
         }
       }
     },
     "BBA": {
       "General": {
-        "Core Subjects": {
-          "Principles of Management": [
-            "Functions of Management",
-            "Organisational Structure",
-            "Leadership Theories"
-          ],
-          "Marketing Management": [
-            "Marketing Mix",
-            "Consumer Behaviour",
-            "Marketing Research",
-            "Digital Marketing"
-          ],
-          "Financial Management": [
-            "Capital Budgeting",
-            "Working Capital",
-            "Dividend Policy"
-          ],
-          "Human Resource Management": [
-            "Recruitment and Selection",
-            "Training and Development",
-            "Performance Management"
-          ],
-          "Operations Management": [
-            "Production Planning",
-            "Inventory Management",
-            "Supply Chain Management"
-          ],
-          "Business Statistics": [
-            "Descriptive Statistics",
-            "Probability",
-            "Regression Analysis"
-          ],
-          "Entrepreneurship": [
-            "Entrepreneurial Mindset",
-            "Business Plan",
-            "Start-up Ecosystem"
-          ]
-        }
-      }
-    },
-    "MBBS": {
-      "General": {
-        "Pre-Clinical": {
-          "Anatomy": [
-            "General Anatomy",
-            "Upper and Lower Limb",
-            "Thorax Abdomen and Pelvis",
-            "Head Neck and Neuroanatomy"
-          ],
-          "Physiology": [
-            "Cell Physiology",
-            "Blood and Cardiovascular",
-            "Respiratory and Renal",
-            "Neurophysiology and Endocrinology"
-          ],
-          "Biochemistry": [
-            "Biomolecules",
-            "Metabolism",
-            "Enzymology",
-            "Molecular Biology"
-          ]
+        "Management Core": {
+          "Principles of Management": ["Evolution of Management", "Planning", "Organizing", "Leadership", "Controlling"],
+          "Marketing Management": ["Marketing Mix", "Consumer Behavior", "Digital Marketing", "Market Research"],
+          "Human Resource Management": ["Recruitment", "Training & Development", "Performance Appraisal", "Labor Laws"],
+          "Financial Management": ["Cost of Capital", "Capital Budgeting", "Working Capital", "Ratio Analysis"]
         },
-        "Para-Clinical": {
-          "Pathology": [
-            "General Pathology",
-            "Systemic Pathology",
-            "Haematology",
-            "Clinical Pathology"
-          ],
-          "Pharmacology": [
-            "General Pharmacology",
-            "Autonomic Nervous System Drugs",
-            "Cardiovascular and CNS Drugs",
-            "Chemotherapy"
-          ],
-          "Microbiology": [
-            "General Microbiology",
-            "Bacteriology",
-            "Virology and Parasitology",
-            "Clinical Microbiology"
-          ],
-          "Forensic Medicine": [
-            "Medical Jurisprudence",
-            "Thanatology",
-            "Toxicology"
-          ],
-          "Community Medicine": [
-            "Epidemiology",
-            "Biostatistics",
-            "Health Programmes in India"
-          ]
-        },
-        "Clinical": {
-          "General Medicine": [
-            "Cardiovascular Diseases",
-            "Respiratory Diseases",
-            "GI Disorders",
-            "Endocrinology and Neurology"
-          ],
-          "General Surgery": [
-            "Principles of Surgery",
-            "GI Surgery",
-            "Orthopaedics and Trauma"
-          ],
-          "Obstetrics and Gynaecology": [
-            "Obstetrics Normal and Abnormal",
-            "Gynaecological Disorders",
-            "Family Planning"
-          ],
-          "Paediatrics": [
-            "Growth and Development",
-            "Neonatology",
-            "Infectious Diseases in Children"
-          ]
+        "Business Fundamentals": {
+          "Business Economics": ["Demand & Supply", "Market Structures", "Macroeconomic Indicators"],
+          "Business Law": ["Indian Contract Act", "Company Law Basics"],
+          "Business Communication": ["Verbal & Non-verbal Communication", "Business Letters", "Presentations"]
         }
       }
     }
   },
+
   "Postgraduate": {
+      "M.Tech": {
+      "Computer Science & Engineering": {
+        "Advanced CS": {
+          "Advanced Algorithms": ["Amortized Analysis", "Network Flow Algorithms", "NP-Completeness & Approximation", "Online Algorithms", "Randomized Algorithms"],
+          "Machine Learning & Deep Learning": ["Advanced Supervised Learning", "Ensemble & Boosting Methods", "Deep Neural Networks (CNNs, RNNs, Transformers)", "Generative Models (GANs, VAEs)"],
+          "Cloud Computing": ["Virtualization Techniques", "Cloud Architecture & Microservices", "AWS/Azure Services Deep Dive", "Edge & Fog Computing"],
+          "Big Data Analytics": ["Distributed File Systems (HDFS)", "MapReduce & Spark Programming", "Stream Processing (Kafka, Flink)", "NoSQL Databases Deep Dive"]
+        }
+      },
+      "VLSI Design": {
+        "Core VLSI": {
+          "Digital VLSI Design": ["CMOS Logic Design", "MOS Transistor Theory", "Combinational & Sequential Logic", "VLSI Design Flow (RTL to GDSII)"],
+          "Analog VLSI Design": ["CMOS Amplifiers", "Operational Transconductance Amplifiers", "Comparator & Reference Circuits", "Data Converters (ADC, DAC)"],
+          "Physical Design": ["Floorplanning & Placement", "Routing & Clock Tree Synthesis", "Power & Timing Analysis", "DFT (Design for Testability)"],
+          "Verification & Testing": ["Functional Verification (UVM)", "Formal Verification", "ATPG & Fault Simulation", "Built-In Self-Test (BIST)"]
+        }
+      },
+      "Power Systems": {
+        "Core Power": {
+          "Power System Analysis": ["Load Flow Studies (Newton-Raphson, Fast Decoupled)", "Fault Analysis & Symmetrical Components", "Power System Stability (Transient, Voltage)", "Economic Load Dispatch"],
+          "Power System Protection": ["Protective Relaying & Coordination", "Digital Protection (Numerical Relays)", "System Protection (Wide Area, Adaptive)"],
+          "HVDC & FACTS": ["HVDC Transmission Systems", "FACTS Devices (SVC, STATCOM, UPFC)", "Power Quality & Harmonic Filtering"],
+          "Smart Grids": ["Smart Grid Architecture", "AMI & Smart Meters", "Demand Side Management", "Microgrids & Distributed Generation"]
+        }
+      },
+      "Structural Engineering": {
+        "Core Structural": {
+          "Advanced Structural Analysis": ["Matrix Methods (Stiffness & Flexibility)", "Finite Element Method for Structures", "Nonlinear Analysis", "Dynamic Analysis of Structures"],
+          "Design of Structures": ["Advanced RCC Design (Ductile Detailing)", "Steel Structure Design (IS 800)", "Prestressed Concrete Design", "Earthquake Resistant Design"],
+          "Structural Dynamics": ["Single & Multi-DOF Systems", "Modal Analysis & Response Spectrum", "Earthquake Ground Motion", "Base Isolation & Damping"],
+          "Bridge & Offshore Structures": ["Bridge Loads & Analysis", "Design of RCC & Steel Bridges", "Offshore Structural Systems", "Corrosion & Fatigue in Structures"]
+        }
+      },
+      "Power Electronics & Drives": {
+        "Core PE": {
+          "Advanced Power Converters": ["Multilevel Inverters", "Resonant Converters", "Matrix Converters", "DC-DC Converters (Buck, Boost, Flyback)"],
+          "Electric Drives": ["DC Drive Control (Speed, Torque)", "Induction Motor Drives (V/F Control)", "Synchronous & BLDC Motor Drives", "Regenerative Braking Systems"],
+          "Power Quality": ["Harmonics & Mitigation Techniques", "Active Power Filters", "Power Factor Correction", "UPQC & DVR Systems"],
+          "Renewable Energy Integration": ["Solar Inverter Design", "Wind Energy Conversion Systems", "Battery Energy Storage Systems", "Grid Integration Challenges"]
+        }
+      },
+      "Thermal Engineering": {
+        "Core Thermal": {
+          "Advanced Thermodynamics": ["Exergy Analysis", "Combustion Thermodynamics", "Gas Turbine & Jet Propulsion", "Cryogenics"],
+          "Heat Transfer Advanced": ["Conduction (Numerical Methods)", "Convection (Heat Exchanger Design)", "Radiation (View Factor, Enclosure)", "Two-Phase Heat Transfer & Boiling"],
+          "CFD (Computational Fluid Dynamics)": ["Governing Equations & Discretization", "Finite Volume Method", "Turbulence Modeling (k-epsilon, LES)", "CFD for Industrial Applications"],
+          "IC Engines & Alternative Fuels": ["Combustion in SI & CI Engines", "Emissions & After-Treatment", "Alternative Fuels (Biofuels, Hydrogen)", "Engine Modeling & Simulation"]
+        }
+      },
+      "Communication Systems": {
+        "Core Communication": {
+          "Advanced Digital Communication": ["Digital Modulation (M-ary, OFDM)", "Channel Coding (Turbo, LDPC, Polar)", "Equalization & Synchronization", "Spread Spectrum & CDMA"],
+          "Wireless Communication": ["Cellular Systems (4G/5G)", "MIMO Systems & Beamforming", "Millimeter Wave Communication", "Cognitive Radio & Software-Defined Radio"],
+          "Optical Communication": ["Advanced Optical Modulation", "DWDM & Optical Networks", "Free Space Optics", "Optical Signal Processing"],
+          "Signal Processing": ["Adaptive Signal Processing", "Array Signal Processing (Beamforming)", "Statistical Signal Processing", "Image & Video Processing"]
+        }
+      }
+    },
+
+    "MCA": {
+      "General": {
+        "Advanced CS": {
+          "Advanced Data Structures": ["Red-Black Trees", "B-Trees & B+ Trees", "Graph Algorithms Advanced", "String Matching (KMP, Rabin-Karp)"],
+          "Advanced Operating Systems": ["Distributed Systems", "Linux Kernel Internals", "Virtualization & Containerization"],
+          "Software Engineering & DevOps": ["Agile & Scrum", "CI/CD Pipelines", "Docker & Kubernetes", "Software Architecture Patterns"],
+          "Machine Learning": ["Regression & Classification", "Neural Networks Basics", "Recommendation Systems"],
+          "Cloud & Web Technologies": ["Full Stack Development (React + Node)", "Cloud Services (AWS/Azure)", "Microservices Architecture"]
+        },
+        "Specialization Topics": {
+          "Artificial Intelligence": ["Machine Learning Basics", "Neural Networks", "NLP", "Computer Vision"],
+          "Cloud Computing": ["Virtualization", "AWS & Azure Services", "Cloud Security", "Docker & Kubernetes"],
+          "Web Technologies": ["Full Stack Development", "REST APIs", "Microservices", "React/Node.js"]
+        },
+        "Languages & Communication": {
+          "Business Communication": ["Corporate Communication", "Research Paper Writing", "Interview Skills"]
+        }
+      }
+    },
+
     "MBA": {
-      "General": {
-        "Core Subjects": {
-          "Strategic Management": [
-            "Strategic Analysis",
-            "Strategy Formulation",
-            "Strategy Implementation",
-            "Corporate Governance"
-          ],
-          "Financial Management": [
-            "Capital Structure and Valuation",
-            "Portfolio Theory",
-            "Derivatives and Risk Management",
-            "Mergers and Acquisitions"
-          ],
-          "Marketing Management": [
-            "Consumer Behaviour",
-            "Brand Management",
-            "Integrated Marketing Communication",
-            "International Marketing"
-          ],
-          "Human Resource Management": [
-            "Talent Acquisition",
-            "Compensation and Benefits",
-            "Organisational Behaviour",
-            "Industrial Relations"
-          ],
-          "Operations and Supply Chain Management": [
-            "Operations Strategy",
-            "Lean and Six Sigma",
-            "Supply Chain Analytics"
-          ],
-          "Business Analytics": [
-            "Data Analysis with Excel and Python",
-            "Regression and Forecasting",
-            "Business Intelligence Tools"
-          ],
-          "Entrepreneurship and Innovation": [
-            "Design Thinking",
-            "Venture Capital",
-            "Social Entrepreneurship"
-          ]
-        }
-      }
-    },
-    "MTech and ME": {
-      "Computer Science and Engineering": {
-        "Core Subjects": {
-          "Advanced Algorithms": [
-            "Complexity Theory",
-            "Approximation Algorithms",
-            "Randomised Algorithms"
-          ],
-          "Machine Learning": [
-            "Supervised Learning",
-            "Unsupervised Learning",
-            "Deep Learning",
-            "Natural Language Processing"
-          ],
-          "Advanced Database Systems": [
-            "Distributed Databases",
-            "NoSQL Systems",
-            "Big Data Technologies"
-          ],
-          "Cloud Computing": [
-            "Virtualisation",
-            "Cloud Architecture",
-            "Containerisation Docker and Kubernetes"
-          ]
-        }
-      }
-    },
-    "MSc": {
-      "Physics": {
-        "Core Subjects": {
-          "Advanced Quantum Mechanics": [
-            "Perturbation Theory",
-            "Angular Momentum",
-            "Scattering Theory"
-          ],
-          "Statistical Mechanics": [
-            "Partition Functions",
-            "Phase Transitions",
-            "Quantum Statistics"
-          ],
-          "Condensed Matter Physics": [
-            "Crystal Structure",
-            "Band Theory",
-            "Superconductivity"
-          ],
-          "Nuclear and Particle Physics": [
-            "Nuclear Models",
-            "Standard Model",
-            "Particle Accelerators"
-          ],
-          "Electronics and Communication": [
-            "Semiconductor Devices",
-            "Digital Signal Processing",
-            "Communication Systems"
-          ]
+      "Finance": {
+        "Core Finance": {
+          "Corporate Finance": ["Capital Structure", "Dividend Policy", "Valuation Models", "Mergers & Acquisitions"],
+          "Investment Analysis": ["Portfolio Management", "Derivatives (Options/Futures)", "Fixed Income Securities"],
+          "Financial Markets": ["Money Market", "Capital Market", "Banking System", "Mutual Funds"]
         }
       },
-      "Mathematics": {
-        "Core Subjects": {
-          "Functional Analysis": [
-            "Normed Spaces",
-            "Banach Spaces",
-            "Hilbert Spaces"
-          ],
-          "Topology": [
-            "Topological Spaces",
-            "Connectedness and Compactness",
-            "Metric Spaces"
-          ],
-          "Number Theory": [
-            "Arithmetic Functions",
-            "Congruences",
-            "Quadratic Residues"
-          ]
-        }
-      }
-    },
-    "MA": {
-      "Economics": {
-        "Core Subjects": {
-          "Advanced Microeconomics": [
-            "Consumer Theory",
-            "General Equilibrium",
-            "Game Theory"
-          ],
-          "Advanced Macroeconomics": [
-            "Growth Models",
-            "Business Cycle Theory",
-            "Monetary Policy"
-          ],
-          "Econometrics": [
-            "OLS and Regression",
-            "Time Series Analysis",
-            "Panel Data Methods"
-          ],
-          "Development Economics": [
-            "Theories of Development",
-            "Poverty and Inequality",
-            "Agriculture and Rural Development"
-          ]
+      "Marketing": {
+        "Core Marketing": {
+          "Consumer Behavior": ["Decision Process", "Psychological Influences", "Sociocultural Influences"],
+          "Brand Management": ["Brand Equity", "Brand Positioning", "Brand Extension", "Brand Architecture"],
+          "Digital Marketing": ["SEO & SEM", "Social Media Marketing", "Content Marketing", "Email Marketing"]
         }
       },
-      "History": {
-        "Core Subjects": {
-          "Historiography": [
-            "Schools of Historiography",
-            "Research Methods"
-          ],
-          "Modern South Asian History": [
-            "Colonialism",
-            "Nationalism",
-            "Post-Independence India"
-          ],
-          "World History": [
-            "20th Century World",
-            "Global Capitalism",
-            "Decolonisation"
-          ]
+      "Human Resources": {
+        "Core HR": {
+          "Talent Acquisition": ["Manpower Planning", "Selection Process", "Onboarding Strategies"],
+          "Performance Management": ["Appraisal Methods", "Reward Systems", "Competency Mapping", "KPIs"],
+          "Organizational Behavior": ["Motivation Theories", "Leadership Styles", "Organizational Culture", "Change Management"]
         }
       }
     },
-    "MCom": {
+    "M.Sc": {
+      "Science": {
+        "Advanced Physics": ["Quantum Mechanics", "Electrodynamics", "Solid State Physics", "Statistical Mechanics"],
+        "Advanced Chemistry": ["Advanced Organic Synthesis", "Spectroscopy", "Coordination Chemistry", "Thermodynamics"],
+        "Advanced Mathematics": ["Abstract Algebra", "Topology", "Functional Analysis", "Measure Theory"]
+      }
+    }
+  },
+  "Professional": {
+    "CA": {
+      "Foundation": {
+        "Accounting": {
+          "Principles & Practice": ["Theoretical Framework", "Accounting Process", "Bank Reconciliation Statement", "Depreciation", "Partnership Accounts", "Company Accounts"]
+        },
+        "Business Laws": {
+          "Business Laws": ["Indian Contract Act 1872", "Sale of Goods Act 1930", "Indian Partnership Act 1932", "The Limited Liability Partnership Act 2008", "The Companies Act 2013"]
+        },
+        "Quantitative Aptitude": {
+          "Maths & Stats": ["Ratio & Proportion", "Equations", "Time Value of Money", "Permutations & Combinations", "Sequence & Series", "Statistics Basics", "Probability"]
+        },
+        "Business Economics": {
+          "Economics": ["Nature & Scope of Economics", "Theory of Demand & Supply", "Theory of Production & Cost", "Price Determination in Different Markets", "Business Cycles"]
+        }
+      },
+      "Intermediate": {
+        "Advanced Accounting": {
+          "Accounting Standards": ["Application of AS", "Company Accounts", "Amalgamation", "Reconstruction"],
+          "Special Transactions": ["Branch Accounting", "Departmental Accounts"]
+        },
+        "Corporate & Other Laws": {
+          "Company Law": ["Incorporation", "Share Capital", "Management & Administration", "Declaration of Dividend"],
+          "Other Laws": ["Indian Contract Act (Specific Contracts)", "Negotiable Instruments Act", "General Clauses Act"]
+        },
+        "Taxation": {
+          "Income Tax Law": ["Basic Concepts", "Heads of Income", "Computation of Total Income", "Advance Tax & TDS"],
+          "Indirect Taxes": ["GST Concept", "Time & Value of Supply", "Input Tax Credit", "Returns & Payment"]
+        },
+        "Cost & Management Accounting": {
+          "Costing": ["Material, Labour & Overheads", "Activity Based Costing", "Cost Records", "Marginal Costing", "Standard Costing"]
+        },
+        "Auditing & Ethics": {
+          "Auditing": ["Nature, Objective and Scope of Audit", "Audit Strategy & Planning", "Audit Documentation & Evidence", "Audit Report"]
+        },
+        "Financial Management": {
+          "Financial Management": ["Cost of Capital", "Capital Structure", "Capital Budgeting", "Working Capital Management"]
+        }
+      },
+      "Final": {
+        "Financial Reporting": {
+          "Advanced FR": ["Ind AS", "Consolidated Financial Statements", "Business Combinations", "Financial Instruments"]
+        },
+        "Advanced Financial Management": {
+          "AFM": ["Mergers & Acquisitions", "Derivatives", "Forex Management", "Portfolio Management", "Corporate Valuation"]
+        },
+        "Advanced Auditing & Professional Ethics": {
+          "Auditing": ["Audit of Consolidated Financial Statements", "Audit of Banks/Insurance", "Professional Ethics & Code of Conduct"]
+        },
+        "Direct Tax Laws & International Taxation": {
+          "Direct Tax": ["Assessment of Various Entities", "Tax Planning", "Transfer Pricing", "DTAA (Double Tax Avoidance)"]
+        },
+        "Indirect Tax Laws": {
+          "GST & Customs": ["Advanced GST Concepts", "Customs Act", "Foreign Trade Policy", "Appeals and Revisions"]
+        }
+      }
+    },
+    "CFA": {
+      "Level 1": {
+        "Ethical & Professional Standards": {
+          "Ethics": ["Code of Ethics", "Standards of Professional Conduct", "GIPS"]
+        },
+        "Quantitative Methods": {
+          "Quants": ["Time Value of Money", "Statistical Concepts", "Probability Concepts", "Hypothesis Testing", "Linear Regression"]
+        },
+        "Economics": {
+          "Economics": ["Microeconomics", "Macroeconomics", "International Trade", "Currency Exchange Rates"]
+        },
+        "Financial Statement Analysis": {
+          "FSA": ["Financial Reporting Mechanics", "Income Statement", "Balance Sheet", "Cash Flow Statement", "Financial Analysis Techniques", "Inventories", "Long-Lived Assets"]
+        },
+        "Corporate Issuers": {
+          "Corporate Finance": ["Corporate Governance", "Capital Structure", "Cost of Capital", "Measures of Leverage"]
+        },
+        "Equity Investments": {
+          "Equity": ["Market Organization", "Market Indexes", "Market Efficiency", "Equity Valuation Models"]
+        },
+        "Fixed Income": {
+          "Fixed Income": ["Fixed-Income Securities", "Fixed-Income Markets", "Valuation", "Risk and Return", "Credit Analysis"]
+        },
+        "Derivatives & Alternative Investments": {
+          "Derivatives": ["Derivative Markets and Instruments", "Basics of Derivative Pricing"],
+          "Alternatives": ["Private Equity", "Real Estate", "Commodities", "Hedge Funds"]
+        }
+      }
+    },
+    "CS": {
+      "Executive": {
+        "Company Law & Practice": {
+          "Company Law": ["Introduction to Company Law", "Share Capital", "Members and Shareholders", "Debt Instruments", "Directors", "Board Meetings"]
+        },
+        "Corporate Accounting & Financial Management": {
+          "Accounting & FM": ["Corporate Accounting", "Accounting Standards", "Financial Management Concepts", "Capital Budgeting", "Working Capital"]
+        }
+      },
+      "Professional": {
+        "Advanced Company Law": {
+          "Advanced Law": ["Corporate Restructuring", "Insolvency & Bankruptcy Code", "Secretarial Audit", "Corporate Governance"]
+        }
+      }
+    },
+    "Law (LLB)": {
       "General": {
-        "Core Subjects": {
-          "Advanced Financial Accounting": [
-            "Accounting Standards",
-            "Group Accounts",
-            "International Financial Reporting Standards"
-          ],
-          "Advanced Cost Accounting": [
-            "Activity Based Costing",
-            "Standard Costing",
-            "Marginal Costing"
-          ],
-          "Corporate Taxation": [
-            "Income Tax Advanced",
-            "GST Goods and Services Tax",
-            "Tax Planning"
-          ],
-          "Securities and Portfolio Management": [
-            "Security Analysis",
-            "Portfolio Construction",
-            "Derivatives"
-          ]
+        "Constitutional Law": {
+          "Constitution": ["Preamble & Fundamental Rights", "Directive Principles", "Union & State Executive", "Judiciary", "Emergency Provisions"]
+        },
+        "Criminal Law": {
+          "CrPC & IPC": ["Indian Penal Code General Exceptions", "Offences against Human Body", "Criminal Procedure Code Basics", "Law of Evidence"]
+        },
+        "Civil Law": {
+          "Contracts & Torts": ["Law of Contracts (Offer & Acceptance)", "Law of Torts (Negligence, Nuisance)", "Family Law", "Property Law"]
         }
       }
     }
   },
-  "PhD and Doctoral": {
-    "PhD Program": {
-      "All Disciplines": {
-        "Research Methodology": {
-          "Research Process and Design": [
-            "Types of Research",
-            "Research Problem Formulation",
-            "Literature Review",
-            "Research Design Qualitative and Quantitative"
-          ],
-          "Data Collection Methods": [
-            "Primary Data Surveys Interviews",
-            "Secondary Data Sources",
-            "Sampling Techniques",
-            "Reliability and Validity"
-          ],
-          "Statistical Analysis": [
-            "Descriptive Statistics",
-            "Inferential Statistics t-test ANOVA",
-            "Regression and Correlation",
-            "Multivariate Analysis"
-          ],
-          "Qualitative Methods": [
-            "Ethnography and Case Studies",
-            "Grounded Theory",
-            "Content and Discourse Analysis"
-          ],
-          "Research Writing and Publication": [
-            "Thesis Structure and Writing",
-            "Academic Paper Writing",
-            "Citation and Referencing APA MLA Chicago",
-            "Plagiarism and Research Ethics"
-          ]
-        },
-        "Advanced Subject Coursework": {
-          "Science and Technology": [
-            "Advanced Topics in Chosen Discipline",
-            "Interdisciplinary Research",
-            "Lab Research Techniques",
-            "Computational Methods"
-          ],
-          "Social Sciences and Humanities": [
-            "Advanced Theory in Chosen Discipline",
-            "Field Research Methods",
-            "Archival and Document Analysis",
-            "Comparative Studies"
-          ],
-          "Management": [
-            "Advanced Business Research",
-            "Case Study Methodology",
-            "Survey Design and Analysis",
-            "Industry-Academic Interface"
-          ]
-        },
-        "Doctoral Process": {
-          "Pre-Registration Phase": [
-            "Synopsis Preparation",
-            "Research Proposal Defence",
-            "Supervisor and Committee Allocation"
-          ],
-          "Research Execution Phase": [
-            "Data Collection and Analysis",
-            "Chapter Writing",
-            "Progress Seminars"
-          ],
-          "Thesis Completion Phase": [
-            "Pre-Submission Seminar",
-            "Thesis Formatting and Submission",
-            "Viva Voce Oral Defence"
-          ],
-          "Post-PhD": [
-            "Post-Doctoral Research",
-            "Publishing from Thesis",
-            "Academic and Industry Career Pathways"
-          ]
-        }
-      }
-    }
-  },
-  "Entrance Exams": {
-    "Engineering": {
-      "JEE Main and Advanced": {
+  "Competitive Exams": {
+    "JEE Main & Advanced": {
+      "Engineering Entrance": {
         "Physics": {
-          "Mechanics": [
-            "Kinematics",
-            "Laws of Motion",
-            "Work Energy Power",
-            "Rotational Motion",
-            "Gravitation",
-            "Simple Harmonic Motion"
-          ],
-          "Electricity and Magnetism": [
-            "Electrostatics",
-            "Current Electricity",
-            "Magnetic Effects of Current",
-            "Electromagnetic Induction",
-            "Alternating Current"
-          ],
-          "Optics and Modern Physics": [
-            "Ray and Wave Optics",
-            "Dual Nature of Matter",
-            "Atomic and Nuclear Physics",
-            "Semiconductors"
-          ],
-          "Heat and Thermodynamics": [
-            "Thermal Properties of Matter",
-            "Thermodynamics",
-            "Kinetic Theory of Gases"
-          ]
+          "Mechanics": ["Kinematics", "Laws of Motion", "Work, Energy and Power", "Rotational Motion", "Gravitation"],
+          "Electromagnetism": ["Electrostatics", "Current Electricity", "Magnetic Effects", "EMI & AC"],
+          "Optics & Modern Physics": ["Ray Optics", "Wave Optics", "Dual Nature", "Atoms & Nuclei"]
         },
         "Chemistry": {
-          "Physical Chemistry": [
-            "Mole Concept",
-            "Atomic Structure",
-            "Chemical Bonding",
-            "Thermodynamics",
-            "Chemical Equilibrium",
-            "Electrochemistry",
-            "Chemical Kinetics"
-          ],
-          "Organic Chemistry": [
-            "Basics and IUPAC",
-            "Hydrocarbons",
-            "Functional Groups",
-            "Reaction Mechanisms",
-            "Biomolecules and Polymers"
-          ],
-          "Inorganic Chemistry": [
-            "Periodic Table and Periodicity",
-            "Chemical Bonding",
-            "s and p Block Elements",
-            "d and f Block Elements",
-            "Coordination Compounds"
-          ]
+          "Physical Chemistry": ["Mole Concept", "Atomic Structure", "Thermodynamics", "Equilibrium", "Chemical Kinetics"],
+          "Organic Chemistry": ["GOC", "Hydrocarbons", "Alcohols & Ethers", "Aldehydes & Ketones", "Amines"],
+          "Inorganic Chemistry": ["Periodic Table", "Chemical Bonding", "Coordination Compounds", "Metallurgy"]
         },
         "Mathematics": {
-          "Algebra": [
-            "Complex Numbers",
-            "Matrices and Determinants",
-            "Quadratic Equations",
-            "Permutations and Combinations",
-            "Binomial Theorem",
-            "Sequences and Series"
-          ],
-          "Calculus": [
-            "Limits and Continuity",
-            "Differentiation",
-            "Applications of Derivatives",
-            "Integration",
-            "Differential Equations"
-          ],
-          "Coordinate Geometry and Vectors": [
-            "Straight Lines",
-            "Circles and Conics",
-            "3D Geometry",
-            "Vectors"
-          ],
-          "Trigonometry and Statistics": [
-            "Trigonometric Functions and Equations",
-            "Inverse Trigonometric Functions",
-            "Probability and Statistics"
-          ]
+          "Algebra": ["Complex Numbers", "Quadratic Equations", "Sequence & Series", "Binomial Theorem", "Matrices & Determinants"],
+          "Calculus": ["Functions", "Limits & Continuity", "Derivatives", "Integration", "Differential Equations"],
+          "Coordinate Geometry": ["Straight Lines", "Circles", "Conic Sections"]
         }
       }
     },
-    "Medical": {
-      "NEET UG": {
+    "NEET": {
+      "Medical Entrance": {
         "Physics": {
-          "Class 11 Physics": [
-            "Physical World and Measurement",
-            "Kinematics",
-            "Laws of Motion",
-            "Work Energy and Power",
-            "Rotational Motion",
-            "Gravitation",
-            "Properties of Matter",
-            "Thermodynamics",
-            "Oscillations and Waves"
-          ],
-          "Class 12 Physics": [
-            "Electrostatics",
-            "Current Electricity",
-            "Magnetic Effects and Magnetism",
-            "EMI and AC",
-            "EM Waves",
-            "Optics",
-            "Dual Nature and Atoms",
-            "Nuclei",
-            "Semiconductors"
-          ]
+          "Mechanics": ["Kinematics", "Laws of Motion", "Work & Energy", "Rotational Mechanics"],
+          "Electromagnetism": ["Electrostatics", "Current Electricity", "Magnetism", "Alternating Current"]
         },
         "Chemistry": {
-          "Class 11 Chemistry": [
-            "Basic Concepts",
-            "Atomic Structure",
-            "Chemical Bonding",
-            "States of Matter",
-            "Thermodynamics",
-            "Equilibrium",
-            "Redox Reactions",
-            "Organic Chemistry Basics",
-            "Hydrocarbons"
-          ],
-          "Class 12 Chemistry": [
-            "Solid State",
-            "Solutions",
-            "Electrochemistry",
-            "Chemical Kinetics",
-            "p d f Block Elements",
-            "Coordination Compounds",
-            "Haloalkanes and Haloarenes",
-            "Alcohols Aldehydes Amines",
-            "Biomolecules and Polymers"
-          ]
+          "Physical": ["Mole Concept", "Thermodynamics", "Equilibrium", "Electrochemistry"],
+          "Organic": ["GOC", "Hydrocarbons", "Biomolecules", "Polymers"]
         },
         "Biology": {
-          "Botany": [
-            "Diversity in Living World",
-            "Structural Organisation in Plants",
-            "Cell Biology",
-            "Plant Physiology",
-            "Reproduction in Plants",
-            "Genetics and Evolution",
-            "Ecology and Environment"
-          ],
-          "Zoology": [
-            "Diversity in Living World Animals",
-            "Structural Organisation in Animals",
-            "Human Physiology",
-            "Reproduction in Humans",
-            "Genetics",
-            "Biology in Human Welfare",
-            "Biotechnology"
-          ]
+          "Botany": ["Plant Diversity", "Plant Physiology", "Genetics & Evolution", "Ecology"],
+          "Zoology": ["Animal Diversity", "Human Physiology", "Human Reproduction", "Biotechnology"]
         }
       }
     },
-    "Management": {
-      "CAT XAT MAT CMAT": {
+    "UPSC CSE": {
+      "Civil Services": {
+        "General Studies Paper I": {
+          "History": ["Ancient India", "Medieval India", "Modern India", "Art & Culture", "Post-Independence Consolidation"],
+          "Geography": ["Physical Geography", "Indian Geography", "World Geography", "Climatology"],
+          "Polity": ["Constitution", "Governance", "Panchayati Raj", "Public Policy", "Rights Issues"],
+          "Economics": ["Economic Development", "Poverty", "Demographics", "Social Sector Initiatives"]
+        },
+        "CSAT Paper II": {
+          "Aptitude": ["Comprehension", "Logical Reasoning", "Data Interpretation", "Basic Numeracy", "Decision Making"]
+        }
+      }
+    },
+    "CAT": {
+      "Management Entrance": {
         "Quantitative Ability": {
-          "Arithmetic": [
-            "Number Systems",
-            "Percentage Profit and Loss",
-            "Time Speed and Distance",
-            "Time and Work",
-            "Simple and Compound Interest"
-          ],
-          "Algebra": [
-            "Linear and Quadratic Equations",
-            "Progressions",
-            "Functions and Graphs"
-          ],
-          "Geometry and Mensuration": [
-            "Lines Angles and Triangles",
-            "Circles and Quadrilaterals",
-            "Mensuration 2D and 3D"
-          ],
-          "Modern Mathematics": [
-            "Permutations and Combinations",
-            "Probability",
-            "Set Theory"
-          ]
+          "Arithmetic": ["Percentages", "Profit & Loss", "Time & Work", "Time Speed & Distance", "Simple & Compound Interest"],
+          "Algebra & Geometry": ["Linear Equations", "Quadratic Equations", "Triangles", "Circles", "Coordinate Geometry"]
         },
-        "Verbal Ability and Reading Comprehension": {
-          "Verbal Ability": [
-            "Vocabulary and Word Usage",
-            "Grammar and Sentence Correction",
-            "Para-Jumbles",
-            "Summary Writing"
-          ],
-          "Reading Comprehension": [
-            "Comprehension Strategies",
-            "Inference and Main Idea",
-            "Tone and Authors Purpose"
-          ]
+        "Logical Reasoning & DI": {
+          "Data Interpretation": ["Tables", "Bar Graphs", "Pie Charts", "Line Graphs", "Radar Charts"],
+          "Logical Reasoning": ["Seating Arrangement", "Blood Relations", "Syllogisms", "Puzzles", "Venn Diagrams"]
         },
-        "Data Interpretation and Logical Reasoning": {
-          "Data Interpretation": [
-            "Tables and Bar Charts",
-            "Line and Pie Charts",
-            "Caselets"
-          ],
-          "Logical Reasoning": [
-            "Blood Relations and Direction Sense",
-            "Seating Arrangements",
-            "Syllogisms",
-            "Critical Reasoning"
-          ]
+        "Verbal Ability": {
+          "Reading & Grammar": ["Reading Comprehension", "Para Jumbles", "Sentence Completion", "Vocabulary", "Critical Reasoning"]
+        }
+      }
+    }
+  },
+  "Skill & Certification": {
+    "IT Certifications": {
+      "Cloud & DevOps": {
+        "AWS": {
+          "Cloud Practitioner": ["Cloud Concepts", "Security & Compliance", "Technology", "Billing & Pricing"],
+          "Solutions Architect": ["Design Resilient Architectures", "High-Performing Architectures", "Secure Applications"]
+        },
+        "Azure": {
+          "Azure Fundamentals": ["Cloud Concepts", "Core Azure Services", "Security & Privacy", "Azure Pricing"]
+        }
+      },
+      "Data Science & AI": {
+        "Python": {
+          "Data Analysis": ["Numpy Basics", "Pandas Dataframes", "Data Visualization", "Exploratory Data Analysis"]
+        },
+        "Machine Learning": {
+          "Algorithms": ["Linear Regression", "Logistic Regression", "Decision Trees", "K-Means Clustering", "Neural Networks Basics"]
         }
       }
     },
-    "Civil Services": {
-      "UPSC CSE": {
-        "Prelims": {
-          "General Studies Paper I": [
-            "Indian History Ancient Medieval Modern",
-            "Indian and World Geography",
-            "Indian Polity and Governance",
-            "Economic and Social Development",
-            "Current Events and General Awareness",
-            "Environment and Ecology",
-            "General Science"
-          ],
-          "CSAT Paper II": [
-            "Comprehension",
-            "Logical Reasoning and Analytical Ability",
-            "Decision Making and Problem Solving",
-            "Quantitative Aptitude",
-            "Data Interpretation"
-          ]
-        },
-        "Mains": {
-          "Essay": [
-            "Essay Writing Social and Ethical Issues",
-            "Essay Writing Philosophy and Governance"
-          ],
-          "General Studies I": [
-            "Indian Heritage and Culture",
-            "History of India and the World",
-            "Geography"
-          ],
-          "General Studies II": [
-            "Governance Constitution and Polity",
-            "Social Justice",
-            "International Relations"
-          ],
-          "General Studies III": [
-            "Technology and Economic Development",
-            "Biodiversity and Disaster Management",
-            "Internal Security"
-          ],
-          "General Studies IV": [
-            "Ethics and Human Interface",
-            "Attitude and Aptitude",
-            "Case Studies"
-          ]
+    "Language & Communication": {
+      "Proficiency Exams": {
+        "English": {
+          "IELTS": ["Listening Strategies", "Reading Techniques", "Writing Task 1 & 2", "Speaking Practice"],
+          "TOEFL": ["Reading Section", "Listening Section", "Speaking Section", "Writing Section"]
         }
       }
     }
