@@ -21,6 +21,88 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, HRFlowable
 from reportlab.lib.enums import TA_CENTER, TA_LEFT
 
 
+def inject_mobile_ui():
+    """
+    Injects CSS to optimize the Streamlit UI specifically for mobile phones.
+    This uses media queries to only apply changes when the screen is narrow.
+    """
+    mobile_css = """
+    <style>
+    /* 📱 MOBILE ONLY STYLES (Applies to screens smaller than 768px) */
+    @media (max-width: 768px) {
+        
+        /* 1. Reduce blank space on the sides to use full screen width */
+        .block-container {
+            padding-top: 2rem !important;
+            padding-left: 1rem !important;
+            padding-right: 1rem !important;
+            padding-bottom: 5rem !important; /* Space for the floating button */
+            max-width: 100% !important;
+        }
+
+        /* 2. Scale down heavy fonts so they don't look awkwardly huge */
+        h1 { font-size: 1.7rem !important; }
+        h2 { font-size: 1.4rem !important; }
+        h3 { font-size: 1.2rem !important; }
+        
+        /* 3. Make custom HTML cards (sf-soft-card) fit perfectly */
+        .sf-soft-card {
+            padding: 12px 10px !important;
+            margin-bottom: 12px !important;
+            border-radius: 12px !important;
+        }
+
+        /* 4. Fix the AI Chat Floating Button for Mobile */
+        div[data-testid="stBaseButton-element"] > button#ai_chat_toggle_btn {
+            bottom: 20px !important;
+            right: 15px !important;
+            width: 55px !important;
+            height: 55px !important;
+            font-size: 1.2rem !important; /* Slightly smaller icon */
+        }
+
+        /* 5. Fix Chat Widget Container so it doesn't overflow */
+        div[data-testid="stVerticalBlock"] > div.st-emotion-cache-1wmy9hl { 
+            /* Targets the border container of the chat */
+            padding: 10px !important;
+        }
+
+        /* 6. Keep the Send Button NEXT TO the input box, instead of stacking below it */
+        /* Streamlit normally stacks columns on mobile, this forces them side-by-side */
+        div[data-testid="stForm"] > div[data-testid="stVerticalBlock"] > div > div[data-testid="stHorizontalBlock"] {
+            display: flex !important;
+            flex-direction: row !important;
+            flex-wrap: nowrap !important;
+            align-items: center !important;
+            gap: 5px !important;
+        }
+        
+        /* Give input 85% width and button 15% width strictly on mobile */
+        div[data-testid="stForm"] > div[data-testid="stVerticalBlock"] > div > div[data-testid="stHorizontalBlock"] > div:nth-child(1) {
+            width: 85% !important;
+            flex: 1 1 85% !important;
+        }
+        div[data-testid="stForm"] > div[data-testid="stVerticalBlock"] > div > div[data-testid="stHorizontalBlock"] > div:nth-child(2) {
+            width: 15% !important;
+            flex: 0 0 15% !important;
+        }
+
+        /* 7. Adjust Streamlit default inputs/buttons for touch targets */
+        .stTextInput input, .stSelectbox > div {
+            font-size: 16px !important; /* Prevents iOS auto-zoom on click */
+            padding: 12px 10px !important;
+            border-radius: 10px !important;
+        }
+        
+        .stButton button {
+            border-radius: 10px !important;
+            padding: 6px 12px !important;
+        }
+    }
+    </style>
+    """
+    st.markdown(mobile_css, unsafe_allow_html=True)
+
 # ─────────────────────────────────────────────────────────────────────────────
 # PAGE CONFIG
 # ─────────────────────────────────────────────────────────────────────────────
