@@ -23,85 +23,73 @@ from reportlab.lib.enums import TA_CENTER, TA_LEFT
 
 def inject_mobile_ui():
     """
-    Injects CSS to optimize the Streamlit UI specifically for mobile phones.
-    This uses media queries to only apply changes when the screen is narrow.
+    Premium Mobile UI - Makes Streamlit look like a Native iOS/Android App
     """
     mobile_css = """
     <style>
-    /* 📱 MOBILE ONLY STYLES (Applies to screens smaller than 768px) */
+    /* --- ALL DEVICE TWEAKS --- */
+    .stApp { background-color: #f8fafc; } /* Light, clean background */
+    
+    /* --- MOBILE ONLY (Screens < 768px) --- */
     @media (max-width: 768px) {
-        
-        /* 1. Reduce blank space on the sides to use full screen width */
+        /* 1. Remove unnecessary padding & Header/Footer */
+        [data-testid="stHeader"], [data-testid="stFooter"] { display: none !important; }
         .block-container {
-            padding-top: 2rem !important;
-            padding-left: 1rem !important;
-            padding-right: 1rem !important;
-            padding-bottom: 5rem !important; /* Space for the floating button */
+            padding: 1rem 0.8rem 5rem 0.8rem !important;
             max-width: 100% !important;
         }
 
-        /* 2. Scale down heavy fonts so they don't look awkwardly huge */
-        h1 { font-size: 1.7rem !important; }
-        h2 { font-size: 1.4rem !important; }
-        h3 { font-size: 1.2rem !important; }
-        
-        /* 3. Make custom HTML cards (sf-soft-card) fit perfectly */
-        .sf-soft-card {
-            padding: 12px 10px !important;
-            margin-bottom: 12px !important;
+        /* 2. Professional Card Styling */
+        div[data-testid="stVerticalBlock"] > div.st-emotion-cache-1wmy9hl {
+            border: none !important;
+            background: white !important;
+            border-radius: 20px !important;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05) !important;
+            padding: 20px !important;
+            margin-bottom: 15px !important;
+        }
+
+        /* 3. Modern Tabs UI (Login/Register Fix) */
+        button[data-baseweb="tab"] {
+            font-size: 1rem !important;
+            font-weight: 600 !important;
+            color: #64748b !important;
+        }
+        button[data-baseweb="tab"][aria-selected="true"] {
+            color: #1d4ed8 !important;
+            border-bottom-color: #1d4ed8 !important;
+        }
+
+        /* 4. Inputs & Buttons (Native Feel) */
+        .stTextInput input, .stSelectbox div {
             border-radius: 12px !important;
-        }
-
-        /* 4. Fix the AI Chat Floating Button for Mobile */
-        div[data-testid="stBaseButton-element"] > button#ai_chat_toggle_btn {
-            bottom: 20px !important;
-            right: 15px !important;
-            width: 55px !important;
-            height: 55px !important;
-            font-size: 1.2rem !important; /* Slightly smaller icon */
-        }
-
-        /* 5. Fix Chat Widget Container so it doesn't overflow */
-        div[data-testid="stVerticalBlock"] > div.st-emotion-cache-1wmy9hl { 
-            /* Targets the border container of the chat */
-            padding: 10px !important;
-        }
-
-        /* 6. Keep the Send Button NEXT TO the input box, instead of stacking below it */
-        /* Streamlit normally stacks columns on mobile, this forces them side-by-side */
-        div[data-testid="stForm"] > div[data-testid="stVerticalBlock"] > div > div[data-testid="stHorizontalBlock"] {
-            display: flex !important;
-            flex-direction: row !important;
-            flex-wrap: nowrap !important;
-            align-items: center !important;
-            gap: 5px !important;
-        }
-        
-        /* Give input 85% width and button 15% width strictly on mobile */
-        div[data-testid="stForm"] > div[data-testid="stVerticalBlock"] > div > div[data-testid="stHorizontalBlock"] > div:nth-child(1) {
-            width: 85% !important;
-            flex: 1 1 85% !important;
-        }
-        div[data-testid="stForm"] > div[data-testid="stVerticalBlock"] > div > div[data-testid="stHorizontalBlock"] > div:nth-child(2) {
-            width: 15% !important;
-            flex: 0 0 15% !important;
-        }
-
-        /* 7. Adjust Streamlit default inputs/buttons for touch targets */
-        .stTextInput input, .stSelectbox > div {
-            font-size: 16px !important; /* Prevents iOS auto-zoom on click */
-            padding: 12px 10px !important;
-            border-radius: 10px !important;
+            background-color: #f1f5f9 !important;
+            border: 1px solid #e2e8f0 !important;
+            height: 50px !important;
+            font-size: 16px !important; /* Prevents iPhone Zoom */
         }
         
         .stButton button {
-            border-radius: 10px !important;
-            padding: 6px 12px !important;
+            width: 100% !important;
+            height: 50px !important;
+            border-radius: 12px !important;
+            font-weight: bold !important;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* 5. Chat Input (Stay on one line) */
+        [data-testid="stForm"] > div > div > div[data-testid="stHorizontalBlock"] {
+            display: flex !important;
+            flex-direction: row !important;
+            align-items: center !important;
+            gap: 8px !important;
         }
     }
     </style>
     """
     st.markdown(mobile_css, unsafe_allow_html=True)
+
 
 # ─────────────────────────────────────────────────────────────────────────────
 # PAGE CONFIG
@@ -3787,15 +3775,17 @@ def auth_ui():
 # MAIN APP ROUTER
 # ─────────────────────────────────────────────────────────────────────────────
 def main_app():
+    # ✅ ADD THIS LINE HERE — First thing inside main_app()
+    inject_mobile_ui()
+    
     username = st.session_state.username
 
     # ── ONBOARDING GATE — show wizard if profile not set ─────────────────
     if not is_onboarded(username):
         show_onboarding(username)
-        return                        # ← stop here; no sidebar, no dashboard
+        return
 
     # ── Normal app flow ───────────────────────────────────────────────────
-    # Call the sidebar and store the selected language
     target_lang = render_sidebar(username)
     
     page = st.session_state.active_page
@@ -3809,7 +3799,6 @@ def main_app():
 
 
 
-
 # ═══════════════════════════════════════════════════════════════════════════════
 # ENTRY POINT
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -3819,7 +3808,7 @@ init_session_state()
 # ─────────────────────────────────────────────────────────────────────────────
 # MAINTENANCE MODE
 # ─────────────────────────────────────────────────────────────────────────────
-MAINTENANCE_MODE = True
+MAINTENANCE_MODE = False
 ALLOWED_USERS_MAINTENANCE = ["Deepak"]   # <- replace with your real username
 
 def show_maintenance_screen():
