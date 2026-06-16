@@ -2,111 +2,1026 @@
   "K-12th": {
     "Class 10": {
       "General": {
-        "Science": {
-          "Physics": ["Light - Reflection and Refraction", "The Human Eye and the Colourful World", "Electricity", "Magnetic Effects of Electric Current"],
-          "Chemistry": ["Chemical Reactions and Equations", "Acids, Bases and Salts", "Metals and Non-metals", "Carbon and its Compounds", "Periodic Classification of Elements"],
-          "Biology": ["Life Processes", "Control and Coordination", "How do Organisms Reproduce?", "Heredity and Evolution", "Our Environment"]
-        },
         "Mathematics": {
-          "Algebra": ["Polynomials", "Pair of Linear Equations", "Quadratic Equations", "Arithmetic Progressions"],
-          "Geometry": ["Triangles", "Circles", "Constructions", "Coordinate Geometry"],
-          "Trigonometry": ["Introduction to Trigonometry", "Some Applications of Trigonometry"],
-          "Mensuration & Statistics": ["Areas Related to Circles", "Surface Areas and Volumes", "Statistics", "Probability"]
+          "Number Systems & Algebra": [
+            "Real Numbers",
+            "Polynomials",
+            "Pair of Linear Equations in Two Variables",
+            "Quadratic Equations",
+            "Arithmetic Progressions"
+          ],
+          "Geometry & Coordinate Geometry": [
+            "Triangles",
+            "Coordinate Geometry",
+            "Introduction to Trigonometry",
+            "Some Applications of Trigonometry",
+            "Circles",
+            "Areas Related to Circles",
+            "Surface Areas and Volumes"
+          ],
+          "Statistics & Probability": [
+            "Statistics",
+            "Probability"
+          ]
+        },
+        "Science": {
+          "Physics": [
+            "Light - Reflection and Refraction",
+            "The Human Eye and the Colourful World",
+            "Electricity",
+            "Magnetic Effects of Electric Current",
+            "Sources of Energy"
+          ],
+          "Chemistry": [
+            "Chemical Reactions and Equations",
+            "Acids, Bases and Salts",
+            "Metals and Non-metals",
+            "Carbon and its Compounds",
+            "Periodic Classification of Elements"
+          ],
+          "Biology": [
+            "Life Processes",
+            "Control and Coordination",
+            "How do Organisms Reproduce?",
+            "Heredity and Evolution",
+            "Our Environment",
+            "Management of Natural Resources"
+          ]
         },
         "Social Science": {
-          "History": ["The Rise of Nationalism in Europe", "Nationalism in India", "The Making of a Global World", "The Age of Industrialisation"],
-          "Geography": ["Resources and Development", "Forest and Wildlife Resources", "Water Resources", "Agriculture", "Minerals and Energy Resources"],
-          "Political Science": ["Power Sharing", "Federalism", "Democracy and Diversity", "Gender, Religion and Caste", "Political Parties"],
-          "Economics": ["Development", "Sectors of the Indian Economy", "Money and Credit", "Globalisation and the Indian Economy"]
+          "History (India & Contemporary World II)": [
+            "The Rise of Nationalism in Europe",
+            "Nationalism in India",
+            "The Making of a Global World",
+            "The Age of Industrialisation",
+            "Print Culture and the Modern World"
+          ],
+          "Geography (Contemporary India II)": [
+            "Resources and Development",
+            "Forest and Wildlife Resources",
+            "Water Resources",
+            "Agriculture",
+            "Minerals and Energy Resources",
+            "Manufacturing Industries",
+            "Lifelines of National Economy"
+          ],
+          "Political Science (Democratic Politics II)": [
+            "Power Sharing",
+            "Federalism",
+            "Democracy and Diversity",
+            "Gender, Religion and Caste",
+            "Political Parties",
+            "Outcomes of Democracy",
+            "Challenges to Democracy"
+          ],
+          "Economics (Understanding Economic Development)": [
+            "Development",
+            "Sectors of the Indian Economy",
+            "Money and Credit",
+            "Globalisation and the Indian Economy",
+            "Consumer Rights"
+          ]
         },
         "Languages": {
-          "English": ["Grammar (Tenses, Modals, Voice)", "Literature (Prose & Poetry)", "Writing Skills (Essay, Letters)"],
-          "Hindi": ["Vyakaran (Samas, Alankar)", "Sahitya (Kavita, Kahani)", "Lekhan (Patra, Nibandh)"],
-          "Kannada": ["Vyakarana (Sandhi, Samasa)", "Sahitya (Gadya, Padya)", "Prabandha Lekhana"],
-          "Tamil": ["Ilakkanam (Ezhuthu, Sol)", "Ilakkiyam (Thirukkural, Seyyul)", "Katturai Ezhudhuthal"],
-          "Telugu": ["Vyakaranam (Sandhulu, Samasalu)", "Sahityam (Padyalu, Gadyam)", "Vyasa Rachana"],
-          "Malayalam": ["Vyakaranam", "Sahityam (Kavitha, Padam)", "Rachana (Essay Writing)"]
+          "English (First Flight & Footprints)": [
+            "A Letter to God",
+            "Nelson Mandela: Long Walk to Freedom",
+            "Two Stories about Flying",
+            "From the Diary of Anne Frank",
+            "The Hundred Dresses",
+            "Glimpses of India",
+            "Mijbil the Otter",
+            "Madam Rides the Bus",
+            "The Sermon at Benares",
+            "The Proposal (Play)",
+            "A Triumph of Surgery (Footprints)",
+            "The Thief's Story",
+            "The Midnight Visitor",
+            "Grammar & Writing Skills"
+          ],
+          "Hindi (Kshitij & Kritika)": [
+            "Surdas ke Pad",
+            "Ram Lakshman Parshuram Samvad",
+            "Saviya (Devdas)",
+            "Utsah / Att Nahi Rahi Hai (Nirala)",
+            "Yeh Danturit Muskan / Fasal (Nagarjun)",
+            "Chhaya Mat Chhuna (Girija Kumar Mathur)",
+            "Kanyadan (Rituraj)",
+            "Sangatkar (Manglesh Dabral)",
+            "Neta Ji ka Chasma (Swayam Prakash)",
+            "Balgobin Bhagat (Ramvriksha Benipuri)",
+            "Lakhnavi Andaz (Yashpal)",
+            "Manviya Karuna ki Divya Chamak (Sarveshwar Dayal Saxena)",
+            "Ek Kahani Yeh Bhi (Mannu Bhandari)",
+            "Striya (Mahavir Prasad Dwivedi)",
+            "Noubat khane mein Ibadat (Yatindra Mishra)",
+            "Sanskriti (Bhagwat Sharan Upadhyay)",
+            "Grammar (Vyakaran)"
+          ],
+          "Kannada": [
+            "Vyakarana (Sandhi, Samasa, Vibhakti)",
+            "Sahitya Gadya (Prose Lessons)",
+            "Sahitya Padya (Poetry Lessons)",
+            "Prabandha Lekhana (Essay Writing)",
+            "Patra Lekhana (Letter Writing)"
+          ],
+          "Tamil": [
+            "Ilakkanam (Grammar - Ezhuthu, Sol, Porul)",
+            "Gadyam (Prose)",
+            "Seyyul (Poetry - Thirukkural, Modern)",
+            "Katturai Ezhudhuthal (Essay Writing)",
+            "Kadidha Eluthal (Letter Writing)"
+          ],
+          "Telugu": [
+            "Vyakaranam (Sandhulu, Samasalu)",
+            "Gadyam (Prose Lessons)",
+            "Padyam (Poetry Lessons)",
+            "Vyasa Rachana (Essay Writing)",
+            "Patra Rachana (Letter Writing)"
+          ],
+          "Malayalam": [
+            "Vyakaranam (Grammar)",
+            "Gadyam (Prose)",
+            "Kavitha (Poetry)",
+            "Rachana (Essay & Letter Writing)"
+          ]
+        },
+        "Information Technology": {
+          "Digital Literacy & Basics": [
+            "Communication Skills",
+            "Self-Management Skills",
+            "ICT Skills (Internet, Email, Digital Payments)",
+            "Entrepreneurial Skills",
+            "Green Skills"
+          ]
+        }
+      }
+    },
+    "Class 11": {
+      "Science": {
+        "Physics": {
+          "Physical World & Measurement": [
+            "Physical World",
+            "Units and Measurements"
+          ],
+          "Kinematics": [
+            "Motion in a Straight Line",
+            "Motion in a Plane"
+          ],
+          "Laws of Motion": [
+            "Laws of Motion"
+          ],
+          "Work, Energy and Power": [
+            "Work, Energy and Power"
+          ],
+          "System of Particles & Rotational Motion": [
+            "System of Particles and Rotational Motion"
+          ],
+          "Gravitation": [
+            "Gravitation"
+          ],
+          "Properties of Matter": [
+            "Mechanical Properties of Solids",
+            "Mechanical Properties of Fluids",
+            "Thermal Properties of Matter"
+          ],
+          "Thermodynamics & Kinetic Theory": [
+            "Thermodynamics",
+            "Kinetic Theory"
+          ],
+          "Oscillations & Waves": [
+            "Oscillations",
+            "Waves"
+          ]
+        },
+        "Chemistry": {
+          "Basic Concepts": [
+            "Some Basic Concepts of Chemistry",
+            "Structure of Atom",
+            "Classification of Elements and Periodicity in Properties",
+            "Chemical Bonding and Molecular Structure",
+            "States of Matter: Gases and Liquids"
+          ],
+          "Thermodynamics & Equilibrium": [
+            "Thermodynamics",
+            "Equilibrium"
+          ],
+          "Inorganic Chemistry": [
+            "Redox Reactions",
+            "Hydrogen",
+            "The s-Block Elements (Alkali and Alkaline Earth Metals)",
+            "The p-Block Elements (Groups 13 and 14)"
+          ],
+          "Organic Chemistry": [
+            "Organic Chemistry - Some Basic Principles and Techniques",
+            "Hydrocarbons",
+            "Environmental Chemistry"
+          ]
+        },
+        "Mathematics": {
+          "Sets, Relations & Functions": [
+            "Sets",
+            "Relations and Functions",
+            "Trigonometric Functions"
+          ],
+          "Algebra": [
+            "Complex Numbers and Quadratic Equations",
+            "Linear Inequalities",
+            "Permutations and Combinations",
+            "Binomial Theorem",
+            "Sequences and Series"
+          ],
+          "Coordinate Geometry": [
+            "Straight Lines",
+            "Conic Sections",
+            "Introduction to Three-Dimensional Geometry"
+          ],
+          "Calculus & Statistics": [
+            "Limits and Derivatives",
+            "Statistics",
+            "Probability"
+          ]
+        },
+        "Biology": {
+          "Diversity in Living World": [
+            "The Living World",
+            "Biological Classification",
+            "Plant Kingdom",
+            "Animal Kingdom"
+          ],
+          "Structural Organisation": [
+            "Morphology of Flowering Plants",
+            "Anatomy of Flowering Plants",
+            "Structural Organisation in Animals"
+          ],
+          "Cell Structure & Function": [
+            "The Unit of Life (Cell)",
+            "Biomolecules",
+            "Cell Cycle and Cell Division"
+          ],
+          "Plant Physiology": [
+            "Transport in Plants",
+            "Mineral Nutrition",
+            "Photosynthesis in Higher Plants",
+            "Respiration in Plants",
+            "Plant Growth and Development"
+          ],
+          "Human Physiology": [
+            "Digestion and Absorption",
+            "Breathing and Exchange of Gases",
+            "Body Fluids and Circulation",
+            "Excretory Products and their Elimination",
+            "Locomotion and Movement",
+            "Neural Control and Coordination",
+            "Chemical Coordination and Integration"
+          ]
+        },
+        "English (Hornbill & Snapshots)": {
+          "Prose & Poetry (Hornbill)": [
+            "The Portrait of a Lady (Khushwant Singh)",
+            "We're Not Afraid to Die (Gordon Cook)",
+            "Discovering Tut: the Saga Continues",
+            "Landscape of the Soul",
+            "The Ailing Planet: the Green Movement's Role",
+            "The Browning Version (Play)",
+            "The Adventure",
+            "Silk Road",
+            "A Photograph (Poem)",
+            "The Laburnum Top (Poem)",
+            "The Voice of the Rain (Poem)",
+            "Childhood (Poem)",
+            "Father to Son (Poem)"
+          ],
+          "Supplementary Reader (Snapshots)": [
+            "The Summer of the Beautiful White Horse",
+            "The Address",
+            "Ranga's Marriage",
+            "Albert Einstein at School",
+            "Mother's Day (Play)",
+            "The Ghat of the Only World",
+            "Birth",
+            "The Tale of Melon City"
+          ],
+          "Writing & Grammar": [
+            "Note-Making and Summarising",
+            "Letter Writing (Formal & Informal)",
+            "Essay Writing",
+            "Grammar (Reported Speech, Clauses, Voice)"
+          ]
+        },
+        "Physical Education": {
+          "Theory": [
+            "Changing Trends & Career in Physical Education",
+            "Olympic Movement",
+            "Yoga",
+            "Doping",
+            "Physical Activity & Leadership Training",
+            "Test & Measurement in Sports",
+            "Fundamentals of Anatomy & Physiology",
+            "Fundamentals of Kinesiology & Biomechanics",
+            "Psychology & Sports",
+            "Training in Sports"
+          ]
+        },
+        "Computer Science": {
+          "Python Programming": [
+            "Computer Systems & Organisation",
+            "Encoding Schemes and Number System",
+            "Emerging Trends",
+            "Introduction to Problem Solving",
+            "Getting Started with Python",
+            "Flow of Control (If, If-Else, Loops)",
+            "Functions",
+            "Strings",
+            "Lists",
+            "Tuples and Dictionaries",
+            "Societal Impacts"
+          ]
+        }
+      },
+      "Commerce": {
+        "Accountancy": {
+          "Theoretical Framework": [
+            "Introduction to Accounting",
+            "Theory Base of Accounting",
+            "Recording of Transactions I (Journal)",
+            "Recording of Transactions II (Ledger & Trial Balance)",
+            "Bank Reconciliation Statement",
+            "Trial Balance and Rectification of Errors"
+          ],
+          "Financial Statements": [
+            "Depreciation, Provisions and Reserves",
+            "Bills of Exchange",
+            "Financial Statements - I (Trading & P&L Account)",
+            "Financial Statements - II (Balance Sheet)",
+            "Accounts from Incomplete Records"
+          ],
+          "Computerised Accounting": [
+            "Computers in Accounting",
+            "Accounting Software (Tally Basics)"
+          ]
+        },
+        "Business Studies": {
+          "Foundation of Business": [
+            "Nature and Purpose of Business",
+            "Forms of Business Organisations (Sole Proprietor, Partnership, Company)",
+            "Private, Public and Global Enterprises",
+            "Business Services (Banking, Insurance, Transportation)",
+            "Emerging Modes of Business (e-Business, Outsourcing)",
+            "Social Responsibility of Business and Business Ethics"
+          ],
+          "Finance & Trade": [
+            "Formation of a Company",
+            "Sources of Business Finance",
+            "Small Business and Entrepreneurship",
+            "Internal Trade (Wholesale and Retail)",
+            "International Business - I",
+            "International Business - II"
+          ]
+        },
+        "Economics": {
+          "Statistics for Economics": [
+            "Introduction to Economics",
+            "Collection of Data",
+            "Organisation of Data",
+            "Presentation of Data (Tabular & Diagrammatic)",
+            "Measures of Central Tendency (Mean, Median, Mode)",
+            "Measures of Dispersion",
+            "Correlation",
+            "Index Numbers",
+            "Use of Statistical Tools"
+          ],
+          "Indian Economic Development": [
+            "Indian Economy on the Eve of Independence",
+            "Indian Economy 1950-1990 (Five Year Plans)",
+            "Liberalisation, Privatisation and Globalisation (LPG)",
+            "Poverty",
+            "Human Capital Formation in India",
+            "Rural Development",
+            "Employment - Growth, Informalisation",
+            "Infrastructure",
+            "Environment and Sustainable Development",
+            "Comparative Development Experiences of India with Neighbours"
+          ]
+        },
+        "Mathematics": {
+          "Sets & Functions": [
+            "Sets",
+            "Relations and Functions",
+            "Trigonometric Functions"
+          ],
+          "Algebra": [
+            "Complex Numbers and Quadratic Equations",
+            "Linear Inequalities",
+            "Permutations and Combinations",
+            "Binomial Theorem",
+            "Sequences and Series"
+          ],
+          "Coordinate Geometry & Calculus": [
+            "Straight Lines",
+            "Conic Sections",
+            "Limits and Derivatives"
+          ],
+          "Statistics & Probability": [
+            "Statistics",
+            "Probability"
+          ]
+        },
+        "English": {
+          "Hornbill & Snapshots": [
+            "The Portrait of a Lady",
+            "We're Not Afraid to Die",
+            "Landscape of the Soul",
+            "The Ailing Planet",
+            "The Browning Version",
+            "The Adventure",
+            "Silk Road",
+            "Poems (A Photograph, Laburnum Top, Voice of Rain)",
+            "Supplementary (Snapshots) Chapters",
+            "Writing Skills & Grammar"
+          ]
+        },
+        "Informatics Practices": {
+          "Python & Data": [
+            "Introduction to Computer System",
+            "Getting Started with Python",
+            "Data Handling using Python",
+            "Importing and Using Python Libraries",
+            "Database Concepts and SQL",
+            "Introduction to Emerging Trends"
+          ]
+        }
+      },
+      "Arts": {
+        "History": {
+          "World History (Themes in World History)": [
+            "Writing and City Life (Mesopotamia)",
+            "An Empire Across Three Continents (Roman Empire)",
+            "Nomadic Empires",
+            "The Three Orders (Feudal Society)",
+            "Changing Cultural Traditions (Renaissance)",
+            "Displacing Indigenous Peoples",
+            "Paths to Modernisation (China, Japan)"
+          ],
+          "Indian History": [
+            "From the Beginning of Time (Prehistoric India)",
+            "Early Cities (Harappan Civilization)",
+            "An Empire across Three Continents"
+          ]
+        },
+        "Geography": {
+          "Fundamentals of Physical Geography": [
+            "Geography as a Discipline",
+            "The Origin and Evolution of the Earth",
+            "Interior of the Earth",
+            "Distribution of Oceans and Continents",
+            "Minerals and Rocks",
+            "Geomorphic Processes",
+            "Fluvial Landforms",
+            "Arid and Semi-arid Landforms",
+            "Glacial Landforms",
+            "Coastal and Oceanic Landforms",
+            "Atmospheric Circulation and Weather Systems",
+            "Water in the Atmosphere",
+            "World Climate and Climate Change",
+            "Water (Oceans)",
+            "Movements of Ocean Water",
+            "Life on the Earth",
+            "Biodiversity and Conservation"
+          ],
+          "India - Physical Environment": [
+            "India - Location",
+            "Structure and Physiography",
+            "Drainage System",
+            "Climate",
+            "Natural Vegetation",
+            "Soils",
+            "Natural Hazards and Disasters"
+          ]
+        },
+        "Political Science": {
+          "Political Theory": [
+            "Political Theory: An Introduction",
+            "Freedom",
+            "Equality",
+            "Social Justice",
+            "Rights",
+            "Citizenship",
+            "Nationalism",
+            "Secularism",
+            "Peace",
+            "Development"
+          ],
+          "India's Constitution at Work": [
+            "Constitution: Why and How?",
+            "Rights in the Indian Constitution",
+            "Election and Representation",
+            "Executive",
+            "Legislature",
+            "Judiciary",
+            "Federalism",
+            "Local Governments",
+            "Constitution as a Living Document",
+            "The Philosophy of the Constitution"
+          ]
+        },
+        "Sociology": {
+          "Introducing Sociology": [
+            "Sociology and Society",
+            "Terms, Concepts and their Use in Sociology",
+            "Understanding Social Institutions",
+            "Culture and Socialisation",
+            "Doing Sociology: Research Methods"
+          ],
+          "Understanding Society": [
+            "Social Structure, Stratification and Social Processes",
+            "Social Change and Social Order",
+            "Environment and Society",
+            "Introducing Western Sociologists (Marx, Durkheim, Weber)",
+            "Indian Sociologists (D.P. Mukerji, A.R. Desai, M.N. Srinivas)"
+          ]
+        },
+        "Psychology": {
+          "Core Psychology": [
+            "What is Psychology?",
+            "Methods of Enquiry in Psychology",
+            "The Bases of Human Behaviour (Biological & Sociocultural)",
+            "Human Development",
+            "Sensory, Attentional and Perceptual Processes",
+            "Learning",
+            "Human Memory",
+            "Thinking",
+            "Motivation and Emotion"
+          ]
+        },
+        "English": {
+          "Hornbill & Snapshots": [
+            "The Portrait of a Lady",
+            "We're Not Afraid to Die",
+            "Landscape of the Soul",
+            "The Ailing Planet",
+            "The Browning Version",
+            "The Adventure",
+            "Silk Road",
+            "Poems (A Photograph, Laburnum Top, Voice of Rain, Childhood, Father to Son)",
+            "Supplementary (Snapshots) Chapters",
+            "Writing Skills & Grammar"
+          ]
+        },
+        "Economics": {
+          "Statistics for Economics": [
+            "Introduction to Economics",
+            "Collection of Data",
+            "Organisation of Data",
+            "Presentation of Data",
+            "Measures of Central Tendency",
+            "Measures of Dispersion",
+            "Correlation",
+            "Index Numbers",
+            "Use of Statistical Tools"
+          ],
+          "Indian Economic Development": [
+            "Indian Economy on the Eve of Independence",
+            "Indian Economy 1950-1990",
+            "Liberalisation, Privatisation and Globalisation",
+            "Poverty",
+            "Human Capital Formation",
+            "Rural Development",
+            "Employment",
+            "Infrastructure",
+            "Environment and Sustainable Development",
+            "Comparative Development Experiences"
+          ]
+        },
+        "Physical Education": {
+          "Theory": [
+            "Changing Trends & Career in Physical Education",
+            "Olympic Movement",
+            "Yoga",
+            "Doping",
+            "Physical Activity & Leadership Training",
+            "Test & Measurement in Sports",
+            "Anatomy, Physiology & Kinesiology",
+            "Psychology & Sports",
+            "Training in Sports"
+          ]
         }
       }
     },
     "Class 12": {
       "Science": {
         "Physics": {
-          "Electrostatics": ["Electric Charges and Fields", "Electrostatic Potential and Capacitance"],
-          "Current Electricity": ["Current Electricity"],
-          "Magnetic Effects": ["Moving Charges and Magnetism", "Magnetism and Matter", "Electromagnetic Induction", "Alternating Current"],
-          "Optics": ["Ray Optics and Optical Instruments", "Wave Optics"],
-          "Modern Physics": ["Dual Nature of Radiation and Matter", "Atoms", "Nuclei", "Semiconductor Electronics"]
+          "Electrostatics": [
+            "Electric Charges and Fields",
+            "Electrostatic Potential and Capacitance"
+          ],
+          "Current Electricity & Magnetism": [
+            "Current Electricity",
+            "Moving Charges and Magnetism",
+            "Magnetism and Matter",
+            "Electromagnetic Induction",
+            "Alternating Current"
+          ],
+          "Optics & Waves": [
+            "Electromagnetic Waves",
+            "Ray Optics and Optical Instruments",
+            "Wave Optics"
+          ],
+          "Modern Physics": [
+            "Dual Nature of Radiation and Matter",
+            "Atoms",
+            "Nuclei",
+            "Semiconductor Electronics: Materials, Devices and Simple Circuits"
+          ]
         },
         "Chemistry": {
-          "Physical Chemistry": ["Solutions", "Electrochemistry", "Chemical Kinetics", "Surface Chemistry"],
-          "Inorganic Chemistry": ["Isolation of Elements", "p-Block Elements", "d and f Block Elements", "Coordination Compounds"],
-          "Organic Chemistry": ["Haloalkanes and Haloarenes", "Alcohols, Phenols and Ethers", "Aldehydes, Ketones and Carboxylic Acids", "Amines", "Biomolecules", "Polymers"]
+          "Physical Chemistry": [
+            "The Solid State",
+            "Solutions",
+            "Electrochemistry",
+            "Chemical Kinetics",
+            "Surface Chemistry"
+          ],
+          "Inorganic Chemistry": [
+            "General Principles and Processes of Isolation of Elements",
+            "The p-Block Elements (Groups 15, 16, 17, 18)",
+            "The d and f Block Elements",
+            "Coordination Compounds"
+          ],
+          "Organic Chemistry": [
+            "Haloalkanes and Haloarenes",
+            "Alcohols, Phenols and Ethers",
+            "Aldehydes, Ketones and Carboxylic Acids",
+            "Amines",
+            "Biomolecules (Carbohydrates, Proteins, Vitamins, Nucleic Acids)",
+            "Polymers",
+            "Chemistry in Everyday Life"
+          ]
         },
         "Mathematics": {
-          "Calculus": ["Continuity and Differentiability", "Applications of Derivatives", "Integrals", "Applications of the Integrals", "Differential Equations"],
-          "Algebra": ["Matrices", "Determinants"],
-          "Vectors and 3D": ["Vector Algebra", "Three Dimensional Geometry"],
-          "Probability & LP": ["Linear Programming", "Probability"]
+          "Relations, Functions & Algebra": [
+            "Relations and Functions",
+            "Inverse Trigonometric Functions",
+            "Matrices",
+            "Determinants"
+          ],
+          "Calculus": [
+            "Continuity and Differentiability",
+            "Application of Derivatives",
+            "Integrals",
+            "Application of Integrals",
+            "Differential Equations"
+          ],
+          "Vectors, 3D & Linear Programming": [
+            "Vector Algebra",
+            "Three Dimensional Geometry",
+            "Linear Programming"
+          ],
+          "Probability": [
+            "Probability"
+          ]
         },
         "Biology": {
-          "Reproduction": ["Reproduction in Organisms", "Sexual Reproduction in Flowering Plants", "Human Reproduction", "Reproductive Health"],
-          "Genetics": ["Principles of Inheritance and Variation", "Molecular Basis of Inheritance", "Evolution"],
-          "Ecology": ["Organisms and Populations", "Ecosystem", "Biodiversity and Conservation", "Environmental Issues"]
+          "Reproduction": [
+            "Reproduction in Organisms",
+            "Sexual Reproduction in Flowering Plants",
+            "Human Reproduction",
+            "Reproductive Health"
+          ],
+          "Genetics & Evolution": [
+            "Principles of Inheritance and Variation",
+            "Molecular Basis of Inheritance",
+            "Evolution"
+          ],
+          "Biology & Human Welfare": [
+            "Human Health and Disease",
+            "Microbes in Human Welfare",
+            "Biotechnology: Principles and Processes",
+            "Biotechnology and its Applications"
+          ],
+          "Ecology": [
+            "Organisms and Populations",
+            "Ecosystem",
+            "Biodiversity and Conservation",
+            "Environmental Issues"
+          ]
         },
-        "Languages": {
-          "English": ["Writing Skills (Letters, Reports)", "Literature (Flamingo, Vistas)", "Reading Comprehension"],
-          "Hindi": ["Vyakaran & Rachana", "Aroh (Kavya & Gadya)", "Vitan"],
-          "Kannada": ["Vyakarana", "Sahitya Spandana", "Pallava"],
-          "Tamil": ["Urainadai", "Seyyul", "Ilakkanam"],
-          "Telugu": ["Padyabagam", "Gadyabagam", "Vyakaranam"]
+        "English (Flamingo & Vistas)": {
+          "Prose & Poetry (Flamingo)": [
+            "The Last Lesson (Alphonse Daudet)",
+            "Lost Spring (Anees Jung)",
+            "Deep Water (William Douglas)",
+            "The Rattrap (Selma Lagerlof)",
+            "Indigo (Louis Fischer)",
+            "Poets and Pancakes (Asokamitran)",
+            "The Interview",
+            "Going Places (A.R. Barton)",
+            "My Mother at Sixty-Six (Poem - Kamala Das)",
+            "An Elementary School Classroom in a Slum (Poem - Stephen Spender)",
+            "Keeping Quiet (Poem - Pablo Neruda)",
+            "A Thing of Beauty (Poem - John Keats)",
+            "A Roadside Stand (Poem - Robert Frost)",
+            "Aunt Jennifer's Tigers (Poem - Adrienne Rich)"
+          ],
+          "Supplementary (Vistas)": [
+            "The Third Level (Jack Finney)",
+            "The Tiger King (Kalki)",
+            "Journey to the End of the Earth (Tishani Doshi)",
+            "The Enemy (Pearl S. Buck)",
+            "Should Wizard Hit Mommy? (John Updike)",
+            "On the Face of It (Susan Hill)",
+            "Evans Tries an O-Level (Colin Dexter)",
+            "Memories of Childhood"
+          ],
+          "Writing & Grammar": [
+            "Notice Writing",
+            "Letter Writing (Business & Official)",
+            "Article and Report Writing",
+            "Grammar (Determiners, Voice, Narration, Clauses)"
+          ]
+        },
+        "Physical Education": {
+          "Theory": [
+            "Planning in Sports",
+            "Sports and Nutrition",
+            "Yoga and Lifestyle",
+            "Physical Education and Sports for CWSN",
+            "Children and Women in Sports",
+            "Test, Measurement and Evaluation in Sports",
+            "Physiology and Sports",
+            "Biomechanics and Sports",
+            "Psychology and Sports",
+            "Training and Doping in Sports"
+          ]
+        },
+        "Computer Science": {
+          "Advanced Python & Data": [
+            "Review of Python Basics",
+            "Exception Handling",
+            "File Handling",
+            "Stack and Queue",
+            "Computer Networks",
+            "Database Concepts",
+            "Structured Query Language (SQL)",
+            "Cybersecurity Basics"
+          ]
         }
       },
       "Commerce": {
         "Accountancy": {
-          "Partnership Accounts": ["Fundamentals", "Admission of a Partner", "Retirement and Death of a Partner", "Dissolution of a Partnership Firm"],
-          "Company Accounts": ["Accounting for Share Capital", "Issue and Redemption of Debentures"],
-          "Analysis of Financial Statements": ["Financial Statements of a Company", "Accounting Ratios", "Cash Flow Statement"]
+          "Partnership Accounts (Part I)": [
+            "Accounting for Partnership - Fundamentals",
+            "Change in Profit Sharing Ratio Among Existing Partners",
+            "Admission of a Partner",
+            "Retirement and Death of a Partner",
+            "Dissolution of Partnership Firm"
+          ],
+          "Company Accounts (Part II)": [
+            "Accounting for Share Capital",
+            "Issue and Redemption of Debentures"
+          ],
+          "Analysis of Financial Statements (Part II)": [
+            "Financial Statements of a Company",
+            "Analysis of Financial Statements",
+            "Accounting Ratios",
+            "Cash Flow Statement"
+          ]
         },
         "Business Studies": {
-          "Principles of Management": ["Nature and Significance of Management", "Principles of Management", "Business Environment"],
-          "Functions of Management": ["Planning", "Organising", "Staffing", "Directing", "Controlling"],
-          "Business Finance and Marketing": ["Financial Management", "Financial Markets", "Marketing Management", "Consumer Protection"]
+          "Principles and Functions of Management": [
+            "Nature and Significance of Management",
+            "Principles of Management",
+            "Business Environment",
+            "Planning",
+            "Organising",
+            "Staffing",
+            "Directing",
+            "Controlling"
+          ],
+          "Business Finance and Marketing": [
+            "Financial Management",
+            "Financial Markets",
+            "Marketing Management",
+            "Consumer Protection",
+            "Entrepreneurship Development"
+          ]
         },
         "Economics": {
-          "Macroeconomics": ["National Income and Related Aggregates", "Money and Banking", "Determination of Income and Employment", "Government Budget", "Balance of Payments"],
-          "Indian Economic Development": ["Development Experience (1947-90)", "Economic Reforms since 1991", "Current Challenges facing Indian Economy"]
+          "Introductory Macroeconomics": [
+            "Introduction to Macroeconomics",
+            "National Income Accounting",
+            "Money and Banking",
+            "Determination of Income and Employment (Keynesian Model)",
+            "Government Budget and the Economy",
+            "Open Economy Macroeconomics (Balance of Payments)"
+          ],
+          "Indian Economic Development": [
+            "Development Experience (1947-90) and Economic Reforms since 1991",
+            "Current Challenges Facing the Indian Economy",
+            "Development Experience of India - A Comparison with Neighbours (China, Pakistan)"
+          ]
         },
         "Mathematics": {
-          "Calculus": ["Continuity and Differentiability", "Applications of Derivatives", "Integrals"],
-          "Statistics & Probability": ["Probability Distributions", "Linear Programming"]
+          "Relations & Calculus": [
+            "Relations and Functions",
+            "Inverse Trigonometric Functions",
+            "Matrices",
+            "Determinants",
+            "Continuity and Differentiability",
+            "Application of Derivatives",
+            "Integrals",
+            "Application of Integrals",
+            "Differential Equations"
+          ],
+          "Probability & Linear Programming": [
+            "Vector Algebra",
+            "Three Dimensional Geometry",
+            "Linear Programming",
+            "Probability"
+          ]
         },
-        "Languages": {
-          "English": ["Writing Skills", "Literature", "Business Communication Focus"],
-          "Hindi": ["Vyakaran", "Sahitya"],
-          "Kannada": ["Vyakarana", "Sahitya"]
+        "English": {
+          "Flamingo & Vistas": [
+            "The Last Lesson",
+            "Lost Spring",
+            "Deep Water",
+            "The Rattrap",
+            "Indigo",
+            "Poets and Pancakes",
+            "The Interview",
+            "Going Places",
+            "Poems from Flamingo",
+            "Vistas Supplementary Chapters",
+            "Writing Skills (Notice, Article, Report, Letter)",
+            "Grammar"
+          ]
+        },
+        "Informatics Practices": {
+          "Advanced Python & SQL": [
+            "Review: Python Basics",
+            "Data Handling using Pandas",
+            "Plotting using Matplotlib",
+            "Computer Networks",
+            "Database Query using SQL",
+            "Data Communication",
+            "Societal Impacts"
+          ]
         }
       },
       "Arts (Humanities)": {
         "History": {
-          "Ancient India": ["Bricks, Beads and Bones", "Kings, Farmers and Towns", "Kinship, Caste and Class"],
-          "Medieval India": ["Through the Eyes of Travellers", "Bhakti-Sufi Traditions", "Kings and Chronicles"],
-          "Modern India": ["Colonialism and the Countryside", "Mahatma Gandhi and the Nationalist Movement", "Framing the Constitution"]
+          "Themes in Indian History Part I": [
+            "Bricks, Beads and Bones (Harappan Civilisation)",
+            "Kings, Farmers and Towns (600 BCE - 600 CE)",
+            "Kinship, Caste and Class (600 BCE - 600 CE)",
+            "Thinkers, Beliefs and Buildings (600 BCE - 600 CE)"
+          ],
+          "Themes in Indian History Part II": [
+            "Through the Eyes of Travellers (10th-17th centuries)",
+            "Bhakti-Sufi Traditions",
+            "An Imperial Capital: Vijayanagara",
+            "Peasants, Zamindars and the State (Mughal Era)",
+            "Kings and Chronicles (Mughal Courts)"
+          ],
+          "Themes in Indian History Part III": [
+            "Colonialism and the Countryside",
+            "Rebels and the Raj (1857 Revolt)",
+            "Colonial Cities: Urbanisation, Planning and Architecture",
+            "Mahatma Gandhi and the Nationalist Movement",
+            "Partition through Oral Sources",
+            "Framing the Constitution"
+          ]
         },
         "Geography": {
-          "Fundamentals of Human Geography": ["Human Geography Nature and Scope", "The World Population", "Human Development", "Primary & Secondary Activities"],
-          "India - People and Economy": ["Population", "Migration", "Land Resources and Agriculture", "Water Resources", "Transport and Communication"]
+          "Fundamentals of Human Geography": [
+            "Human Geography: Nature and Scope",
+            "The World Population (Distribution, Density, Growth)",
+            "Population Composition",
+            "Human Development",
+            "Primary Activities",
+            "Secondary Activities",
+            "Tertiary and Quaternary Activities",
+            "Transport and Communication",
+            "International Trade",
+            "Human Settlements"
+          ],
+          "India - People and Economy": [
+            "Population: Distribution, Density, Growth and Composition",
+            "Migration: Types, Causes and Consequences",
+            "Human Development (India)",
+            "Human Settlements in India",
+            "Land Resources and Agriculture",
+            "Water Resources",
+            "Mineral and Energy Resources",
+            "Manufacturing Industries",
+            "Planning and Sustainable Development",
+            "Transport and Communication",
+            "International Trade",
+            "Geographical Perspective on Selected Issues"
+          ]
         },
         "Political Science": {
-          "Contemporary World Politics": ["The Cold War Era", "The End of Bipolarity", "US Hegemony in World Politics", "International Organisations"],
-          "Politics in India Since Independence": ["Challenges of Nation Building", "Era of One-Party Dominance", "Politics of Planned Development", "India's External Relations"]
+          "Contemporary World Politics": [
+            "The Cold War Era",
+            "The End of Bipolarity",
+            "US Hegemony in World Politics",
+            "Alternative Centres of Power (EU, China, Japan)",
+            "Contemporary South Asia",
+            "International Organisations (UN, IMF, World Bank, WTO)",
+            "Security in the Contemporary World",
+            "Environment and Natural Resources",
+            "Globalisation"
+          ],
+          "Politics in India Since Independence": [
+            "Challenges of Nation Building",
+            "Era of One-Party Dominance",
+            "Politics of Planned Development",
+            "India's External Relations",
+            "Challenges to and Restoration of Congress System",
+            "The Crisis of Democratic Order (Emergency)",
+            "Rise of Popular Movements",
+            "Regional Aspirations",
+            "Recent Developments in Indian Politics"
+          ]
         },
-        "Languages": {
-          "English": ["Writing Skills", "Literature"],
-          "Hindi": ["Vyakaran", "Sahitya"],
-          "Kannada": ["Vyakarana", "Sahitya"],
-          "Tamil": ["Ilakkanam", "Ilakkiyam"],
-          "Telugu": ["Vyakaranam", "Sahityam"]
+        "Sociology": {
+          "Indian Society": [
+            "Introducing Indian Society",
+            "The Demographic Structure of Indian Society",
+            "Social Institutions: Continuity and Change",
+            "The Market as a Social Institution",
+            "Patterns of Social Inequality and Exclusion",
+            "The Challenges of Cultural Diversity",
+            "Suggestions for Project Work"
+          ],
+          "Social Change and Development in India": [
+            "Structural Change",
+            "Cultural Change",
+            "The Story of Indian Democracy",
+            "Change and Development in Rural Society",
+            "Change and Development in Industrial Society",
+            "Globalisation and Social Change",
+            "Mass Media and Communications",
+            "Social Movements"
+          ]
+        },
+        "Psychology": {
+          "Core Psychology": [
+            "Variations in Psychological Attributes (Intelligence, Aptitude, Creativity)",
+            "Self and Personality",
+            "Meeting Life Challenges (Stress, Coping, Health)",
+            "Psychological Disorders",
+            "Therapeutic Approaches",
+            "Attitude and Social Cognition",
+            "Social Influence and Group Processes",
+            "Psychology and Life (Environment, Peace, Indigenous Traditions)",
+            "Developing Psychological Skills"
+          ]
+        },
+        "Economics": {
+          "Macroeconomics": [
+            "Introduction to Macroeconomics",
+            "National Income Accounting",
+            "Money and Banking",
+            "Determination of Income and Employment",
+            "Government Budget and the Economy",
+            "Open Economy Macroeconomics"
+          ],
+          "Indian Economic Development": [
+            "Development Experience (1947-90) and Economic Reforms since 1991",
+            "Current Challenges Facing the Indian Economy",
+            "Development Experience of India - Comparison with China and Pakistan"
+          ]
+        },
+        "English": {
+          "Flamingo & Vistas": [
+            "The Last Lesson",
+            "Lost Spring",
+            "Deep Water",
+            "The Rattrap",
+            "Indigo",
+            "Poets and Pancakes",
+            "The Interview",
+            "Going Places",
+            "Poems from Flamingo",
+            "Vistas Supplementary Chapters",
+            "Writing Skills (Notice, Article, Report, Letter)",
+            "Grammar"
+          ]
+        },
+        "Physical Education": {
+          "Theory": [
+            "Planning in Sports",
+            "Sports and Nutrition",
+            "Yoga and Lifestyle",
+            "Physical Education and Sports for CWSN",
+            "Children and Women in Sports",
+            "Test, Measurement and Evaluation",
+            "Physiology and Sports",
+            "Biomechanics and Sports",
+            "Psychology and Sports",
+            "Training and Doping in Sports"
+          ]
         }
       }
     }

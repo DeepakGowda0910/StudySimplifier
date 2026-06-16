@@ -1,41 +1,87 @@
-# 🎓 StudyFiesta AI
+# StudySmart AI v2.0
 
-StudyFiesta AI is a universal, AI-powered EdTech platform designed to simplify exam preparation for students across all levels—from Middle School (Class 8+) to PhD researchers, including competitive exams like UPSC, JEE, and NEET.
+A production-grade AI-powered study platform rebuilt with **FastAPI** backend and **React** frontend.
 
-## ✨ Features
-- **Universal Curriculum Support:** Covers School Boards, Undergrad/Postgrad Degrees, Engineering, and Competitive Exams.
-- **Dynamic AI Syllabus Fetching:** Automatically retrieves chapter lists for selected subjects.
-- **Multi-Tool Arsenal:**
-  - 📝 **Summary:** Generates structured academic summaries.
-  - 🧠 **Quiz:** Creates 5-question MCQs with explanations.
-  - 📌 **Revision Notes:** Highlights key terms, formulas, and concepts.
-  - ❓ **Exam Q&A:** Predicts highly probable exam questions with detailed answers.
-- **Mathematical Support:** Fully renders complex equations using LaTeX formatting.
-- **Professional UI:** Card-based, responsive design built with Streamlit custom CSS.
+## Tech Stack
 
-## 🚀 Installation & Setup
+| Layer | Technology |
+|-------|-----------|
+| Frontend | React 18, Vite, TailwindCSS, Framer Motion, Recharts |
+| Backend | FastAPI, SQLAlchemy (async), SQLite/PostgreSQL |
+| AI | Google Gemini 1.5 Pro/Flash |
+| Auth | JWT (python-jose), bcrypt |
+| State | Zustand + TanStack Query |
 
-1. **Clone the repository:**
-   `git clone https://github.com/yourusername/studyfiesta-ai.git`
-   `cd studyfiesta-ai`
+## Features
 
-2. **Install dependencies:**
-   `pip install streamlit google-generativeai pysqlite3`
+- **9 AI Study Tools** — Quick Notes, Summary, Notes, Detailed Guide, Revision, Quiz, Q&A, Question Paper, Document Upload
+- **Spaced Repetition Flashcards** — SM-2 algorithm, AI card generation
+- **Rich Notes Editor** — with AI enhancement (expand, improve, generate questions)
+- **Study Planner** — AI-generated study schedules from exam dates
+- **Pomodoro Timer** — built-in focus timer with session tracking
+- **Exam Countdown** — track upcoming exams with days remaining
+- **Progress Analytics** — charts for study time, subject distribution, XP trends
+- **Gamification** — XP, levels, streaks, 17 achievement badges
+- **Leaderboard** — compete with other students
+- **AI Chat (StudyBot)** — course-aware AI tutor, always accessible
+- **Dark Mode** — system-wide theme switching
+- **Multi-language** — 12 language output support
+- **Document Analysis** — upload PDF/DOCX and generate study material
 
-3. **Set up API Keys:**
-   Create a `.streamlit/secrets.toml` file in the root directory and add your Gemini API key:
-   `GEMINI_API_KEY = "your_google_gemini_api_key_here"`
+## Quick Start
 
-4. **Run the application:**
-   `streamlit run app.py`
+### 1. Set your Gemini API Key
 
-## 🛠️ Tech Stack
-- **Frontend/Backend:** Python, Streamlit
-- **AI Engine:** Google Gemini (1.5 Pro / Flash)
-- **Database:** SQLite (Local User Authentication)
+Edit `backend/.env`:
+```
+GEMINI_API_KEY=your_key_here
+SECRET_KEY=change_this_in_production
+```
 
-## 🔮 Future Roadmap
-- [ ] Export generated notes to PDF and DOCX.
-- [ ] User dashboard to save previous study materials.
-- [ ] PDF upload support for custom PhD/Masters study material analysis.
-- [ ] Migration to PostgreSQL for scalable user management.
+### 2. Start Backend
+
+```bash
+cd backend
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+uvicorn main:app --reload
+```
+
+Backend: http://localhost:8000  |  Docs: http://localhost:8000/docs
+
+### 3. Start Frontend
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Frontend: http://localhost:5173
+
+## Project Structure
+
+```
+StudySimplifier/
+├── backend/
+│   ├── main.py              # FastAPI entry point
+│   ├── models/              # SQLAlchemy models
+│   ├── schemas/             # Pydantic schemas
+│   ├── routers/             # API endpoints
+│   └── services/            # Business logic + AI
+├── frontend/
+│   └── src/
+│       ├── pages/           # All pages
+│       ├── components/      # UI components
+│       ├── api/             # API client
+│       └── store/           # Zustand state
+└── data/
+    └── study_data.json      # Curriculum data
+```
+
+## Production
+
+- Swap SQLite for PostgreSQL: `DATABASE_URL=postgresql+asyncpg://user:pass@host/db`
+- Build frontend: `cd frontend && npm run build` (serve `dist/` with nginx)
+- Run: `gunicorn -k uvicorn.workers.UvicornWorker main:app`
