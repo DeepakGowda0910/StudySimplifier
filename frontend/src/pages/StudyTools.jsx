@@ -7,7 +7,7 @@ import remarkGfm from 'remark-gfm'
 import { Zap, FileText, BookOpen, AlignLeft, Bookmark, Brain, HelpCircle, FileQuestion, Upload, Download, Copy, Check } from 'lucide-react'
 import { getProfile } from '../api/user'
 import { getSubjects, getTopics, getChapters, generate, uploadDocument } from '../api/study'
-import AdaptiveQuiz from '../components/Quiz/AdaptiveQuiz'
+import QuizModal from '../components/Quiz/QuizModal'
 
 const TOOLS = [
   { id: 'short', label: 'Quick Notes', icon: Zap, color: 'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-400', desc: 'Last-minute revision' },
@@ -59,11 +59,7 @@ export default function StudyTools() {
     try {
       const data = await generate({ tool, chapter, topic, subject, language, course: profile?.course, board: profile?.board, stream: profile?.stream })
       setResult(data.content)
-      toast.success(`+${data.xp_awarded} XP earned! 🎉`)
-      // Auto-trigger adaptive quiz after study content generation (not for quiz/paper tools)
-      if (!['quiz', 'paper', 'upload'].includes(tool)) {
-        setTimeout(() => setShowQuiz(true), 1200)
-      }
+      toast.success(`+${data.xp_awarded} XP earned!`)
     } catch { toast.error('Generation failed. Check your API key.') }
     finally { setLoading(false) }
   }
@@ -78,7 +74,7 @@ export default function StudyTools() {
     try {
       const data = await uploadDocument(fd)
       setResult(data.content)
-      toast.success('Document analyzed! ✨')
+      toast.success('Document analyzed!')
     } catch { toast.error('Upload failed') }
     finally { setLoading(false) }
   }
@@ -101,7 +97,7 @@ export default function StudyTools() {
     <div className="page-container">
       <AnimatePresence>
         {showQuiz && subject && chapter && result && (
-          <AdaptiveQuiz
+          <QuizModal
             subject={subject}
             chapter={chapter}
             contentSnippet={result.slice(0, 3000)}
@@ -118,12 +114,12 @@ export default function StudyTools() {
             <div className="space-y-1">
               {TOOLS.map(t => (
                 <button key={t.id} onClick={() => { setTool(t.id); setResult('') }}
-                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-all ${tool === t.id ? 'bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800' : 'hover:bg-slate-50 dark:hover:bg-slate-800'}`}>
+                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-all ${tool === t.id ? 'bg-navy-50 dark:bg-navy-700 border border-navy-200 dark:border-navy-600' : 'hover:bg-slate-50 dark:hover:bg-navy-800'}`}>
                   <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${t.color}`}>
                     <t.icon size={16} />
                   </div>
                   <div className="min-w-0">
-                    <p className={`text-sm font-medium ${tool === t.id ? 'text-blue-700 dark:text-blue-400' : 'text-slate-700 dark:text-slate-300'}`}>{t.label}</p>
+                    <p className={`text-sm font-medium ${tool === t.id ? 'text-navy-700 dark:text-white' : 'text-slate-700 dark:text-slate-300'}`}>{t.label}</p>
                     <p className="text-xs text-slate-400 dark:text-slate-500">{t.desc}</p>
                   </div>
                 </button>
@@ -145,12 +141,12 @@ export default function StudyTools() {
           {tool === 'upload' ? (
             <div className="card p-6 space-y-4">
               <h3 className="font-semibold text-slate-900 dark:text-white">Upload & Analyze Document</h3>
-              <div className="border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl p-8 text-center">
+              <div className="border-2 border-dashed border-slate-200 dark:border-navy-600 rounded-xl p-8 text-center">
                 <Upload size={32} className="mx-auto text-slate-400 mb-3" />
                 <p className="text-sm text-slate-600 dark:text-slate-400 mb-3">Drop a PDF or DOCX file here</p>
                 <input type="file" accept=".pdf,.docx,.txt" onChange={e => setFile(e.target.files[0])} className="hidden" id="file-upload" />
                 <label htmlFor="file-upload" className="btn-secondary cursor-pointer inline-flex">Browse Files</label>
-                {file && <p className="mt-2 text-sm text-blue-600 dark:text-blue-400 font-medium">{file.name}</p>}
+                {file && <p className="mt-2 text-sm text-navy-600 dark:text-navy-300 font-medium">{file.name}</p>}
               </div>
               <div>
                 <label className="label">Analyze As</label>
@@ -216,13 +212,20 @@ export default function StudyTools() {
                 <div className="md-content text-slate-700 dark:text-slate-300">
                   <ReactMarkdown remarkPlugins={[remarkGfm]}>{result}</ReactMarkdown>
                 </div>
+                {subject && chapter && !['upload', 'paper'].includes(tool) && (
+                  <div className="mt-5 pt-5 border-t border-slate-100 dark:border-navy-700">
+                    <button onClick={() => setShowQuiz(true)} className="btn-primary w-full flex items-center justify-center gap-2">
+                      <Brain size={16} /> Start Quiz on This Content
+                    </button>
+                  </div>
+                )}
               </motion.div>
             )}
           </AnimatePresence>
 
           {loading && (
             <div className="card p-12 flex flex-col items-center justify-center gap-4">
-              <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin" />
+              <div className="w-12 h-12 border-4 border-navy-200 border-t-navy-600 rounded-full animate-spin" />
               <p className="text-slate-500 dark:text-slate-400 text-sm">AI is generating your content…</p>
             </div>
           )}

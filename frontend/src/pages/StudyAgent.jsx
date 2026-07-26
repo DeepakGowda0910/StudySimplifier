@@ -16,17 +16,17 @@ const BLOCK_ICONS = {
   break: Coffee,
 }
 const BLOCK_COLORS = {
-  flashcards: 'bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-400 border-blue-200 dark:border-blue-800',
-  study: 'bg-violet-100 text-violet-700 dark:bg-violet-950 dark:text-violet-400 border-violet-200 dark:border-violet-800',
+  flashcards: 'bg-navy-100 text-navy-700 dark:bg-navy-800 dark:text-navy-300 border-navy-200 dark:border-navy-600',
+  study: 'bg-teal-100 text-teal-700 dark:bg-teal-950 dark:text-teal-400 border-teal-200 dark:border-teal-800',
   quiz: 'bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-400 border-green-200 dark:border-green-800',
   revision: 'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-400 border-amber-200 dark:border-amber-800',
-  break: 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400 border-slate-200 dark:border-slate-700',
+  break: 'bg-slate-100 text-slate-600 dark:bg-navy-800 dark:text-slate-400 border-slate-200 dark:border-navy-600',
 }
 
 const ELO_LABEL_COLOR = {
   Beginner: 'text-red-500',
   Intermediate: 'text-amber-500',
-  Advanced: 'text-blue-500',
+  Advanced: 'text-navy-500',
   Expert: 'text-green-500',
 }
 
@@ -106,7 +106,7 @@ export default function StudyAgent() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
-            <Brain className="text-violet-500" size={26} /> Study Agent
+            <Brain className="text-navy-500" size={26} /> Study Agent
           </h1>
           <p className="text-slate-500 dark:text-slate-400 text-sm mt-0.5">AI-powered personalized learning schedule</p>
         </div>
@@ -124,9 +124,9 @@ export default function StudyAgent() {
       {perfData && (
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {[
-            { label: 'Avg ELO', value: perfData.average_elo, icon: TrendingUp, color: 'text-blue-500' },
-            { label: 'Level', value: perfData.elo_label, icon: Trophy, color: ELO_LABEL_COLOR[perfData.elo_label] || 'text-violet-500' },
-            { label: 'Subjects', value: perfData.subjects_studied, icon: BookOpen, color: 'text-violet-500' },
+            { label: 'Avg ELO', value: perfData.average_elo, icon: TrendingUp, color: 'text-navy-500' },
+            { label: 'Level', value: perfData.elo_label, icon: Trophy, color: ELO_LABEL_COLOR[perfData.elo_label] || 'text-navy-500' },
+            { label: 'Subjects', value: perfData.subjects_studied, icon: BookOpen, color: 'text-teal-500' },
             { label: 'Mistakes', value: perfData.mistake_count, icon: AlertTriangle, color: 'text-amber-500' },
           ].map(({ label, value, icon: Icon, color }) => (
             <div key={label} className="card p-4 flex items-center gap-3">
@@ -147,19 +147,19 @@ export default function StudyAgent() {
         <div className="lg:col-span-3 space-y-4">
           {agendaLoading ? (
             <div className="card p-12 flex flex-col items-center gap-4">
-              <div className="w-12 h-12 border-4 border-violet-200 border-t-violet-600 rounded-full animate-spin" />
+              <div className="w-12 h-12 border-4 border-navy-200 border-t-navy-600 rounded-full animate-spin" />
               <p className="text-slate-500 text-sm">Agent is analyzing your learning data…</p>
             </div>
           ) : agenda ? (
             <>
               {/* Greeting card */}
-              <div className="card p-5 bg-gradient-to-br from-violet-600 to-blue-700 text-white border-0">
+              <div className="card p-5 bg-navy-700 text-white border-0">
                 <div className="flex items-start gap-3">
                   <Flame size={22} className="shrink-0 mt-0.5 text-amber-300" />
                   <div>
                     <p className="font-semibold text-base">{agenda.greeting}</p>
                     {agenda.priority_alert && (
-                      <div className="mt-2 bg-white/15 rounded-xl p-3 text-sm text-blue-100">
+                      <div className="mt-2 bg-white/15 rounded-xl p-3 text-sm text-navy-100">
                         <span className="font-semibold text-white">Priority: </span>{agenda.priority_alert}
                       </div>
                     )}
@@ -178,7 +178,7 @@ export default function StudyAgent() {
               {/* Blocks */}
               <div className="card p-4 space-y-3">
                 <h3 className="font-semibold text-slate-900 dark:text-white flex items-center gap-2">
-                  <Clock size={16} className="text-violet-500" /> Today's Schedule
+                  <Clock size={16} className="text-navy-500" /> Today's Schedule
                 </h3>
                 {(agenda.blocks || []).map((block, i) => (
                   <AgendaBlock key={i} block={block} index={i} />
@@ -187,9 +187,9 @@ export default function StudyAgent() {
 
               {/* Insight */}
               {agenda.insight && (
-                <div className="card p-4 flex items-start gap-3 bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800">
-                  <Star size={16} className="text-blue-500 shrink-0 mt-0.5" />
-                  <p className="text-sm text-blue-800 dark:text-blue-300">{agenda.insight}</p>
+                <div className="card p-4 flex items-start gap-3 bg-navy-50 dark:bg-navy-800/50 border border-navy-200 dark:border-navy-600">
+                  <Star size={16} className="text-navy-500 shrink-0 mt-0.5" />
+                  <p className="text-sm text-navy-800 dark:text-navy-300">{agenda.insight}</p>
                 </div>
               )}
             </>
@@ -208,7 +208,7 @@ export default function StudyAgent() {
                 <RadarChart data={radarData}>
                   <PolarGrid stroke="#e2e8f0" />
                   <PolarAngleAxis dataKey="subject" tick={{ fontSize: 10, fill: '#94a3b8' }} />
-                  <Radar name="ELO" dataKey="elo" stroke="#8b5cf6" fill="#8b5cf6" fillOpacity={0.2} strokeWidth={2} />
+                  <Radar name="ELO" dataKey="elo" stroke="#2e4d7a" fill="#2e4d7a" fillOpacity={0.2} strokeWidth={2} />
                 </RadarChart>
               </ResponsiveContainer>
             </div>
@@ -224,7 +224,7 @@ export default function StudyAgent() {
                   <YAxis type="category" dataKey="name" width={80} tick={{ fontSize: 10, fill: '#94a3b8' }} />
                   <Tooltip
                     contentStyle={{ background: '#1e293b', border: 'none', borderRadius: '8px', color: '#f1f5f9', fontSize: 12 }}
-                    cursor={{ fill: 'rgba(139,92,246,0.1)' }}
+                    cursor={{ fill: 'rgba(46,77,122,0.1)' }}
                   />
                   <Bar dataKey="elo" radius={[0, 4, 4, 0]}>
                     {barData.map((entry, i) => <Cell key={i} fill={entry.fill} />)}
@@ -248,7 +248,7 @@ export default function StudyAgent() {
                       <p className="text-xs text-slate-400">{w.subject}</p>
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
-                      <div className="w-16 h-1.5 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
+                      <div className="w-16 h-1.5 bg-slate-100 dark:bg-navy-700 rounded-full overflow-hidden">
                         <div className="h-full bg-red-400 rounded-full" style={{ width: `${Math.round(w.accuracy * 100)}%` }} />
                       </div>
                       <span className="text-xs font-bold text-red-500 w-8 text-right">{Math.round(w.elo)}</span>
@@ -261,7 +261,7 @@ export default function StudyAgent() {
 
           {weakLoading && (
             <div className="card p-8 flex justify-center">
-              <div className="w-8 h-8 border-4 border-violet-200 border-t-violet-600 rounded-full animate-spin" />
+              <div className="w-8 h-8 border-4 border-navy-200 border-t-navy-600 rounded-full animate-spin" />
             </div>
           )}
 

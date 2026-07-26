@@ -3,10 +3,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func, desc
 from database import get_db
 from models.user import User
-from models.quiz import QuizAttempt, StudentELO, MistakeEntry
+from models.quiz import QuizAttempt, MistakeEntry
 from models.flashcard import Flashcard
 from middleware.auth import get_current_user
-from services.ai_service import generate_content, build_auto_quiz_prompt
+from services.ai_service import generate_content, build_quiz_prompt
 from services.gamification import award_xp
 from pydantic import BaseModel
 from typing import Optional, List
@@ -29,7 +29,6 @@ class QuizSubmitItem(BaseModel):
     user_answer: str
     correct_letter: str
     concept: str
-    difficulty: float = 1000.0
     time_taken_secs: int = 30
 
 
@@ -39,30 +38,13 @@ class QuizSubmitRequest(BaseModel):
     answers: List[QuizSubmitItem]
 
 
-def update_elo(current_elo: float, is_correct: bool, question_difficulty: float) -> float:
-    K = 32
-    expected = 1 / (1 + 10 ** ((question_difficulty - current_elo) / 400))
-    actual = 1.0 if is_correct else 0.0
-    return round(current_elo + K * (actual - expected), 1)
-
-
 @router.post("/generate")
 async def generate_quiz(
     req: QuizGenerateRequest,
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
-    result = await db.execute(
-        select(StudentELO).where(
-            StudentELO.username == current_user.username,
-            StudentELO.subject == req.subject,
-            StudentELO.chapter == req.chapter
-        )
-    )
-    elo_row = result.scalar_one_or_none()
-    current_elo = elo_row.elo_rating if elo_row else 1000.0
-
-    prompt = build_auto_quiz_prompt(req.chapter, req.subject, req.content_snippet, current_elo)
+    prompt = build_quiz_prompt(req.chapter, req.subject, req.content_snippet)
     raw, model = await generate_content(prompt)
 
     try:
@@ -74,7 +56,7 @@ async def generate_quiz(
     except Exception:
         raise HTTPException(status_code=500, detail="Failed to parse quiz questions from AI")
 
-    return {"questions": questions, "current_elo": current_elo, "model": model}
+    return {"questions": questions, "model": model}
 
 
 @router.post("/submit")
@@ -83,32 +65,11 @@ async def submit_quiz(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
-    result = await db.execute(
-        select(StudentELO).where(
-            StudentELO.username == current_user.username,
-            StudentELO.subject == req.subject,
-            StudentELO.chapter == req.chapter
-        )
-    )
-    elo_row = result.scalar_one_or_none()
-    if not elo_row:
-        elo_row = StudentELO(
-            username=current_user.username,
-            subject=req.subject,
-            chapter=req.chapter,
-            elo_rating=1000.0,
-            total_questions=0,
-            correct_answers=0
-        )
-        db.add(elo_row)
-
     correct_count = 0
     xp_earned = 0
 
     for ans in req.answers:
         is_correct = ans.user_answer.strip().upper() == ans.correct_letter.strip().upper()
-        elo_before = elo_row.elo_rating
-        new_elo = update_elo(elo_row.elo_rating, is_correct, ans.difficulty)
 
         attempt = QuizAttempt(
             username=current_user.username,
@@ -118,19 +79,12 @@ async def submit_quiz(
             correct_answer=ans.correct_answer,
             user_answer=ans.user_answer,
             is_correct=is_correct,
-            difficulty=ans.difficulty,
             time_taken_secs=ans.time_taken_secs,
-            elo_before=elo_before,
-            elo_after=new_elo
         )
         db.add(attempt)
 
-        elo_row.elo_rating = new_elo
-        elo_row.total_questions += 1
-
         if is_correct:
             correct_count += 1
-            elo_row.correct_answers += 1
             xp_earned += 5
         else:
             result2 = await db.execute(
@@ -173,7 +127,6 @@ async def submit_quiz(
             )
             db.add(fc)
 
-    elo_row.accuracy = elo_row.correct_answers / max(elo_row.total_questions, 1)
     await award_xp(db, current_user.username, xp_earned)
     await db.commit()
 
@@ -182,7 +135,6 @@ async def submit_quiz(
         "correct": correct_count,
         "total": len(req.answers),
         "accuracy": accuracy,
-        "new_elo": elo_row.elo_rating,
         "xp_earned": xp_earned,
         "auto_flashcards_created": len(req.answers) - correct_count
     }
@@ -208,48 +160,4 @@ async def get_mistakes(
             "times_wrong": m.times_wrong, "last_seen": m.last_seen.isoformat()
         }
         for m in mistakes
-    ]
-
-
-@router.get("/elo")
-async def get_elo_ratings(
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
-):
-    result = await db.execute(
-        select(StudentELO)
-        .where(StudentELO.username == current_user.username)
-        .order_by(StudentELO.elo_rating)
-    )
-    rows = result.scalars().all()
-    return [
-        {
-            "subject": r.subject, "chapter": r.chapter,
-            "elo_rating": r.elo_rating, "accuracy": r.accuracy,
-            "total_questions": r.total_questions, "correct_answers": r.correct_answers
-        }
-        for r in rows
-    ]
-
-
-@router.get("/history")
-async def get_quiz_history(
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
-):
-    result = await db.execute(
-        select(QuizAttempt)
-        .where(QuizAttempt.username == current_user.username)
-        .order_by(desc(QuizAttempt.created_at))
-        .limit(100)
-    )
-    attempts = result.scalars().all()
-    return [
-        {
-            "id": a.id, "subject": a.subject, "chapter": a.chapter,
-            "question": a.question, "is_correct": a.is_correct,
-            "elo_before": a.elo_before, "elo_after": a.elo_after,
-            "created_at": a.created_at.isoformat()
-        }
-        for a in attempts
     ]

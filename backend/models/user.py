@@ -11,6 +11,10 @@ class User(Base):
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime, server_default=func.now())
     avatar_url = Column(String(500), nullable=True)
+    # School module fields — null for StudySmart users
+    role = Column(String(30), default="studysmart_user")  # studysmart_user | school_student | school_teacher | school_admin
+    school_id = Column(Integer, nullable=True)  # FK resolved at app layer to avoid circular imports
+    full_name = Column(String(200), nullable=True)  # required for school users
 
 class UserProfile(Base):
     __tablename__ = "user_profiles"

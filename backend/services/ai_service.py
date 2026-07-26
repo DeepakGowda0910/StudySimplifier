@@ -1,6 +1,7 @@
 import google.generativeai as genai
+import httpx
 from config import settings
-from typing import Optional, Tuple
+from typing import Tuple
 import asyncio
 
 genai.configure(api_key=settings.gemini_api_key)
@@ -11,15 +12,62 @@ GENERATION_CONFIG = {
     "top_p": 0.9,
 }
 
-AVAILABLE_MODELS = [
-    "gemini-1.5-pro",
-    "gemini-1.5-flash",
+GEMINI_MODELS = [
     "gemini-2.0-flash",
+    "gemini-1.5-flash",
+    "gemini-1.5-pro",
     "gemini-pro",
 ]
 
-async def generate_content(prompt: str, stream: bool = False) -> Tuple[str, str]:
-    for model_name in AVAILABLE_MODELS:
+GROQ_MODELS = [
+    "llama-3.1-8b-instant",
+    "llama-3.3-70b-versatile",
+]
+
+GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
+
+
+GROQ_MAX_TOKENS = 2000  # Groq free tier TPM limit is 6000/min - keep well under it
+
+
+async def _generate_groq(prompt: str) -> Tuple[str, str]:
+    """Call Groq API directly via httpx (OpenAI-compatible endpoint)."""
+    headers = {
+        "Authorization": f"Bearer {settings.groq_api_key}",
+        "Content-Type": "application/json",
+    }
+    for model_name in GROQ_MODELS:
+        # Retry once with a smaller token budget if we hit the free-tier rate limit
+        for max_tokens in (GROQ_MAX_TOKENS, 800):
+            try:
+                async with httpx.AsyncClient(timeout=60.0) as client:
+                    resp = await client.post(
+                        GROQ_API_URL,
+                        headers=headers,
+                        json={
+                            "model": model_name,
+                            "messages": [{"role": "user", "content": prompt}],
+                            "temperature": 0.3,
+                            "max_tokens": max_tokens,
+                        },
+                    )
+                if resp.status_code == 200:
+                    return resp.json()["choices"][0]["message"]["content"], f"groq/{model_name}"
+                err_text = resp.text.lower()
+                if resp.status_code in (400, 404) and any(k in err_text for k in ("model", "not found", "deactivated")):
+                    break  # try next model
+                if resp.status_code == 413 or "rate_limit_exceeded" in err_text:
+                    continue  # try smaller max_tokens on same model
+                resp.raise_for_status()
+            except httpx.HTTPStatusError:
+                raise
+            except Exception as e:
+                raise e
+    raise Exception("No available Groq models")
+
+
+async def _generate_gemini(prompt: str) -> Tuple[str, str]:
+    for model_name in GEMINI_MODELS:
         try:
             model = genai.GenerativeModel(
                 model_name=model_name,
@@ -33,8 +81,28 @@ async def generate_content(prompt: str, stream: bool = False) -> Tuple[str, str]
             raise e
     raise Exception("No available Gemini models")
 
+
+async def generate_content(prompt: str, provider: str = None) -> Tuple[str, str]:
+    active = provider or settings.ai_provider
+
+    if active == "groq" and settings.groq_api_key:
+        try:
+            return await _generate_groq(prompt)
+        except Exception:
+            # Fall back to Gemini if Groq fails
+            return await _generate_gemini(prompt)
+
+    # Default: Gemini, fall back to Groq if key exists
+    try:
+        return await _generate_gemini(prompt)
+    except Exception:
+        if settings.groq_api_key:
+            return await _generate_groq(prompt)
+        raise
+
 def build_study_prompt(tool: str, chapter: str, topic: str, subject: str,
-                        course: str, board: str, stream: str, language: str) -> str:
+                        course: str, board: str, stream: str, language: str,
+                        grounding_context: str = "") -> str:
     audience = f"{course} student" if course else "student"
     if board:
         audience += f" ({board})"
@@ -230,7 +298,14 @@ Q34-Q35: [Case study / essay questions]
 [Complete answers for all sections]""",
     }
 
-    return prompts.get(tool, prompts["summary"])
+    selected = prompts.get(tool, prompts["summary"])
+    if grounding_context:
+        selected = (
+            f"Ground your answer in this official NCERT textbook excerpt — prefer its facts, "
+            f"terminology, and examples over your general knowledge:\n"
+            f"---\n{grounding_context}\n---\n\n{selected}"
+        )
+    return selected
 
 def build_chat_prompt(message: str, profile: dict, history: list) -> str:
     course = profile.get("course", "General")
@@ -364,19 +439,10 @@ async def enhance_note(content: str, action: str) -> str:
     return result
 
 
-def build_auto_quiz_prompt(chapter: str, subject: str, content_snippet: str, elo: float = 1000.0) -> str:
-    if elo < 900:
-        level = "basic (beginner-friendly, focus on definitions and simple recall)"
-    elif elo < 1100:
-        level = "intermediate (application and understanding)"
-    elif elo < 1300:
-        level = "advanced (analysis, synthesis, edge cases)"
-    else:
-        level = "expert (tricky variations, common misconceptions, deep reasoning)"
-
-    return f"""You are an adaptive quiz engine. Generate exactly 5 MCQ questions for:
+def build_quiz_prompt(chapter: str, subject: str, content_snippet: str) -> str:
+    return f"""You are a quiz engine. Generate exactly 5 MCQ questions for:
 Subject: {subject} | Chapter: {chapter}
-Student ELO: {elo:.0f} → Difficulty: {level}
+Difficulty: standard (clear, fair questions testing real understanding — application and comprehension, not just rote recall)
 
 Base questions on this content:
 {content_snippet[:3000]}
@@ -388,16 +454,14 @@ Output STRICT JSON array (no markdown, no extra text):
     "options": ["A) ...", "B) ...", "C) ...", "D) ..."],
     "correct": "A",
     "explanation": "Brief explanation why A is correct",
-    "concept": "concept being tested",
-    "difficulty": {min(1500, max(700, elo)):.0f}
+    "concept": "concept being tested"
   }}
 ]
 
 Rules:
 - correct must be exactly "A", "B", "C", or "D"
 - All 4 options must be plausible
-- Avoid trivially easy or trick questions
-- Match difficulty to ELO level"""
+- Avoid trivially easy or trick questions"""
 
 
 def build_socratic_prompt(message: str, profile: dict, history: list) -> str:
@@ -505,3 +569,34 @@ Rules:
 - Foundation chapters have no prerequisites
 - Be accurate about academic dependencies
 - difficulty 1=easiest, 5=hardest"""
+
+
+def build_school_tutor_prompt(question: str, grade: int, lesson_title: str = None) -> str:
+    grade_profile = {
+        6: ("simple everyday language and fun analogies", "10-year-old", "curious beginner"),
+        7: ("clear language with examples from daily life", "11-year-old", "young learner"),
+        8: ("friendly language with Python code examples", "12-year-old", "beginner coder"),
+        9: ("intermediate language with data/Python examples", "13-year-old", "data explorer"),
+        10: ("clear technical language with ML examples", "14-year-old", "ML learner"),
+        11: ("technical language with library/code examples", "15-year-old", "advanced learner"),
+        12: ("professional technical language", "16-year-old", "near-professional"),
+    }
+    lang, age, level = grade_profile.get(grade, ("clear language", "student", "learner"))
+    lesson_ctx = f"They are currently studying: '{lesson_title}'." if lesson_title else ""
+
+    return f"""You are an AI tutor teaching Grade {grade} students about Artificial Intelligence and programming.
+The student is a {age}, a {level}. {lesson_ctx}
+
+RULES:
+1. Answer ONLY questions about AI, machine learning, data science, programming, and related technology topics.
+2. If asked about unrelated topics (history, geography, gossip, etc.), politely redirect: "That's outside my expertise! I'm here to help you learn AI and programming."
+3. Use {lang}.
+4. Be encouraging and patient — this student is learning something new.
+5. Use the Socratic method by default: ask a guiding question to help them figure out the answer themselves, rather than giving it directly.
+6. If the student is clearly stuck after 2+ exchanges, give a clear explanation.
+7. Keep responses concise — under 200 words unless a code example is needed.
+8. For Grade 6-7: no code examples. For Grade 8+: include short Python examples when helpful.
+
+Student's question: {question}
+
+Respond in a way that guides the student toward understanding, without directly giving the answer unless they've tried first."""

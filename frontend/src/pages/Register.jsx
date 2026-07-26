@@ -22,7 +22,7 @@ export default function Register() {
     try {
       const data = await register({ username: form.username, password: form.password })
       setAuth(data.access_token, data.username, false)
-      toast.success('Account created! Let\'s set up your profile 🎓')
+      toast.success('Account created! Let\'s set up your profile')
       navigate('/onboarding')
     } catch (err) {
       toast.error(err.response?.data?.detail || 'Registration failed')
@@ -32,10 +32,10 @@ export default function Register() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-violet-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-navy-900 px-4">
       <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-md">
         <div className="text-center mb-8">
-          <div className="inline-flex w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-violet-600 items-center justify-center shadow-lg mb-4">
+          <div className="inline-flex w-16 h-16 rounded-2xl bg-navy-600 items-center justify-center shadow-lg mb-4">
             <GraduationCap size={32} className="text-white" />
           </div>
           <h1 className="text-3xl font-bold text-gradient">StudySmart AI</h1>
@@ -68,7 +68,7 @@ export default function Register() {
           </form>
           <p className="text-center text-sm text-slate-500 dark:text-slate-400 mt-6">
             Already have an account?{' '}
-            <Link to="/login" className="text-blue-600 dark:text-blue-400 font-medium hover:underline">Sign in</Link>
+            <Link to="/login" className="text-navy-600 dark:text-navy-300 font-medium hover:underline">Sign in</Link>
           </p>
         </div>
       </motion.div>

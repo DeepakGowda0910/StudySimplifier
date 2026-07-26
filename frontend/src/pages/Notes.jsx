@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { motion, AnimatePresence } from 'framer-motion'
 import toast from 'react-hot-toast'
-import { Plus, Trash2, Pin, Search, Wand2, Save, X, FileText } from 'lucide-react'
+import { Plus, Trash2, Pin, Search, Wand2, Save, X, FileText, Sparkles, BookOpen, ClipboardList, HelpCircle, Layers } from 'lucide-react'
 import { getNotes, createNote, updateNote, deleteNote, enhanceNote } from '../api/notes'
 
 const COLORS = ['blue', 'violet', 'emerald', 'amber', 'rose', 'orange']
@@ -20,11 +20,11 @@ const DOT_MAP = {
 }
 
 const ENHANCE_ACTIONS = [
-  { id: 'improve', label: '✨ Improve' },
-  { id: 'expand', label: '📖 Expand' },
-  { id: 'summary', label: '📋 Summarize' },
-  { id: 'questions', label: '❓ Questions' },
-  { id: 'flashcards', label: '🃏 Flashcards' },
+  { id: 'improve', label: 'Improve', icon: Sparkles },
+  { id: 'expand', label: 'Expand', icon: BookOpen },
+  { id: 'summary', label: 'Summarize', icon: ClipboardList },
+  { id: 'questions', label: 'Questions', icon: HelpCircle },
+  { id: 'flashcards', label: 'Flashcards', icon: Layers },
 ]
 
 const EMPTY_FORM = { title: '', content: '', subject: '', chapter: '', color: 'blue', tags: '' }
@@ -76,16 +76,16 @@ function NoteForm({ note, onSave, onCancel, onEnhance, enhancing, enhancedConten
           <div className="flex flex-wrap gap-2">
             {ENHANCE_ACTIONS.map(a => (
               <button key={a.id} type="button" onClick={() => onEnhance(note.id, a.id)} disabled={enhancing}
-                className="btn-secondary text-xs py-1.5 px-3">{a.label}</button>
+                className="btn-secondary text-xs py-1.5 px-3 flex items-center gap-1.5"><a.icon size={13} /> {a.label}</button>
             ))}
           </div>
           {enhancing && (
             <div className="flex items-center gap-2 mt-2 text-sm text-slate-500">
-              <div className="w-4 h-4 border-2 border-blue-200 border-t-blue-500 rounded-full animate-spin" /> Enhancing…
+              <div className="w-4 h-4 border-2 border-navy-200 border-t-navy-500 rounded-full animate-spin" /> Enhancing…
             </div>
           )}
           {enhancedContent && (
-            <div className="mt-3 bg-blue-50 dark:bg-blue-950 rounded-xl p-4 text-sm text-slate-700 dark:text-slate-300 max-h-48 overflow-y-auto whitespace-pre-wrap">
+            <div className="mt-3 bg-navy-50 dark:bg-navy-800 rounded-xl p-4 text-sm text-slate-700 dark:text-slate-300 max-h-48 overflow-y-auto whitespace-pre-wrap">
               {enhancedContent}
               <button type="button" onClick={() => { setLocal(f => ({ ...f, content: enhancedContent })); onUseEnhanced() }} className="btn-primary text-xs mt-2 block">
                 Use this content
@@ -117,7 +117,7 @@ function NoteCard({ note, onEdit, onDelete, onPin }) {
           <p className="font-semibold text-slate-900 dark:text-white text-sm truncate pr-2">{note.title}</p>
           <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" onClick={e => e.stopPropagation()}>
             <button type="button" onClick={onPin} className="btn-ghost p-1 text-xs">
-              <Pin size={14} className={note.is_pinned ? 'fill-current text-blue-500' : ''} />
+              <Pin size={14} className={note.is_pinned ? 'fill-current text-navy-500' : ''} />
             </button>
             <button type="button" onClick={onDelete} className="btn-ghost p-1 text-red-400">
               <Trash2 size={14} />
@@ -239,7 +239,7 @@ export default function Notes() {
         <>
           {pinned.length > 0 && (
             <div>
-              <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">📌 Pinned</p>
+              <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-1"><Pin size={12} className="fill-current" /> Pinned</p>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {pinned.map(n => (
                   <NoteCard key={n.id} note={n}

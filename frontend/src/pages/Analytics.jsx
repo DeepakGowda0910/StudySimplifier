@@ -31,8 +31,8 @@ export default function Analytics() {
     <div className="page-container space-y-6">
       {/* Summary cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatBox label="Weekly Study" value={`${weeklyHours}h`} icon={Clock} color="bg-blue-500" />
-        <StatBox label="Total XP" value={stats?.total_xp ?? 0} icon={TrendingUp} color="bg-violet-500" />
+        <StatBox label="Weekly Study" value={`${weeklyHours}h`} icon={Clock} color="bg-navy-600" />
+        <StatBox label="Total XP" value={stats?.total_xp ?? 0} icon={TrendingUp} color="bg-teal-600" />
         <StatBox label="Current Level" value={stats?.level ?? 1} icon={Target} color="bg-emerald-500" />
         <StatBox label="Streak" value={`${stats?.streak_days ?? 0}d`} icon={BookOpen} color="bg-amber-500" />
       </div>
@@ -92,8 +92,8 @@ export default function Analytics() {
             <h3 className="font-semibold text-slate-900 dark:text-white mb-4">Weekly Summary</h3>
             <div className="grid grid-cols-2 gap-4">
               {[
-                { label: 'Total XP This Week', value: analytics?.weekly_summary?.total_xp ?? 0, color: 'text-violet-600 dark:text-violet-400' },
-                { label: 'Study Minutes', value: analytics?.weekly_summary?.total_minutes ?? 0, color: 'text-blue-600 dark:text-blue-400' },
+                { label: 'Total XP This Week', value: analytics?.weekly_summary?.total_xp ?? 0, color: 'text-teal-600 dark:text-teal-400' },
+                { label: 'Study Minutes', value: analytics?.weekly_summary?.total_minutes ?? 0, color: 'text-navy-600 dark:text-navy-300' },
                 { label: 'Current Level', value: analytics?.weekly_summary?.level ?? 1, color: 'text-emerald-600 dark:text-emerald-400' },
                 { label: 'Day Streak', value: `${analytics?.weekly_summary?.streak ?? 0}d`, color: 'text-amber-600 dark:text-amber-400' },
               ].map(item => (
@@ -109,7 +109,7 @@ export default function Analytics() {
           <div className="card p-6">
             <h3 className="font-semibold text-slate-900 dark:text-white mb-4">Level Progress</h3>
             <div className="flex items-center gap-4 mb-6">
-              <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-violet-500 to-blue-600 flex items-center justify-center shadow-lg">
+              <div className="w-20 h-20 rounded-2xl bg-navy-600 flex items-center justify-center shadow-lg">
                 <span className="text-3xl font-black text-white">{stats?.level ?? 1}</span>
               </div>
               <div className="flex-1">

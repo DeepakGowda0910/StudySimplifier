@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import toast from 'react-hot-toast'
-import { Play, Pause, RotateCcw, Check } from 'lucide-react'
+import { Play, Pause, RotateCcw, Check, Flame } from 'lucide-react'
 import { recordPomodoro, getPomodoroStats } from '../../api/planner'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 
 const MODES = [
-  { label: 'Focus', duration: 25, color: '#3b82f6' },
+  { label: 'Focus', duration: 25, color: '#2e4d7a' },
   { label: 'Short Break', duration: 5, color: '#10b981' },
-  { label: 'Long Break', duration: 15, color: '#8b5cf6' },
+  { label: 'Long Break', duration: 15, color: '#0d9488' },
 ]
 
 export default function PomodoroTimer() {
@@ -54,7 +54,7 @@ export default function PomodoroTimer() {
   }, [running])
 
   const handleComplete = async () => {
-    toast.success(modeIdx === 0 ? `Focus session complete! 🍅 +${Math.floor(mode.duration / 5)} XP` : 'Break over! Ready to focus?', { duration: 5000 })
+    toast.success(modeIdx === 0 ? `Focus session complete! +${Math.floor(mode.duration / 5)} XP` : 'Break over! Ready to focus?', { duration: 5000 })
     if (modeIdx === 0) {
       setSessions(s => s + 1)
       try {
@@ -75,10 +75,10 @@ export default function PomodoroTimer() {
   return (
     <div className="max-w-lg mx-auto space-y-6">
       {/* Mode selector */}
-      <div className="flex gap-2 p-1 bg-slate-100 dark:bg-slate-800 rounded-xl">
+      <div className="flex gap-2 p-1 bg-slate-100 dark:bg-navy-800 rounded-xl">
         {MODES.map((m, i) => (
           <button key={i} onClick={() => setModeIdx(i)}
-            className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all ${modeIdx === i ? 'bg-white dark:bg-slate-900 shadow-sm text-slate-900 dark:text-white' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}>
+            className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all ${modeIdx === i ? 'bg-white dark:bg-navy-700 shadow-sm text-slate-900 dark:text-white' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}>
             {m.label}
           </button>
         ))}
@@ -88,7 +88,7 @@ export default function PomodoroTimer() {
       <div className="card p-8 flex flex-col items-center gap-6">
         <div className="relative w-52 h-52">
           <svg className="w-full h-full pomodoro-ring" viewBox="0 0 200 200">
-            <circle cx="100" cy="100" r="90" fill="none" stroke="#f1f5f9" strokeWidth="10" className="dark:[stroke:#1e293b]" />
+            <circle cx="100" cy="100" r="90" fill="none" stroke="#f1f5f9" strokeWidth="10" className="dark:[stroke:#0f1c33]" />
             <motion.circle
               cx="100" cy="100" r="90" fill="none"
               stroke={mode.color} strokeWidth="10"
@@ -124,7 +124,7 @@ export default function PomodoroTimer() {
         {/* Session count */}
         <div className="flex items-center gap-2">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className={`w-3 h-3 rounded-full ${i < sessions % 4 ? 'bg-red-500' : 'bg-slate-200 dark:bg-slate-700'}`} />
+            <div key={i} className={`w-3 h-3 rounded-full ${i < sessions % 4 ? 'bg-navy-600' : 'bg-slate-200 dark:bg-navy-700'}`} />
           ))}
           <span className="text-sm text-slate-500 dark:text-slate-400 ml-2">{sessions} sessions today</span>
         </div>
@@ -136,11 +136,11 @@ export default function PomodoroTimer() {
           <h3 className="font-semibold text-slate-900 dark:text-white mb-3 text-sm">All-time Pomodoro Stats</h3>
           <div className="grid grid-cols-2 gap-3">
             <div className="bg-red-50 dark:bg-red-950 rounded-xl p-3 text-center">
-              <p className="text-2xl font-bold text-red-600 dark:text-red-400">🍅 {stats.total_sessions}</p>
+              <p className="text-2xl font-bold text-red-600 dark:text-red-400 flex items-center justify-center gap-1.5"><Flame size={20} /> {stats.total_sessions}</p>
               <p className="text-xs text-slate-500 mt-1">Total Sessions</p>
             </div>
-            <div className="bg-blue-50 dark:bg-blue-950 rounded-xl p-3 text-center">
-              <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">{Math.floor(stats.total_minutes / 60)}h</p>
+            <div className="bg-navy-50 dark:bg-navy-800 rounded-xl p-3 text-center">
+              <p className="text-2xl font-bold text-navy-600 dark:text-navy-300">{Math.floor(stats.total_minutes / 60)}h</p>
               <p className="text-xs text-slate-500 mt-1">Focus Time</p>
             </div>
           </div>

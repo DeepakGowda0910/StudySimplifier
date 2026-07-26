@@ -6,6 +6,7 @@ from schemas.study import GenerateRequest, ChatRequest
 from middleware.auth import get_current_user
 from services.ai_service import generate_content, build_study_prompt, build_chat_prompt, build_document_prompt, build_socratic_prompt
 from services.gamification import award_xp, auto_check_badges
+from services.retrieval_service import get_grounding_context
 from sqlalchemy import select
 import json
 import io
@@ -57,15 +58,26 @@ async def generate_study_material(
     result = await db.execute(select(UserProfile).where(UserProfile.username == current_user.username))
     profile = result.scalar_one_or_none()
 
+    course = request.course or (profile.course if profile else "")
+    subject = request.subject or ""
+
+    grounding_context = ""
+    if course and subject and request.chapter:
+        grounding_context = await get_grounding_context(
+            db, course=course, subject=subject, chapter=request.chapter,
+            query=f"{request.tool} {request.chapter} {request.topic or ''}",
+        )
+
     prompt = build_study_prompt(
         tool=request.tool,
         chapter=request.chapter,
         topic=request.topic or "",
-        subject=request.subject or "",
-        course=request.course or (profile.course if profile else ""),
+        subject=subject,
+        course=course,
         board=request.board or (profile.board if profile else ""),
         stream=request.stream or (profile.stream if profile else ""),
-        language=request.language
+        language=request.language,
+        grounding_context=grounding_context,
     )
 
     content, model_name = await generate_content(prompt)

@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import toast from 'react-hot-toast'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import { Calendar, Plus, Trash2, Wand2, Timer, ChevronDown, ChevronUp } from 'lucide-react'
+import { Calendar, Plus, Trash2, Wand2, Timer, ChevronDown, ChevronUp, ClipboardList } from 'lucide-react'
 import { getExams, createExam, deleteExam, generatePlan, getPlans } from '../api/planner'
 import PomodoroTimer from '../components/Planner/PomodoroTimer'
 
@@ -39,7 +39,7 @@ export default function Planner() {
     try {
       const subjects = planForm.subjects.split(',').map(s => s.trim()).filter(Boolean)
       await generatePlan({ ...planForm, subjects })
-      toast.success('Study plan generated! +20 XP 🎯')
+      toast.success('Study plan generated! +20 XP')
       qc.invalidateQueries(['plans'])
       setTab('plans')
     } catch { toast.error('Plan generation failed') }
@@ -49,16 +49,16 @@ export default function Planner() {
   return (
     <div className="page-container space-y-6">
       {/* Tabs */}
-      <div className="flex gap-1 p-1 bg-slate-100 dark:bg-slate-800 rounded-xl w-fit">
+      <div className="flex gap-1 p-1 bg-slate-100 dark:bg-navy-800 rounded-xl w-fit">
         {[
-          { id: 'exams', label: '📅 Exam Countdown' },
-          { id: 'planner', label: '🗓️ Generate Plan' },
-          { id: 'plans', label: `📋 My Plans (${plans.length})` },
-          { id: 'pomodoro', label: '🍅 Pomodoro' },
+          { id: 'exams', label: 'Exam Countdown', icon: Calendar },
+          { id: 'planner', label: 'Generate Plan', icon: Wand2 },
+          { id: 'plans', label: `My Plans (${plans.length})`, icon: ClipboardList },
+          { id: 'pomodoro', label: 'Pomodoro', icon: Timer },
         ].map(t => (
           <button key={t.id} onClick={() => setTab(t.id)}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${tab === t.id ? 'bg-white dark:bg-slate-900 shadow-sm text-slate-900 dark:text-white' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}>
-            {t.label}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-1.5 ${tab === t.id ? 'bg-white dark:bg-navy-700 shadow-sm text-slate-900 dark:text-white' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}>
+            <t.icon size={14} /> {t.label}
           </button>
         ))}
       </div>
@@ -128,14 +128,14 @@ export default function Planner() {
           <motion.div key="planner" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
             <div className="card p-6 max-w-xl space-y-4">
               <h3 className="font-semibold text-slate-900 dark:text-white flex items-center gap-2">
-                <Wand2 size={18} className="text-violet-500" /> AI Study Plan Generator
+                <Wand2 size={18} className="text-navy-500" /> AI Study Plan Generator
               </h3>
               <div><label className="label">Exam Name</label><input className="input text-sm" placeholder="e.g. JEE Main 2025" value={planForm.exam_name} onChange={e => setPlanForm(f => ({ ...f, exam_name: e.target.value }))} /></div>
               <div><label className="label">Exam Date</label><input className="input text-sm" type="date" value={planForm.exam_date} onChange={e => setPlanForm(f => ({ ...f, exam_date: e.target.value }))} /></div>
               <div><label className="label">Subjects (comma separated)</label><input className="input text-sm" placeholder="e.g. Physics, Chemistry, Maths" value={planForm.subjects} onChange={e => setPlanForm(f => ({ ...f, subjects: e.target.value }))} /></div>
               <div>
                 <label className="label">Daily Study Hours: {planForm.daily_hours}h</label>
-                <input type="range" min={1} max={12} value={planForm.daily_hours} onChange={e => setPlanForm(f => ({ ...f, daily_hours: +e.target.value }))} className="w-full accent-blue-600" />
+                <input type="range" min={1} max={12} value={planForm.daily_hours} onChange={e => setPlanForm(f => ({ ...f, daily_hours: +e.target.value }))} className="w-full accent-navy-600" />
               </div>
               <button onClick={handleGeneratePlan} disabled={generating} className="btn-primary w-full flex items-center justify-center gap-2">
                 {generating ? <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Generating plan…</> : <><Wand2 size={16} /> Generate Study Plan</>}
@@ -149,7 +149,7 @@ export default function Planner() {
           <motion.div key="plans" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-4">
             {plans.length === 0 ? (
               <div className="card p-12 text-center">
-                <p className="text-4xl mb-3">📋</p>
+                <ClipboardList size={40} className="mx-auto text-slate-300 dark:text-navy-600 mb-3" />
                 <p className="font-semibold text-slate-600 dark:text-slate-400">No study plans yet</p>
                 <p className="text-sm text-slate-400 mt-1">Generate one from the Planner tab</p>
               </div>
@@ -165,7 +165,7 @@ export default function Planner() {
                 <AnimatePresence>
                   {expandedPlan === p.id && (
                     <motion.div initial={{ height: 0 }} animate={{ height: 'auto' }} exit={{ height: 0 }} className="overflow-hidden">
-                      <div className="px-5 pb-5 md-content text-slate-700 dark:text-slate-300 text-sm border-t border-slate-100 dark:border-slate-800 pt-4">
+                      <div className="px-5 pb-5 md-content text-slate-700 dark:text-slate-300 text-sm border-t border-slate-100 dark:border-navy-700 pt-4">
                         <ReactMarkdown remarkPlugins={[remarkGfm]}>{p.content}</ReactMarkdown>
                       </div>
                     </motion.div>

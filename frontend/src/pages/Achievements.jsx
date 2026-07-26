@@ -6,14 +6,14 @@ import { getAchievements } from '../api/user'
 import { getStats } from '../api/user'
 
 const CATEGORY_COLORS = {
-  milestones: 'from-amber-400 to-yellow-500',
-  streaks: 'from-orange-400 to-red-500',
-  levels: 'from-violet-400 to-purple-500',
-  flashcards: 'from-blue-400 to-cyan-500',
-  study: 'from-emerald-400 to-teal-500',
-  content: 'from-pink-400 to-rose-500',
-  focus: 'from-red-400 to-orange-500',
-  notes: 'from-indigo-400 to-blue-500',
+  milestones: 'bg-amber-500',
+  streaks: 'bg-orange-500',
+  levels: 'bg-navy-600',
+  flashcards: 'bg-teal-500',
+  study: 'bg-emerald-500',
+  content: 'bg-pink-500',
+  focus: 'bg-red-500',
+  notes: 'bg-indigo-500',
 }
 
 export default function Achievements() {
@@ -30,7 +30,7 @@ export default function Achievements() {
   return (
     <div className="page-container space-y-6">
       {/* Header */}
-      <div className="card p-6 bg-gradient-to-r from-amber-400 to-yellow-500 text-white">
+      <div className="card p-6 bg-amber-500 text-white">
         <div className="flex items-center gap-4">
           <div className="w-16 h-16 rounded-2xl bg-white/20 flex items-center justify-center">
             <Trophy size={32} />
@@ -69,9 +69,9 @@ export default function Achievements() {
                   className={`card p-4 text-center relative overflow-hidden ${!b.earned ? 'opacity-50 grayscale' : ''}`}
                 >
                   {b.earned && (
-                    <div className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${CATEGORY_COLORS[b.category] || 'from-blue-400 to-violet-400'}`} />
+                    <div className={`absolute inset-x-0 top-0 h-1 ${CATEGORY_COLORS[b.category] || 'bg-navy-500'}`} />
                   )}
-                  <div className={`w-14 h-14 rounded-2xl mx-auto mb-3 flex items-center justify-center text-3xl ${b.earned ? `bg-gradient-to-br ${CATEGORY_COLORS[b.category] || 'from-slate-400 to-slate-500'}` : 'bg-slate-100 dark:bg-slate-800'}`}>
+                  <div className={`w-14 h-14 rounded-2xl mx-auto mb-3 flex items-center justify-center text-3xl ${b.earned ? (CATEGORY_COLORS[b.category] || 'bg-slate-500') : 'bg-slate-100 dark:bg-navy-700'}`}>
                     {b.earned ? b.icon : <Lock size={20} className="text-slate-400" />}
                   </div>
                   <p className="font-semibold text-slate-900 dark:text-white text-sm">{b.name}</p>

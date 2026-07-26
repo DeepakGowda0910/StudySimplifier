@@ -3,11 +3,16 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from database import init_db
 from routers import auth, user, study, flashcards, notes, planner, quiz, agent
+from routers import school_auth, school_admin, school_teacher, school_student
 from config import settings
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await init_db()
+    from services.curriculum_service import seed_curriculum
+    from database import AsyncSessionLocal
+    async with AsyncSessionLocal() as db:
+        await seed_curriculum(db)
     yield
 
 app = FastAPI(
@@ -33,6 +38,10 @@ app.include_router(notes.router, prefix="/api")
 app.include_router(planner.router, prefix="/api")
 app.include_router(quiz.router, prefix="/api")
 app.include_router(agent.router, prefix="/api")
+app.include_router(school_auth.router, prefix="/api")
+app.include_router(school_admin.router, prefix="/api")
+app.include_router(school_teacher.router, prefix="/api")
+app.include_router(school_student.router, prefix="/api")
 
 @app.get("/")
 async def root():

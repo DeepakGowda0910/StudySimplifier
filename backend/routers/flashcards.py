@@ -15,7 +15,7 @@ router = APIRouter(prefix="/flashcards", tags=["flashcards"])
 
 def parse_flashcards(raw_text: str) -> list:
     cards = []
-    pattern = r"CARD\s*\d+\s*\nFRONT:\s*(.*?)\nBACK:\s*(.*?)(?=---|\Z)"
+    pattern = r"CARD\s*\d+\s*\nFRONT:\s*(.*?)\nBACK:\s*(.*?)(?=\n---|\nCARD\s*\d+|\Z)"
     matches = re.findall(pattern, raw_text, re.DOTALL | re.IGNORECASE)
     for front, back in matches:
         if front.strip() and back.strip():

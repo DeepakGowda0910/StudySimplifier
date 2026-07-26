@@ -4,21 +4,21 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { getProfile } from '../api/user'
 import { getSubjects, getTopics, getChapters } from '../api/study'
 import { generateKnowledgeGraph } from '../api/agent'
-import { Network, ChevronDown, Info, Loader2, BookOpen, ZoomIn, ZoomOut } from 'lucide-react'
+import { Network, ChevronDown, Info, Loader2, BookOpen, ZoomIn, ZoomOut, Star, X } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 const MASTERY_COLOR = {
   untouched: '#94a3b8',
   weak: '#ef4444',
   learning: '#f59e0b',
-  strong: '#3b82f6',
+  strong: '#2e4d7a',
   expert: '#10b981',
 }
 const MASTERY_BG = {
-  untouched: 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400',
+  untouched: 'bg-slate-100 text-slate-600 dark:bg-navy-800 dark:text-slate-400',
   weak: 'bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-400',
   learning: 'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-400',
-  strong: 'bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-400',
+  strong: 'bg-navy-100 text-navy-700 dark:bg-navy-800 dark:text-navy-300',
   expert: 'bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-400',
 }
 const CATEGORY_Y = { foundation: 80, core: 220, advanced: 360, application: 480 }
@@ -175,18 +175,20 @@ function GraphCanvas({ nodes, graphWidth }) {
             initial={{ opacity: 0, scale: 0.95, y: 10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0 }}
-            className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white dark:bg-slate-800 rounded-xl p-4 shadow-xl border border-slate-100 dark:border-slate-700 text-sm min-w-56 max-w-xs z-20"
+            className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white dark:bg-navy-800 rounded-xl p-4 shadow-xl border border-slate-100 dark:border-navy-600 text-sm min-w-56 max-w-xs z-20"
           >
-            <button onClick={() => setTooltip(null)} className="absolute top-2 right-2 text-slate-400 hover:text-slate-600 text-xs">✕</button>
+            <button onClick={() => setTooltip(null)} className="absolute top-2 right-2 text-slate-400 hover:text-slate-600"><X size={14} /></button>
             <p className="font-bold text-slate-800 dark:text-slate-200 mb-2">{tooltip.label || tooltip.id}</p>
             <div className="space-y-1">
               <div className="flex justify-between text-xs">
                 <span className="text-slate-500">Category</span>
                 <span className="font-medium capitalize">{tooltip.category}</span>
               </div>
-              <div className="flex justify-between text-xs">
+              <div className="flex justify-between text-xs items-center">
                 <span className="text-slate-500">Difficulty</span>
-                <span className="font-medium">{'⭐'.repeat(tooltip.difficulty || 3)}</span>
+                <span className="font-medium flex items-center gap-0.5">
+                  {[...Array(tooltip.difficulty || 3)].map((_, i) => <Star key={i} size={11} className="fill-amber-400 text-amber-400" />)}
+                </span>
               </div>
               <div className="flex justify-between text-xs">
                 <span className="text-slate-500">Est. Hours</span>
@@ -264,7 +266,7 @@ export default function KnowledgeGraph() {
   return (
     <div className="page-container space-y-6">
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center">
+        <div className="w-10 h-10 rounded-xl bg-navy-600 flex items-center justify-center">
           <Network size={20} className="text-white" />
         </div>
         <div>
@@ -301,21 +303,21 @@ export default function KnowledgeGraph() {
         {Object.entries(MASTERY_BG).map(([k, cls]) => (
           <span key={k} className={`text-xs px-3 py-1 rounded-full font-medium ${cls}`}>{k}</span>
         ))}
-        <span className="text-xs px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500">Scroll to zoom • Drag to pan • Click node for details</span>
+        <span className="text-xs px-3 py-1 rounded-full bg-slate-100 dark:bg-navy-800 text-slate-500">Scroll to zoom • Drag to pan • Click node for details</span>
       </div>
 
       {/* Graph */}
       {generating ? (
         <div className="card p-16 flex flex-col items-center gap-4">
-          <div className="w-14 h-14 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin" />
+          <div className="w-14 h-14 border-4 border-navy-200 border-t-navy-600 rounded-full animate-spin" />
           <p className="text-slate-500 dark:text-slate-400">Building dependency graph with AI…</p>
         </div>
       ) : graphData?.nodes?.length > 0 ? (
         <GraphCanvas nodes={graphData.nodes} graphWidth={graphWidth} />
       ) : (
         <div className="card p-16 flex flex-col items-center gap-4 text-center">
-          <div className="w-16 h-16 rounded-2xl bg-blue-100 dark:bg-blue-950 flex items-center justify-center">
-            <Network size={28} className="text-blue-500" />
+          <div className="w-16 h-16 rounded-2xl bg-navy-100 dark:bg-navy-800 flex items-center justify-center">
+            <Network size={28} className="text-navy-500" />
           </div>
           <div>
             <p className="font-semibold text-slate-800 dark:text-slate-200">No graph yet</p>

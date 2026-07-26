@@ -2,14 +2,14 @@ import React, { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { motion, AnimatePresence } from 'framer-motion'
 import toast from 'react-hot-toast'
-import { Plus, Brain, BookOpen, Trash2, RotateCcw, Layers, Wand2 } from 'lucide-react'
+import { Plus, Brain, BookOpen, Trash2, RotateCcw, Layers, Wand2, PartyPopper, CheckCircle2 } from 'lucide-react'
 import { getAll, getDue, create, generate, review, remove } from '../api/flashcards'
 
 const PERF_BUTTONS = [
   { value: 1, label: 'Again', color: 'bg-red-100 text-red-700 hover:bg-red-200 dark:bg-red-950 dark:text-red-400' },
   { value: 2, label: 'Hard', color: 'bg-orange-100 text-orange-700 hover:bg-orange-200 dark:bg-orange-950 dark:text-orange-400' },
   { value: 3, label: 'Good', color: 'bg-green-100 text-green-700 hover:bg-green-200 dark:bg-green-950 dark:text-green-400' },
-  { value: 4, label: 'Easy', color: 'bg-blue-100 text-blue-700 hover:bg-blue-200 dark:bg-blue-950 dark:text-blue-400' },
+  { value: 4, label: 'Easy', color: 'bg-navy-100 text-navy-700 hover:bg-navy-200 dark:bg-navy-800 dark:text-navy-300' },
 ]
 
 function FlipCard({ card, onReview }) {
@@ -19,15 +19,15 @@ function FlipCard({ card, onReview }) {
       <div className={`flip-card-inner relative w-full h-64 ${flipped ? 'flipped' : ''}`}>
         {/* Front */}
         <div className="flip-card-front absolute inset-0 card p-6 flex flex-col items-center justify-center text-center cursor-pointer" onClick={() => setFlipped(true)}>
-          <p className="text-xs font-semibold text-blue-500 dark:text-blue-400 mb-4 uppercase tracking-wider">
+          <p className="text-xs font-semibold text-navy-600 dark:text-navy-300 mb-4 uppercase tracking-wider">
             {card.subject} {card.chapter ? `· ${card.chapter}` : ''}
           </p>
           <p className="text-lg font-semibold text-slate-900 dark:text-white leading-snug">{card.front_text}</p>
           <p className="text-sm text-slate-400 dark:text-slate-500 mt-6">Tap to reveal answer</p>
         </div>
         {/* Back */}
-        <div className="flip-card-back absolute inset-0 card bg-gradient-to-br from-blue-50 to-violet-50 dark:from-blue-950 dark:to-violet-950 p-6 flex flex-col">
-          <p className="text-xs font-semibold text-violet-500 dark:text-violet-400 mb-3 uppercase tracking-wider">Answer</p>
+        <div className="flip-card-back absolute inset-0 card bg-navy-50 dark:bg-navy-800 p-6 flex flex-col">
+          <p className="text-xs font-semibold text-navy-600 dark:text-navy-300 mb-3 uppercase tracking-wider">Answer</p>
           <p className="text-base text-slate-800 dark:text-slate-200 leading-relaxed flex-1">{card.back_text}</p>
           <div className="flex gap-2 mt-4">
             {PERF_BUTTONS.map(b => (
@@ -76,7 +76,7 @@ export default function Flashcards() {
   const genMutation = useMutation({
     mutationFn: generate,
     onSuccess: (data) => {
-      toast.success(`Generated ${data.created} flashcards! +${data.xp_awarded} XP ✨`)
+      toast.success(`Generated ${data.created} flashcards! +${data.xp_awarded} XP`)
       qc.invalidateQueries(['flashcards-all'])
       qc.invalidateQueries(['stats'])
     }
@@ -93,14 +93,14 @@ export default function Flashcards() {
   return (
     <div className="page-container">
       {/* Tabs */}
-      <div className="flex gap-1 p-1 bg-slate-100 dark:bg-slate-800 rounded-xl w-fit mb-6">
+      <div className="flex gap-1 p-1 bg-slate-100 dark:bg-navy-800 rounded-xl w-fit mb-6">
         {[
           { id: 'review', label: `Review (${due.length})`, icon: Brain },
           { id: 'create', label: 'Create', icon: Plus },
           { id: 'library', label: `Library (${all.length})`, icon: Layers },
         ].map(t => (
           <button key={t.id} onClick={() => setTab(t.id)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${tab === t.id ? 'bg-white dark:bg-slate-900 shadow-sm text-slate-900 dark:text-white' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}>
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${tab === t.id ? 'bg-white dark:bg-navy-700 shadow-sm text-slate-900 dark:text-white' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}>
             <t.icon size={15} /> {t.label}
           </button>
         ))}
@@ -111,16 +111,16 @@ export default function Flashcards() {
         {tab === 'review' && (
           <motion.div key="review" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
             {dueLoading ? (
-              <div className="card p-12 flex items-center justify-center"><div className="w-10 h-10 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin" /></div>
+              <div className="card p-12 flex items-center justify-center"><div className="w-10 h-10 border-4 border-navy-200 border-t-navy-600 rounded-full animate-spin" /></div>
             ) : due.length === 0 ? (
               <div className="card p-12 text-center">
-                <p className="text-4xl mb-4">🎉</p>
+                <PartyPopper size={40} className="mx-auto mb-4 text-teal-500" />
                 <p className="text-xl font-bold text-slate-900 dark:text-white mb-2">All caught up!</p>
                 <p className="text-slate-500 dark:text-slate-400 text-sm">No flashcards due for review today. Come back tomorrow!</p>
               </div>
             ) : doneReview ? (
               <div className="card p-12 text-center">
-                <p className="text-4xl mb-4">✅</p>
+                <CheckCircle2 size={40} className="mx-auto mb-4 text-teal-500" />
                 <p className="text-xl font-bold text-slate-900 dark:text-white mb-2">Session complete!</p>
                 <p className="text-slate-500 dark:text-slate-400 text-sm mb-4">You reviewed {due.length} flashcards.</p>
                 <button onClick={() => setReviewIdx(0)} className="btn-secondary flex items-center gap-2 mx-auto">
@@ -131,8 +131,8 @@ export default function Flashcards() {
               <div className="max-w-xl mx-auto space-y-4">
                 <div className="flex items-center justify-between text-sm text-slate-500 dark:text-slate-400">
                   <span>Card {reviewIdx + 1} of {due.length}</span>
-                  <div className="h-1.5 w-48 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                    <div className="h-full bg-blue-500 rounded-full transition-all" style={{ width: `${(reviewIdx / due.length) * 100}%` }} />
+                  <div className="h-1.5 w-48 bg-slate-100 dark:bg-navy-700 rounded-full overflow-hidden">
+                    <div className="h-full bg-navy-600 rounded-full transition-all" style={{ width: `${(reviewIdx / due.length) * 100}%` }} />
                   </div>
                 </div>
                 <FlipCard card={currentCard} onReview={(id, perf) => reviewMutation.mutate({ id, perf })} />
@@ -162,7 +162,7 @@ export default function Flashcards() {
             {/* AI Generate */}
             <div className="card p-6 space-y-4">
               <h3 className="font-semibold text-slate-900 dark:text-white flex items-center gap-2">
-                <Wand2 size={18} className="text-violet-500" /> AI Generate
+                <Wand2 size={18} className="text-navy-500" /> AI Generate
               </h3>
               <div><label className="label">Subject</label><input className="input text-sm" placeholder="e.g. Chemistry" value={genForm.subject} onChange={e => setGenForm(f => ({ ...f, subject: e.target.value }))} /></div>
               <div><label className="label">Chapter</label><input className="input text-sm" placeholder="e.g. Organic Chemistry" value={genForm.chapter} onChange={e => setGenForm(f => ({ ...f, chapter: e.target.value }))} /></div>
@@ -172,7 +172,7 @@ export default function Flashcards() {
                   {[5,10,15,20].map(n => <option key={n}>{n}</option>)}
                 </select>
               </div>
-              <button onClick={() => genMutation.mutate(genForm)} disabled={!genForm.subject || !genForm.chapter || genMutation.isPending} className="btn-primary w-full flex items-center justify-center gap-2 bg-gradient-to-r from-violet-600 to-blue-600">
+              <button onClick={() => genMutation.mutate(genForm)} disabled={!genForm.subject || !genForm.chapter || genMutation.isPending} className="btn-primary w-full flex items-center justify-center gap-2">
                 {genMutation.isPending ? <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Generating…</> : <><Wand2 size={16} /> Generate with AI</>}
               </button>
             </div>
@@ -188,7 +188,7 @@ export default function Flashcards() {
               </div>
             ) : all.length === 0 ? (
               <div className="card p-12 text-center">
-                <p className="text-4xl mb-4">🃏</p>
+                <Layers size={40} className="mx-auto mb-4 text-slate-300 dark:text-navy-600" />
                 <p className="text-lg font-semibold text-slate-700 dark:text-slate-300">No flashcards yet</p>
                 <p className="text-sm text-slate-400 mt-1">Create some to start studying</p>
               </div>
@@ -197,14 +197,14 @@ export default function Flashcards() {
                 {all.map(card => (
                   <div key={card.id} className="card p-4 group">
                     <div className="flex items-start justify-between mb-2">
-                      <span className="text-xs text-blue-500 dark:text-blue-400 font-medium">{card.subject || 'General'}</span>
+                      <span className="text-xs text-navy-600 dark:text-navy-300 font-medium">{card.subject || 'General'}</span>
                       <button onClick={() => deleteMutation.mutate(card.id)} className="opacity-0 group-hover:opacity-100 transition-opacity btn-ghost p-1 text-red-400 hover:text-red-600">
                         <Trash2 size={14} />
                       </button>
                     </div>
                     <p className="text-sm font-medium text-slate-800 dark:text-slate-200 mb-2 line-clamp-2">{card.front_text}</p>
                     <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2">{card.back_text}</p>
-                    <div className="flex items-center gap-3 mt-3 pt-3 border-t border-slate-100 dark:border-slate-800">
+                    <div className="flex items-center gap-3 mt-3 pt-3 border-t border-slate-100 dark:border-navy-700">
                       <span className="text-xs text-slate-400">Reviews: {card.review_count}</span>
                       <span className="text-xs text-slate-400">Next: {card.next_review_date}</span>
                     </div>
